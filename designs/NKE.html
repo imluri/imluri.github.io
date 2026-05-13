@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nasi Kandar Express | Authentic Malaysian Cuisine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f5f2;
+            scroll-behavior: smooth;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(210,105,30,0.9) 0%, rgba(255,165,0,0.9) 100%);
+        }
+        
+        .menu-item:hover .menu-overlay {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        
+        .menu-overlay {
+            transition: all 0.3s ease;
+        }
+        
+        .announcement-bar {
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        
+        .slide {
+            animation: slide 20s infinite;
+        }
+        
+        @keyframes slide {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-100%); }
+            50% { transform: translateX(-200%); }
+            75% { transform: translateX(-300%); }
+            100% { transform: translateX(0); }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Announcement Bar -->
+    <div class="announcement-bar bg-orange-600 text-white text-center py-2 px-4">
+        <div class="container mx-auto">
+            <p class="text-sm md:text-base font-medium">
+                <span class="inline-block mr-2"><i class="fas fa-star"></i></span>
+                New! Try Our Special Nasi Kandar Combo - Only RM15.90!
+                <span class="inline-block ml-2"><i class="fas fa-star"></i></span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-amber-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <img src="NKE_logo.jpg" alt="NKE Logo" class="h-8 w-8 rounded-full object-cover">
+                    <a href="#" class="text-2xl font-bold">Nasi Kandar<span class="text-orange-400">Express</span></a>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button class="outline-none mobile-menu-button">
+                        <svg class="w-6 h-6 text-orange-300 hover:text-orange-100"
+                            x-show="!showMenu"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-orange-100 hover:text-white font-medium transition">Home</a>
+                    <a href="#menu" class="text-orange-100 hover:text-white font-medium transition">Menu</a>
+                    <a href="#about" class="text-orange-100 hover:text-white font-medium transition">About</a>
+                    <a href="#gallery" class="text-orange-100 hover:text-white font-medium transition">Gallery</a>
+                    <a href="#contact" class="text-orange-100 hover:text-white font-medium transition">Contact</a>
+                    <a href="#reservation" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full font-medium transition-all transform hover:scale-105">Reservations</a>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div class="mobile-menu hidden md:hidden bg-amber-800 pb-4">
+                <a href="#" class="block py-2 px-4 text-orange-100 hover:bg-amber-700">Home</a>
+                <a href="#menu" class="block py-2 px-4 text-orange-100 hover:bg-amber-700">Menu</a>
+                <a href="#about" class="block py-2 px-4 text-orange-100 hover:bg-amber-700">About</a>
+                <a href="#gallery" class="block py-2 px-4 text-orange-100 hover:bg-amber-700">Gallery</a>
+                <a href="#contact" class="block py-2 px-4 text-orange-100 hover:bg-amber-700">Contact</a>
+                <a href="#reservation" class="block py-2 px-4 text-center bg-orange-500 text-white rounded mx-4 mt-2">Reservations</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Banner Slider -->
+    <div class="relative overflow-hidden h-screen">
+        <div class="absolute inset-0 bg-black opacity-40 z-10"></div>
+        <div class="flex slide h-full w-full">
+            <!-- Slide 1 -->
+            <div class="min-w-full h-full bg-[url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1674&q=80')] bg-cover bg-center"></div>
+            <!-- Slide 2 -->
+            <div class="min-w-full h-full bg-[url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80')] bg-cover bg-center"></div>
+            <!-- Slide 3 -->
+            <div class="min-w-full h-full bg-[url('https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80')] bg-cover bg-center"></div>
+            <!-- Slide 4 -->
+            <div class="min-w-full h-full bg-[url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80')] bg-cover bg-center"></div>
+        </div>
+        
+        <div class="absolute inset-0 flex items-center justify-center z-20">
+            <div class="text-center px-4">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4">
+                    Taste the <span class="text-orange-400">Authentic</span> Nasi Kandar
+                </h1>
+                <p class="text-xl md:text-2xl text-orange-100 mb-8 max-w-2xl mx-auto">
+                    Experience the rich flavors of traditional Malaysian Nasi Kandar with our authentic recipes and fresh ingredients
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="#menu" class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full font-bold text-lg transition-all transform hover:scale-105 shadow-lg">
+                        View Menu
+                    </a>
+                    <a href="#reservation" class="bg-transparent border-2 border-orange-400 hover:bg-orange-400 text-white px-8 py-3 rounded-full font-bold text-lg transition-all transform hover:scale-105 shadow-lg">
+                        Book a Table
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-8 left-0 right-0 flex justify-center z-20">
+            <div class="flex space-x-2">
+                <div class="w-3 h-3 rounded-full bg-orange-400"></div>
+                <div class="w-3 h-3 rounded-full bg-orange-200 opacity-50"></div>
+                <div class="w-3 h-3 rounded-full bg-orange-200 opacity-50"></div>
+                <div class="w-3 h-3 rounded-full bg-orange-200 opacity-50"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Special Offers -->
+    <div class="py-12 bg-amber-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-amber-900 mb-4">
+                    Today's <span class="text-orange-500">Special</span> Offers
+                </h2>
+                <div class="w-24 h-1 bg-orange-500 mx-auto"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Offer 1 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Special Steak" class="w-full h-64 object-cover">
+                        <div class="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                            20% OFF
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-amber-900 mb-2">Nasi Kandar Special</h3>
+                        <p class="text-gray-600 mb-4">Complete meal with rice, curry chicken, beef rendang and vegetables</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-orange-500 font-bold text-xl">RM12.90</span>
+                            <span class="text-gray-400 line-through text-sm">RM15.90</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Offer 2 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1371&q=80" alt="Mee Goreng" class="w-full h-64 object-cover">
+                        <div class="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                            COMBO
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-amber-900 mb-2">Mee Goreng Combo</h3>
+                        <p class="text-gray-600 mb-4">Spicy fried noodles with chicken and vegetables, served with drink</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-orange-500 font-bold text-xl">RM9.50</span>
+                            <span class="text-gray-400 line-through text-sm">RM11.00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Offer 3 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1381&q=80" alt="Dessert Special" class="w-full h-64 object-cover">
+                        <div class="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                            FREE
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-amber-900 mb-2">Teh Tarik</h3>
+                        <p class="text-gray-600 mb-4">Free traditional milk tea with any meal order above RM15</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-orange-500 font-bold text-xl">FREE</span>
+                            <span class="text-gray-400 line-through text-sm">RM3.50</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <div id="about" class="py-16 bg-amber-900 text-white">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row items-center">
+                <div class="lg:w-1/2 mb-12 lg:mb-0 lg:pr-12">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-6">
+                        Our <span class="text-orange-300">Story</span>
+                    </h2>
+                    <p class="text-orange-100 mb-6">
+                        Founded with a passion for authentic Malaysian cuisine, Nasi Kandar Express brings you the traditional flavors of Penang's famous Nasi Kandar. Our recipes have been passed down through generations, ensuring every dish maintains its authentic taste.
+                    </p>
+                    <p class="text-orange-100 mb-6">
+                        From our signature curries to perfectly cooked rice, we use only the finest spices and ingredients to create an unforgettable dining experience that transports you straight to the streets of Malaysia.
+                    </p>
+                    <div class="flex space-x-4">
+                        <div class="bg-orange-500 text-white p-4 rounded-lg text-center flex-1">
+                            <i class="fas fa-award text-2xl mb-2"></i>
+                            <h4 class="font-bold">Award Winning</h4>
+                            <p class="text-sm">5 Years in a Row</p>
+                        </div>
+                        <div class="bg-amber-800 text-white p-4 rounded-lg text-center flex-1">
+                            <i class="fas fa-utensils text-2xl mb-2"></i>
+                            <h4 class="font-bold">100+ Dishes</h4>
+                            <p class="text-sm">Global Cuisine</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 relative">
+                    <div class="relative rounded-xl overflow-hidden shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1674&q=80" alt="Restaurant Interior" class="w-full h-96 object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent to-black opacity-30"></div>
+                        <div class="absolute top-4 left-4 bg-orange-500 text-white px-4 py-2 rounded-full">
+                            <span class="font-bold">Since 2010</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Section -->
+    <div id="menu" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-amber-900 mb-4">
+                    Our <span class="text-orange-500">Menu</span>
+                </h2>
+                <div class="w-24 h-1 bg-orange-500 mx-auto mb-4"></div>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    Discover our carefully curated selection of dishes, crafted with passion and the finest ingredients
+                </p>
+            </div>
+            
+            <div class="flex justify-center mb-8">
+                <div class="bg-amber-100 rounded-full p-1 flex">
+                    <button class="menu-tab active bg-orange-500 text-white px-6 py-2 rounded-full font-medium transition-all" data-tab="nasicandar">Nasi Kandar</button>
+                    <button class="menu-tab text-amber-900 px-6 py-2 rounded-full font-medium transition-all hover:bg-orange-100" data-tab="meegoreng">Mee & Kuey Teow</button>
+                    <button class="menu-tab text-amber-900 px-6 py-2 rounded-full font-medium transition-all hover:bg-orange-100" data-tab="roticanai">Roti & Bread</button>
+                    <button class="menu-tab text-amber-900 px-6 py-2 rounded-full font-medium transition-all hover:bg-orange-100" data-tab="beverages">Beverages</button>
+                </div>
+            </div>
+            
+            <!-- Nasi Kandar -->
+            <div id="nasicandar" class="menu-category">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Nasi Kandar Ayam" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Nasi Kandar Ayam</h3>
+                            <p class="text-gray-600 mb-3">Fragrant rice with curry chicken, boiled egg and vegetables</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM8.50</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1558030006-450675393462?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Nasi Kandar Daging" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Nasi Kandar Daging</h3>
+                            <p class="text-gray-600 mb-3">Steamed rice with tender beef curry and mixed vegetables</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM12.00</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Nasi Kandar Ikan" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Nasi Kandar Ikan</h3>
+                            <p class="text-gray-600 mb-3">Aromatic rice with fish curry and traditional condiments</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM10.50</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Nasi Kandar Kambing" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Nasi Kandar Kambing</h3>
+                            <p class="text-gray-600 mb-3">Special rice with spicy mutton curry and pickled vegetables</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM13.50</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1541014741259-de529411b96a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Nasi Kandar Mixed" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Nasi Kandar Mixed</h3>
+                            <p class="text-gray-600 mb-3">Rice with assorted curries - chicken, beef and vegetables</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM15.90</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1625938145312-70245e2b6396?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Nasi Kandar Sotong" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Nasi Kandar Sotong</h3>
+                            <p class="text-gray-600 mb-3">Fragrant rice with spicy squid curry and boiled egg</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM11.50</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mee & Kuey Teow (hidden by default) -->
+            <div id="meegoreng" class="menu-category hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Mee Goreng" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Mee Goreng Mamak</h3>
+                            <p class="text-gray-600 mb-3">Spicy fried yellow noodles with chicken, prawns and vegetables</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM7.50</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Char Kuey Teow" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Char Kuey Teow</h3>
+                            <p class="text-gray-600 mb-3">Wok-fried flat rice noodles with prawns, cockles and bean sprouts</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM8.50</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1558030006-450675393462?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Mee Curry" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Mee Curry</h3>
+                            <p class="text-gray-600 mb-3">Yellow noodles in rich coconut curry with chicken and potatoes</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM8.00</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Maggi Goreng" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Maggi Goreng</h3>
+                            <p class="text-gray-600 mb-3">Fried instant noodles with egg, vegetables and spicy sauce</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM6.50</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1625938145312-70245e2b6396?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Bihun Goreng" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Bihun Goreng</h3>
+                            <p class="text-gray-600 mb-3">Stir-fried rice vermicelli with chicken and mixed vegetables</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM7.00</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Roti & Bread (hidden by default) -->
+            <div id="roticanai" class="menu-category hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Roti Canai" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Roti Canai</h3>
+                            <p class="text-gray-600 mb-3">Flaky flatbread served with dal curry and sambal</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM1.50</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Roti Telur" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Roti Telur</h3>
+                            <p class="text-gray-600 mb-3">Roti canai with egg, served with curry and sambal</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM2.50</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1488477181946-6428a0291777?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Roti Bawang" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Roti Bawang</h3>
+                            <p class="text-gray-600 mb-3">Roti canai with onions, perfect with spicy curry</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM2.00</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1541014741259-de529411b96a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Roti Boom" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Roti Boom</h3>
+                            <p class="text-gray-600 mb-3">Crispy multi-layered roti with condensed milk or curry</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM3.00</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Chapati" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Chapati</h3>
+                            <p class="text-gray-600 mb-3">Thin unleavened bread served with dal and vegetable curry</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM1.80</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Beverages (hidden by default) -->
+            <div id="beverages" class="menu-category hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1544145945-f90425340c7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Teh Tarik" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Teh Tarik</h3>
+                            <p class="text-gray-600 mb-3">Traditional pulled milk tea, sweet and frothy</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM2.50</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Kopi O" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Kopi O</h3>
+                            <p class="text-gray-600 mb-3">Strong black coffee sweetened with sugar</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM2.00</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1497636577773-f1231844b336?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Milo Ais" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Milo Ais</h3>
+                            <p class="text-gray-600 mb-3">Iced chocolate malt drink, Malaysia's favorite</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM3.00</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1544145945-f90425340c7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Teh O Ais Limau" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Teh O Ais Limau</h3>
+                            <p class="text-gray-600 mb-3">Iced lemon tea, refreshing and tangy</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM2.80</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Sirap Bandung" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Sirap Bandung</h3>
+                            <p class="text-gray-600 mb-3">Pink rose syrup with condensed milk, sweet and creamy</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM3.20</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-amber-50 rounded-xl overflow-hidden shadow-lg transform transition-all hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1497636577773-f1231844b336?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Fresh Orange Juice" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-amber-900 mb-2">Fresh Orange Juice</h3>
+                            <p class="text-gray-600 mb-3">Freshly squeezed orange juice, vitamin C packed</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-orange-500 font-bold text-lg">RM4.50</span>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Section -->
+    <div id="gallery" class="py-16 bg-amber-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-amber-900 mb-4">
+                    Our <span class="text-orange-500">Gallery</span>
+                </h2>
+                <div class="w-24 h-1 bg-orange-500 mx-auto mb-4"></div>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    Take a glimpse into our restaurant atmosphere and delicious creations
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="relative overflow-hidden rounded-xl shadow-lg transform transition-all hover:scale-105">
+                    <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Restaurant Interior" class="w-full h-64 object-cover">
+                    <div class="absolute inset-0 bg-black opacity-0 hover:opacity-50 transition-opacity flex items-center justify-center">
+                        <i class="fas fa-search-plus text-white text-2xl"></i>
+                    </div>
+                </div>
+                
+                <div class="relative overflow-hidden rounded-xl shadow-lg transform transition-all hover:scale-105">
+                    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Chef Cooking" class="w-full h-64 object-cover">
+                    <div class="absolute inset-0 bg-black opacity-0 hover:opacity-50 transition-opacity flex items-center justify-center">
+                        <i class="fas fa-search-plus text-white text-2xl"></i>
+                    </div>
+                </div>
+                
+                <div class="relative overflow-hidden rounded-xl shadow-lg transform transition-all hover:scale-105">
+                    <img src="https://images.unsplash.com/photo-1590577976322-3d2d6e2130d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Food Plating" class="w-full h-64 object-cover">
+                    <div class="absolute inset-0 bg-black opacity-0 hover:opacity-50 transition-opacity flex items-center justify-center">
+                        <i class="fas fa-search-plus text-white text-2xl"></i>
+                    </div>
+                </div>
+                
+                <div class="relative overflow-hidden rounded-xl shadow-lg transform transition-all hover:scale-105">
+                    <img src="https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Dining Area" class="w-full h-64 object-cover">
+                    <div class="absolute inset-0 bg-black opacity-0 hover:opacity-50 transition-opacity flex items-center justify-center">
+                        <i class="fas fa-search-plus text-white text-2xl"></i>
+                    </div>
+                </div>
+                
+                <div class="relative overflow-hidden rounded-xl shadow-lg transform transition-all hover:scale-105">
+                    <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Wine Selection" class="w-full h-64 object-cover">
+                    <div class="absolute inset-0 bg-black opacity-0 hover:opacity-50 transition-opacity flex items-center justify-center">
+                        <i class="fas fa-search-plus text-white text-2xl"></i>
+                    </div>
+                </div>
+                
+                <div class="relative overflow-hidden rounded-xl shadow-lg transform transition-all hover:scale-105">
+                    <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Private Dining" class="w-full h-64 object-cover">
+                    <div class="absolute inset-0 bg-black opacity-0 hover:opacity-50 transition-opacity flex items-center justify-center">
+                        <i class="fas fa-search-plus text-white text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reservation Section -->
+    <div id="reservation" class="py-16 bg-amber-900 text-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    Make a <span class="text-orange-300">Reservation</span>
+                </h2>
+                <div class="w-24 h-1 bg-orange-500 mx-auto mb-4"></div>
+                <p class="text-orange-100 max-w-2xl mx-auto">
+                    Book your table now and experience our exceptional dining
+                </p>
+            </div>
+            
+            <div class="max-w-2xl mx-auto">
+                <form class="bg-amber-800 rounded-xl p-8 shadow-2xl">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-orange-100 text-sm font-bold mb-2">Name</label>
+                            <input type="text" class="w-full px-4 py-3 rounded-lg bg-amber-700 text-white placeholder-orange-200 border border-amber-600 focus:border-orange-500 focus:outline-none" placeholder="Your Name">
+                        </div>
+                        <div>
+                            <label class="block text-orange-100 text-sm font-bold mb-2">Email</label>
+                            <input type="email" class="w-full px-4 py-3 rounded-lg bg-amber-700 text-white placeholder-orange-200 border border-amber-600 focus:border-orange-500 focus:outline-none" placeholder="your@email.com">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <label class="block text-orange-100 text-sm font-bold mb-2">Date</label>
+                            <input type="date" class="w-full px-4 py-3 rounded-lg bg-amber-700 text-white border border-amber-600 focus:border-orange-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-orange-100 text-sm font-bold mb-2">Time</label>
+                            <select class="w-full px-4 py-3 rounded-lg bg-amber-700 text-white border border-amber-600 focus:border-orange-500 focus:outline-none">
+                                <option>6:00 PM</option>
+                                <option>6:30 PM</option>
+                                <option>7:00 PM</option>
+                                <option>7:30 PM</option>
+                                <option>8:00 PM</option>
+                                <option>8:30 PM</option>
+                                <option>9:00 PM</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-orange-100 text-sm font-bold mb-2">Guests</label>
+                            <select class="w-full px-4 py-3 rounded-lg bg-amber-700 text-white border border-amber-600 focus:border-orange-500 focus:outline-none">
+                                <option>1 Guest</option>
+                                <option>2 Guests</option>
+                                <option>3 Guests</option>
+                                <option>4 Guests</option>
+                                <option>5 Guests</option>
+                                <option>6+ Guests</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-orange-100 text-sm font-bold mb-2">Special Requests</label>
+                        <textarea rows="4" class="w-full px-4 py-3 rounded-lg bg-amber-700 text-white placeholder-orange-200 border border-amber-600 focus:border-orange-500 focus:outline-none" placeholder="Any special requests or dietary requirements..."></textarea>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full font-bold text-lg transition-all transform hover:scale-105 shadow-lg">
+                            Reserve Table
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div id="contact" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-amber-900 mb-4">
+                    Get in <span class="text-orange-500">Touch</span>
+                </h2>
+                <div class="w-24 h-1 bg-orange-500 mx-auto mb-4"></div>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    We'd love to hear from you. Contact us for any questions or feedback
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div>
+                    <div class="space-y-8">
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-orange-500 text-white p-3 rounded-full">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-amber-900 text-lg mb-2">Address</h3>
+                                <p class="text-gray-600">123 Jalan Mamak<br>Kuala Lumpur, 50000</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-orange-500 text-white p-3 rounded-full">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-amber-900 text-lg mb-2">Phone</h3>
+                                <p class="text-gray-600">+603-1234-5678</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-orange-500 text-white p-3 rounded-full">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-amber-900 text-lg mb-2">Email</h3>
+                                <p class="text-gray-600">info@nke.com.my</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="bg-orange-500 text-white p-3 rounded-full">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-amber-900 text-lg mb-2">Hours</h3>
+                                <p class="text-gray-600">
+                                    Daily: 7:00 AM - 11:00 PM<br>
+                                    Open 7 days a week<br>
+                                    Peak hours: 12PM-2PM, 7PM-9PM
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <form class="bg-amber-50 rounded-xl p-8 shadow-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-amber-900 text-sm font-bold mb-2">Name</label>
+                                <input type="text" class="w-full px-4 py-3 rounded-lg border border-amber-200 focus:border-orange-500 focus:outline-none" placeholder="Your Name">
+                            </div>
+                            <div>
+                                <label class="block text-amber-900 text-sm font-bold mb-2">Email</label>
+                                <input type="email" class="w-full px-4 py-3 rounded-lg border border-amber-200 focus:border-orange-500 focus:outline-none" placeholder="your@email.com">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="block text-amber-900 text-sm font-bold mb-2">Subject</label>
+                            <input type="text" class="w-full px-4 py-3 rounded-lg border border-amber-200 focus:border-orange-500 focus:outline-none" placeholder="Subject">
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="block text-amber-900 text-sm font-bold mb-2">Message</label>
+                            <textarea rows="5" class="w-full px-4 py-3 rounded-lg border border-amber-200 focus:border-orange-500 focus:outline-none" placeholder="Your message..."></textarea>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full font-bold text-lg transition-all transform hover:scale-105 shadow-lg">
+                                Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-amber-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <img src="NKE_logo.jpg" alt="NKE Logo" class="h-8 w-8 rounded-full object-cover">
+                        <span class="text-2xl font-bold">Nasi Kandar<span class="text-orange-400">Express</span></span>
+                    </div>
+                    <p class="text-orange-100 mb-4">
+                        Experience authentic Malaysian Nasi Kandar flavors and traditional recipes in our cozy restaurant.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-orange-300 hover:text-white text-xl transition"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-orange-300 hover:text-white text-xl transition"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-orange-300 hover:text-white text-xl transition"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-orange-300 hover:text-white text-xl transition"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-orange-100 hover:text-white transition">Home</a></li>
+                        <li><a href="#menu" class="text-orange-100 hover:text-white transition">Menu</a></li>
+                        <li><a href="#about" class="text-orange-100 hover:text-white transition">About</a></li>
+                        <li><a href="#gallery" class="text-orange-100 hover:text-white transition">Gallery</a></li>
+                        <li><a href="#contact" class="text-orange-100 hover:text-white transition">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Contact Info</h3>
+                    <ul class="space-y-2 text-orange-100">
+                        <li><i class="fas fa-map-marker-alt mr-2"></i>123 Jalan Mamak, KL</li>
+                        <li><i class="fas fa-phone mr-2"></i>+603-1234-5678</li>
+                        <li><i class="fas fa-envelope mr-2"></i>info@nke.com.my</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Newsletter</h3>
+                    <p class="text-orange-100 mb-4">Subscribe to get special offers and updates</p>
+                    <div class="flex">
+                        <input type="email" placeholder="Your email" class="flex-1 px-4 py-2 rounded-l-lg bg-amber-800 text-white placeholder-orange-200 border border-amber-700 focus:outline-none">
+                        <button class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-r-lg transition">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-amber-700 mt-8 pt-8 text-center">
+                <p class="text-orange-100">
+                    &copy; 2025 Nasi Kandar Express. All rights reserved. | Authentic Malaysian Cuisine ❤️
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Mobile Menu and Menu Tabs -->
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Menu tab functionality
+        const menuTabs = document.querySelectorAll('.menu-tab');
+        const menuCategories = document.querySelectorAll('.menu-category');
+        
+        menuTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                menuTabs.forEach(t => {
+                    t.classList.remove('active', 'bg-orange-500', 'text-white');
+                    t.classList.add('text-amber-900');
+                });
+                
+                // Add active class to clicked tab
+                tab.classList.add('active', 'bg-orange-500', 'text-white');
+                tab.classList.remove('text-amber-900');
+                
+                // Hide all menu categories
+                menuCategories.forEach(category => {
+                    category.classList.add('hidden');
+                });
+                
+                // Show selected category
+                const targetCategory = document.getElementById(tab.dataset.tab);
+                if (targetCategory) {
+                    targetCategory.classList.remove('hidden');
+                }
+            });
+        });
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // Close mobile menu if open
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+        
+        // Add scroll effect to navbar
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                navbar.classList.add('shadow-xl');
+            } else {
+                navbar.classList.remove('shadow-xl');
+            }
+        });
+    </script>
+</body>
+</html>

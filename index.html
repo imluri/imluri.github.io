@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>imluri</title>
+  <meta name="description" content="imluri — developer of AI tools, Chrome extensions, Android utilities, and web applications. Creator of Chessist, APK Toolkit, and more.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
+</head>
+<body>
+  <!-- Background Layers -->
+  <div class="bg-layer bg-radial"></div>
+  <div class="bg-layer bg-noise"></div>
+  <div class="bg-layer bg-grid"></div>
+  <div class="bg-layer">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="container">
+      <a href="/" class="logo" data-route>imluri</a>
+      <ul class="nav-links">
+        <li><a href="/" data-route>Home</a></li>
+        <li><a href="/projects" data-route>Projects</a></li>
+      </ul>
+      <button class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle menu">
+        <iconify-icon class="menu-open-icon" icon="mdi:menu" width="24" height="24"></iconify-icon>
+        <iconify-icon class="menu-close-icon" icon="mdi:close" width="24" height="24"></iconify-icon>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="/" data-route>Home</a>
+    <a href="/projects" data-route>Projects</a>
+  </div>
+
+  <!-- Page content swapped here by router -->
+  <main id="app"></main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p class="footer-text">© 2026 imluri. All rights reserved.</p>
+      <div class="social-links">
+        <a href="https://github.com/imluri" target="_blank" rel="noopener">
+          <iconify-icon icon="mdi:github" width="18" height="18"></iconify-icon>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/projects.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/router.js"></script>
+</body>
+</html>

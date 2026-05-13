@@ -1,0 +1,125 @@
+<!-- Projects listing page -->
+<section class="page-hero">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-label">// PROJECTS</p>
+      <h2 class="gradient-text">Featured Work</h2>
+      <p class="section-description">A collection of projects showcasing my skills in development, AI integration, and tool creation.</p>
+    </div>
+    <div class="bento-grid" id="projects-grid"></div>
+  </div>
+</section>
+
+<section class="tools-section">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-label">// HOBBIES</p>
+      <h2 class="gradient-text">Games & Mods</h2>
+      <p class="section-description">What I do for fun — Unity C# cheats, game development, and Roblox scripting.</p>
+    </div>
+    <div class="bento-grid" id="hobbies-grid"></div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-header">
+      <p class="section-label">// TOOLS</p>
+      <h2 class="gradient-text">Tools & Experiments</h2>
+      <p class="section-description">Utilities, experiments, and developer-focused side projects.</p>
+    </div>
+    <div class="bento-grid" id="tools-grid"></div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-header">
+      <p class="section-label">// DESIGNS</p>
+      <h2 class="gradient-text">Web Designs</h2>
+      <p class="section-description">UI/UX concepts and website designs made for fun — click any card to open a live preview.</p>
+    </div>
+    <div class="bento-grid" id="designs-grid"></div>
+  </div>
+</section>
+
+<!-- Design preview modal -->
+<div id="design-modal" style="display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
+  <div class="design-modal-inner">
+    <div class="design-modal-bar">
+      <span id="design-modal-title" style="font-weight:600; font-size:0.9375rem;"></span>
+      <button id="design-modal-close" class="btn btn-secondary" style="padding:8px 16px; font-size:0.8125rem;">
+        <iconify-icon icon="mdi:close" width="16" height="16"></iconify-icon>
+        Close
+      </button>
+    </div>
+    <div style="position:relative; flex:1; background:#000;">
+      <div id="design-modal-spinner" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:10;">
+        <iconify-icon icon="mdi:loading" width="40" height="40" style="color:var(--accent);animation:spin 1s linear infinite;"></iconify-icon>
+      </div>
+      <iframe id="design-modal-iframe" src="about:blank" style="width:100%;height:100%;border:none;display:block;"></iframe>
+    </div>
+  </div>
+</div>
+
+<style>
+  .design-modal-inner {
+    width: 92%;
+    max-width: 1100px;
+    height: 85vh;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .design-modal-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border-default);
+    background: var(--bg-elevated);
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<script>
+  renderAll();
+
+  // Design modal logic
+  (function () {
+    const modal   = document.getElementById('design-modal');
+    const iframe  = document.getElementById('design-modal-iframe');
+    const title   = document.getElementById('design-modal-title');
+    const close   = document.getElementById('design-modal-close');
+    const spinner = document.getElementById('design-modal-spinner');
+
+    function openModal(src, name) {
+      spinner.style.display = 'flex';
+      iframe.src = src;
+      title.textContent = name;
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+      iframe.src = 'about:blank';
+      document.body.style.overflow = '';
+    }
+
+    iframe.addEventListener('load', () => setTimeout(() => spinner.style.display = 'none', 150));
+    close.addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    // Delegate design card clicks
+    document.getElementById('designs-grid').addEventListener('click', e => {
+      const card = e.target.closest('[data-design-src]');
+      if (!card) return;
+      openModal(card.dataset.designSrc, card.dataset.designName);
+    });
+  })();
+</script>
