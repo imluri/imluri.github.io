@@ -817,6 +817,51 @@ h2 {
   border-color: rgba(94,106,210,0.25);
 }
 
+/* Floating tech icons — hero bento card */
+.floating-icons {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.fi {
+  position: absolute;
+  opacity: 0.22;
+  filter: saturate(0.7);
+  transition: opacity 0.3s ease;
+}
+
+.bento-card:hover .fi { opacity: 0.38; }
+
+@keyframes fiFloat {
+  0%,100% { transform: translateY(0px) rotate(0deg); }
+  50%      { transform: translateY(-10px) rotate(4deg); }
+}
+@keyframes fiFloatB {
+  0%,100% { transform: translateY(0px) rotate(0deg); }
+  40%     { transform: translateY(-14px) rotate(-5deg); }
+  80%     { transform: translateY(-6px) rotate(3deg); }
+}
+@keyframes fiFloatC {
+  0%,100% { transform: translateY(0px) rotate(0deg); }
+  33%     { transform: translateY(-8px) rotate(-3deg); }
+  66%     { transform: translateY(-12px) rotate(5deg); }
+}
+
+.fi-1  { top: 12%; left:  4%; animation: fiFloat  5.2s ease-in-out infinite 0.0s; }
+.fi-2  { top: 40%; left: 12%; animation: fiFloatB 6.1s ease-in-out infinite 0.7s; }
+.fi-3  { top:  8%; left: 24%; animation: fiFloatC 5.8s ease-in-out infinite 1.1s; }
+.fi-4  { top: 52%; left: 33%; animation: fiFloat  6.5s ease-in-out infinite 0.4s; }
+.fi-5  { top: 14%; left: 45%; animation: fiFloatB 5.5s ease-in-out infinite 1.5s; }
+.fi-6  { top: 42%; left: 54%; animation: fiFloatC 6.8s ease-in-out infinite 0.9s; }
+.fi-7  { top:  6%; left: 64%; animation: fiFloat  5.0s ease-in-out infinite 0.3s; }
+.fi-8  { top: 48%; left: 73%; animation: fiFloatB 6.3s ease-in-out infinite 1.8s; }
+.fi-9  { top: 18%; left: 80%; animation: fiFloatC 5.7s ease-in-out infinite 0.6s; }
+.fi-10 { top: 60%; left: 88%; animation: fiFloat  6.0s ease-in-out infinite 1.3s; }
+.fi-11 { top: 28%; left: 92%; animation: fiFloatB 5.4s ease-in-out infinite 2.1s; }
+.fi-12 { top: 70%; left: 20%; animation: fiFloatC 6.6s ease-in-out infinite 0.2s; }
+
 /* Bento card decorative bg icon */
 .bento-bg-icon {
   position: absolute;

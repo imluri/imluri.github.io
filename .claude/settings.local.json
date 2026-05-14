@@ -17,7 +17,9 @@
       "Bash(cp \"C:/Users/luri/Downloads/old_computers/textures/Texture_baseColor.jpeg\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/computers_textures/Texture_baseColor.jpeg\")",
       "Bash(cp \"C:/Users/luri/Downloads/old_computers/scene.gltf\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/computers/scene.gltf\")",
       "Bash(cp \"C:/Users/luri/Downloads/old_computers/scene.bin\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/computers/scene.bin\")",
-      "Bash(cp \"C:/Users/luri/Downloads/old_computers/textures/Texture_baseColor.jpeg\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/computers/textures/Texture_baseColor.jpeg\")"
+      "Bash(cp \"C:/Users/luri/Downloads/old_computers/textures/Texture_baseColor.jpeg\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/computers/textures/Texture_baseColor.jpeg\")",
+      "Bash(cmdkey /list)",
+      "Bash(findstr \"github\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\luri\\Downloads\\lurimous.github.io-main\\assets"
