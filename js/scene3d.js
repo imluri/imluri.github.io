@@ -46,7 +46,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     girl.scale.setScalar(scale);
     girl.position.sub(centre.multiplyScalar(scale));
     girl.position.x += 1.7;
-    girl.position.y -= 3;
+    girl.position.y += -3;
     girlBaseX = girl.position.x;
     girlBaseY = girl.position.y;
     girl.rotation.y = -0.25;
@@ -110,12 +110,18 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     currentPage = window.location.pathname;
     scrollY = 0;
     smoothScrollY = 0;
+
+    // Fade out fast
+    canvas.style.transition = 'opacity 0.3s ease';
     canvas.style.opacity = '0';
+
+    // After fade-out completes, swap model and fade back in slowly
     setTimeout(() => {
       if (girl)      girl.visible      = currentPage === '/';
       if (computers) computers.visible = currentPage === '/projects';
+      canvas.style.transition = 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
       canvas.style.opacity = currentPage === '/projects' ? '0.18' : '1';
-    }, 180);
+    }, 320);
   }
 
   // ── Animate ─────────────────────────────────────────────────
@@ -132,7 +138,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
       smoothScrollY += (scrollY - smoothScrollY) * 0.06;
       girl.position.x = girlBaseX + smoothScrollY * 0.01;
       girl.position.y = girlBaseY + Math.sin(t * 0.6) * 0.04;
-      girl.rotation.y = -0.25 + Math.sin(t * 0.35) * 0.06;
+      const scrollTurn = Math.min(smoothScrollY * 0.0008, 0.5);
+      girl.rotation.y = -0.25 + -scrollTurn + Math.sin(t * 0.35) * 0.06;
     }
 
     if (computers && computers.visible) {
