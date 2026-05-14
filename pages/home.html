@@ -7,9 +7,10 @@
         <span class="gradient-text">Builder.</span>
         <span class="accent-text">Modder.</span>
         <span class="gradient-text">Developer.</span>
+        <span class="accent-text">Designer.</span>
       </h1>
       <p class="hero-description fade-in delay-2">
-        I build tools, Chrome extensions, and Android utilities by day — and mod Unity games, write cheats in C#, and make things that shouldn't exist by night. Self-taught across 10+ languages, always shipping something.
+        I build Chrome extensions, APK tools, and AI plugins. I also mod Unity games, write C# cheats, and make things that probably shouldn't exist. Self-taught across a bunch of languages and always working on something.
       </p>
       <div class="btn-group fade-in delay-3">
         <a href="/projects" class="btn btn-primary" data-route>
@@ -29,31 +30,92 @@
       <p class="section-label">// ABOUT</p>
       <h2 class="gradient-text">Developer & Creator</h2>
       <p class="section-description">
-        I build real things — from AI-powered plugins to APK mod pipelines to Unity game cheats. If there's a problem and code can fix it, I'm already halfway there.
+        AI plugins, APK mod tools, Unity cheats. If code can fix it, I'm already on it.
       </p>
     </div>
     <div class="bento-grid">
-      <div class="bento-card card spotlight glass-card">
-        <h3 style="font-size: 1.25rem; margin-bottom: 12px;">Who I Am</h3>
-        <p style="color: var(--foreground-muted);">Self-taught developer with a background across web, mobile, game modding, AI tooling, and reverse engineering. I care about shipping things that actually work and feel good to use.</p>
+      <div class="bento-card card spotlight glass-card" style="position:relative;overflow:hidden;">
+        <iconify-icon class="bento-bg-icon" icon="mdi:code-braces" width="110" height="110"></iconify-icon>
+        <div class="bento-card-content">
+          <h3 style="font-size: 1.25rem; margin-bottom: 12px;">Who I Am</h3>
+          <p style="color: var(--foreground-muted);">Self-taught, been coding for years. I do web, mobile, game modding, AI tools, and a bit of reverse engineering. I just like building things that actually work.</p>
+        </div>
       </div>
-      <div class="bento-card card spotlight">
-        <h3 style="font-size: 1.25rem; margin-bottom: 12px;">Tools & Mods</h3>
-        <p style="color: var(--foreground-muted);">Writing Unity C# cheats, internal hooks, memory tools, and gameplay automation — the kind of stuff you don't find tutorials for.</p>
+      <div class="bento-card card spotlight" style="position:relative;overflow:hidden;">
+        <iconify-icon class="bento-bg-icon" icon="mdi:sword-cross" width="110" height="110"></iconify-icon>
+        <div class="bento-card-content">
+          <h3 style="font-size: 1.25rem; margin-bottom: 12px;">Tools & Mods</h3>
+          <p style="color: var(--foreground-muted);">Unity C# cheats, internal hooks, memory tools, gameplay automation. The kind of stuff you won't find tutorials for.</p>
+        </div>
       </div>
-      <div class="bento-card card spotlight">
-        <h3 style="font-size: 1.25rem; margin-bottom: 12px;">Web & AI</h3>
-        <p style="color: var(--foreground-muted);">Building Chrome extensions, AI-powered plugins, APK toolkits, and full-stack systems from scratch.</p>
+      <div class="bento-card card spotlight" style="position:relative;overflow:hidden;">
+        <iconify-icon class="bento-bg-icon" icon="mdi:robot-outline" width="110" height="110"></iconify-icon>
+        <div class="bento-card-content">
+          <h3 style="font-size: 1.25rem; margin-bottom: 12px;">Web & AI</h3>
+          <p style="color: var(--foreground-muted);">Chrome extensions, AI plugins, APK tools, full-stack apps. I just like building useful stuff.</p>
+        </div>
       </div>
-      <div class="bento-card hero-card card spotlight" style="display: flex; flex-direction: column; justify-content: flex-end;">
-        <h3 style="font-size: 1.5rem; margin-bottom: 8px;">Always Shipping</h3>
-        <p style="color: var(--foreground-muted); margin-bottom: 16px;">From Roblox Luau scripts to Infinite Yield AI plugins — the projects are eclectic, but they all get finished.</p>
-        <a href="/projects" class="link-arrow" data-route>
-          See my work
-          <iconify-icon icon="mdi:arrow-right" width="14" height="14"></iconify-icon>
-        </a>
+      <div class="bento-card hero-card card spotlight" style="display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;">
+        <iconify-icon class="bento-bg-icon" icon="mdi:rocket-launch-outline" width="160" height="160"></iconify-icon>
+        <div class="bento-card-content">
+          <h3 style="font-size: 1.5rem; margin-bottom: 8px;">Always Shipping</h3>
+          <p style="color: var(--foreground-muted); margin-bottom: 16px;">From Roblox Luau scripts to Infinite Yield AI plugins, the projects are all over the place but they get done.</p>
+          <a href="/projects" class="link-arrow" data-route>
+            See my work
+            <iconify-icon icon="mdi:arrow-right" width="14" height="14"></iconify-icon>
+          </a>
+        </div>
+      </div>
+      <div class="bento-card code-card glass-card" style="grid-row:span 2;">
+        <div class="code-header">
+          <div class="code-dots">
+            <span class="code-dot" style="background:#ff5f57;"></span>
+            <span class="code-dot" style="background:#febc2e;"></span>
+            <span class="code-dot" style="background:#28c840;"></span>
+          </div>
+          <span class="code-filename">MovePatch.cs</span>
+        </div>
+        <pre class="code-body"><code><span class="ct">// speed mod — harmony prefix</span>
+<span class="ca">[HarmonyPatch(typeof(</span><span class="ctype">PlayerController</span><span class="ca">), </span><span class="cs">"Update"</span><span class="ca">)]</span>
+<span class="ck">static class</span> <span class="ctype">MovePatch</span> <span class="cn">{</span>
+
+  <span class="ck">static bool</span> <span class="cf">Prefix</span><span class="cn">(</span>
+    <span class="ctype">PlayerController</span> <span class="cv">__instance</span><span class="cn">)</span> <span class="cn">{</span>
+
+    <span class="ck">if</span> <span class="cn">(!</span><span class="ctype">Menu</span><span class="cn">.</span><span class="cv">enabled</span><span class="cn">)</span>
+      <span class="ck">return</span> <span class="ck">true</span><span class="cn">;</span>
+
+    <span class="cv">__instance</span><span class="cn">.</span><span class="cv">_speed</span> <span class="cn">=</span>
+      <span class="ctype">Config</span><span class="cn">.</span><span class="cv">moveSpeed</span><span class="cn">;</span>
+    <span class="ck">return</span> <span class="ck">false</span><span class="cn">;</span>
+  <span class="cn">}</span>
+<span class="cn">}</span></code></pre>
       </div>
     </div>
+
+    <div class="about-stats">
+      <div class="stat-item section-enter">
+        <iconify-icon icon="mdi:calendar-outline" width="22" height="22" style="color:var(--accent);"></iconify-icon>
+        <span class="stat-value">4+</span>
+        <span class="stat-label">Years Coding</span>
+      </div>
+      <div class="stat-item section-enter">
+        <iconify-icon icon="mdi:cube-outline" width="22" height="22" style="color:var(--accent);"></iconify-icon>
+        <span class="stat-value">10+</span>
+        <span class="stat-label">Projects Shipped</span>
+      </div>
+      <div class="stat-item section-enter">
+        <iconify-icon icon="mdi:translate" width="22" height="22" style="color:var(--accent);"></iconify-icon>
+        <span class="stat-value">6+</span>
+        <span class="stat-label">Languages</span>
+      </div>
+      <div class="stat-item section-enter">
+        <iconify-icon icon="mdi:layers-outline" width="22" height="22" style="color:var(--accent);"></iconify-icon>
+        <span class="stat-value">5</span>
+        <span class="stat-label">Platforms</span>
+      </div>
+    </div>
+
     <div class="about-highlights">
       <span class="highlight-pill">Unity C# Modding</span>
       <span class="highlight-pill">Chrome Extensions</span>
@@ -78,13 +140,13 @@
         <div class="timeline-meta">
           <div>
             <h3>AI Engineering Intern</h3>
-            <p class="timeline-subtitle">Internship — Ended</p>
+            <p class="timeline-subtitle">Internship (Ended)</p>
           </div>
           <span class="timeline-badge">2025</span>
         </div>
         <ul class="timeline-list">
-          <li>Built an AI chatbot for environmental issue reporting with automated government-ready document generation.</li>
-          <li>Implemented real-time image analysis pipelines for higher operational accuracy.</li>
+          <li>Built an AI chatbot where citizens can report environmental issues and it auto-generates reports for the government.</li>
+          <li>Added image analysis so the bot could actually understand what people were reporting.</li>
         </ul>
       </div>
       <div class="timeline-item glass-card section-enter">
@@ -93,11 +155,11 @@
             <h3>AI & Full-Stack Developer</h3>
             <p class="timeline-subtitle">Freelance & Personal Projects</p>
           </div>
-          <span class="timeline-badge">2024 — Present</span>
+          <span class="timeline-badge">2024 - Present</span>
         </div>
         <ul class="timeline-list">
-          <li>Created schema-aware AI workflows and intelligent assistant interfaces.</li>
-          <li>Delivered full-stack systems with responsive UI, APIs, and automation pipelines.</li>
+          <li>Built AI tools and assistant UIs, mostly for personal projects and a few for clients.</li>
+          <li>Put together full-stack apps with proper UIs, APIs, and some automation.</li>
         </ul>
       </div>
       <div class="timeline-item glass-card section-enter">
@@ -106,12 +168,12 @@
             <h3>Game & Tool Developer</h3>
             <p class="timeline-subtitle">Personal Projects</p>
           </div>
-          <span class="timeline-badge">2021 — Present</span>
+          <span class="timeline-badge">2021 - Present</span>
         </div>
         <ul class="timeline-list">
-          <li>Published games on Roblox using Luau with multiplayer systems and cloud saves.</li>
-          <li>Built Unity C# mods, memory tools, and cheat frameworks for personal game projects.</li>
-          <li>Developed browser tools, APK utilities, and performance-optimised cross-platform experiences.</li>
+          <li>Published games on Roblox with multiplayer and cloud saves.</li>
+          <li>Made Unity C# mods, memory tools, and cheat frameworks for games I play.</li>
+          <li>Built browser tools, APK mods, and random stuff across different platforms.</li>
         </ul>
       </div>
     </div>
@@ -175,6 +237,53 @@
         <div class="skill-icon"><iconify-icon icon="devicon:git" width="28" height="28"></iconify-icon></div>
         <span class="skill-name">Git</span>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- Achievements -->
+<section id="achievements">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-label">// ACHIEVEMENTS</p>
+      <h2 class="gradient-text">Awards & Recognition</h2>
+      <p class="section-description">Some competitions I entered and did well in.</p>
+    </div>
+    <div class="achievements-grid">
+      <div class="achievement-card glass-card section-enter">
+        <div class="achievement-icon">
+          <iconify-icon icon="mdi:trophy" width="28" height="28" style="color: #f59e0b;"></iconify-icon>
+        </div>
+        <div class="achievement-body">
+          <div class="achievement-meta">
+            <span class="achievement-award gold">Gold Award</span>
+            <span class="timeline-badge">2022</span>
+          </div>
+          <h3>Robot-Sumo &amp; Innovation Challenge</h3>
+          <p class="achievement-subtitle">National Innovation Competition NICERS '22, Politeknik Tuanku Sultanah Bahiyah</p>
+        </div>
+      </div>
+      <div class="achievement-card glass-card section-enter">
+        <div class="achievement-icon">
+          <iconify-icon icon="mdi:medal" width="28" height="28" style="color: #cd7f32;"></iconify-icon>
+        </div>
+        <div class="achievement-body">
+          <div class="achievement-meta">
+            <span class="achievement-award bronze">3rd Place</span>
+            <span class="timeline-badge">2022</span>
+          </div>
+          <h3>National Robotics LEGO Competition</h3>
+          <p class="achievement-subtitle">Placed nationally despite having pretty limited sensors to work with.</p>
+        </div>
+      </div>
+    </div>
+    <div class="certifications-grid">
+      <div class="cert-item section-enter"><iconify-icon icon="logos:python" width="20" height="20"></iconify-icon><span>Python</span></div>
+      <div class="cert-item section-enter"><iconify-icon icon="logos:javascript" width="20" height="20"></iconify-icon><span>JavaScript &amp; Node.js</span></div>
+      <div class="cert-item section-enter"><iconify-icon icon="mdi:database" width="20" height="20" style="color:var(--accent)"></iconify-icon><span>Database Management</span></div>
+      <div class="cert-item section-enter"><iconify-icon icon="mdi:shield-lock-outline" width="20" height="20" style="color:var(--accent)"></iconify-icon><span>Cybersecurity</span></div>
+      <div class="cert-item section-enter"><iconify-icon icon="mdi:robot" width="20" height="20" style="color:var(--accent)"></iconify-icon><span>AI &amp; Machine Learning</span></div>
+      <div class="cert-item section-enter"><iconify-icon icon="logos:figma" width="20" height="20"></iconify-icon><span>UI/UX Design (Figma)</span></div>
     </div>
   </div>
 </section>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>imluri</title>
+  <script>
+    // GitHub Pages SPA redirect trick.
+    // Encodes the current path into a query param, then sends the browser
+    // to index.html so the SPA router can handle it.
+    var l = window.location;
+    l.replace(
+      l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+      '/?p=' + encodeURIComponent(l.pathname + l.search) + l.hash
+    );
+  </script>
+</head>
+<body></body>
+</html>

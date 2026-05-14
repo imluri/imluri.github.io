@@ -4,12 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>imluri</title>
-  <meta name="description" content="imluri — developer of AI tools, Chrome extensions, Android utilities, and web applications. Creator of Chessist, APK Toolkit, and more.">
+  <meta name="description" content="imluri, developer of AI tools, Chrome extensions, Android utilities, and web applications. Creator of Chessist, APK Toolkit, and more.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.164/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164/examples/jsm/"
+      }
+    }
+  </script>
+  <!-- GitHub Pages SPA: restore path from ?p= redirect set by 404.html -->
+  <script>
+    (function () {
+      var p = new URLSearchParams(window.location.search).get('p');
+      if (p) {
+        // Replace the current history entry with the real path so the
+        // router sees the correct pathname and the URL bar looks right.
+        window.history.replaceState(null, '', decodeURIComponent(p));
+      }
+    })();
+  </script>
 </head>
 <body>
   <!-- Background Layers -->
@@ -22,6 +41,8 @@
     <div class="blob blob-3"></div>
     <div class="blob blob-4"></div>
   </div>
+  <canvas id="scene-canvas" style="position:fixed;inset:0;pointer-events:none;z-index:0;"></canvas>
+  <div id="scene-debug" style="position:fixed;bottom:16px;left:16px;z-index:9999;background:rgba(0,0,0,0.7);color:#7784ff;font:12px/1.6 'JetBrains Mono',monospace;padding:10px 14px;border-radius:10px;pointer-events:none;"></div>
 
   <!-- Navigation -->
   <nav>
@@ -30,6 +51,11 @@
       <ul class="nav-links">
         <li><a href="/" data-route>Home</a></li>
         <li><a href="/projects" data-route>Projects</a></li>
+        <li>
+          <span class="nav-dots" onclick="toggleMenu()" aria-label="Toggle menu">
+            <iconify-icon icon="ph:dots-nine-bold" width="18" height="18"></iconify-icon>
+          </span>
+        </li>
       </ul>
       <button class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle menu">
         <iconify-icon class="menu-open-icon" icon="mdi:menu" width="24" height="24"></iconify-icon>
@@ -57,10 +83,14 @@
         </a>
       </div>
     </div>
+    <div class="container" style="margin-top:8px;">
+      <p class="footer-text" style="font-size:0.72rem;">3D model: <a href="https://sketchfab.com/3d-models/just-a-girl-b2359160a4f54e76b5ae427a55d9594d" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">"Just a girl"</a> by <a href="https://sketchfab.com/Kensyouen" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">腱鞘炎の人</a> (CC-BY-4.0)</p>
+    </div>
   </footer>
 
   <script src="js/projects.js"></script>
   <script src="js/main.js"></script>
   <script src="js/router.js"></script>
+  <script type="module" src="js/scene3d.js"></script>
 </body>
 </html>

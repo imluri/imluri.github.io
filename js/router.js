@@ -56,6 +56,9 @@ function initPage() {
   // Bind all [data-route] links inside the new content
   bindLinks(app);
 
+  // Reveal any already-cached images (load event won't fire for them)
+  if (typeof revealLoadedImages === 'function') revealLoadedImages();
+
   // Scroll to top on page swap
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -74,11 +77,13 @@ async function swapContent(html) {
   initPage();
 }
 
-// Render project detail page from PROJECTS data
+// Render project detail page from PROJECTS or DESIGN_PROJECTS data
 function renderProjectDetail(slug) {
-  const project = (typeof PROJECTS !== 'undefined')
-    ? PROJECTS.find(p => p.slug === slug)
-    : null;
+  const allProjects = [
+    ...(typeof PROJECTS !== 'undefined' ? PROJECTS : []),
+    ...(typeof DESIGN_PROJECTS !== 'undefined' ? DESIGN_PROJECTS : []),
+  ];
+  const project = allProjects.find(p => p.slug === slug);
 
   if (!project) {
     return `
@@ -111,8 +116,10 @@ function renderProjectDetail(slug) {
         </a>
 
         <div class="project-detail-header">
-          <div class="project-detail-logo">
-            <img src="${project.image}" alt="${project.imageAlt}">
+          <div class="project-detail-logo${project.fullscreen ? ' project-detail-logo--full' : ''}">
+            ${project.image
+              ? `<img src="${project.image}" alt="${project.imageAlt}" onerror="this.outerHTML='<iconify-icon icon=\\'${project.icon || 'mdi:code-braces'}\\' width=\\'72\\' height=\\'72\\' style=\\'color:var(--accent)\\'></iconify-icon>'">`
+              : `<iconify-icon icon="${project.icon || 'mdi:code-braces'}" width="72" height="72" style="color:var(--accent)"></iconify-icon>`}
           </div>
           <div class="project-detail-meta">
             <div class="project-detail-badges">
@@ -121,12 +128,13 @@ function renderProjectDetail(slug) {
             </div>
             <h1 class="gradient-text">${project.title}</h1>
             <p class="project-detail-summary">${details.summary}</p>
+            ${project.link ? `
             <div class="btn-group" style="margin-top:24px;">
               <a href="${project.link}" target="_blank" rel="noopener" class="btn btn-primary">
-                View on GitHub
-                <iconify-icon icon="mdi:github" width="16" height="16"></iconify-icon>
+                ${project.link.includes('github.com') ? 'View on GitHub' : 'View Project'}
+                <iconify-icon icon="${project.link.includes('github.com') ? 'mdi:github' : 'mdi:open-in-new'}" width="16" height="16"></iconify-icon>
               </a>
-            </div>
+            </div>` : ''}
           </div>
         </div>
 
@@ -144,6 +152,14 @@ function renderProjectDetail(slug) {
             </div>
           </div>
         </div>
+
+        ${project.designSrc ? `
+        <div class="design-embed-wrap">
+          <div class="design-embed-spinner">
+            <iconify-icon icon="mdi:loading" width="36" height="36" style="color:var(--accent);animation:spin 1s linear infinite;"></iconify-icon>
+          </div>
+          <iframe src="${project.designSrc}" class="design-embed-iframe" onload="this.previousElementSibling.style.display='none'"></iframe>
+        </div>` : ''}
 
       </div>
     </section>`;
@@ -181,12 +197,16 @@ async function navigate(pathname, pushState = true) {
   // Update document title
   const titles = {
     '/':         'imluri',
-    '/projects': 'Projects — imluri',
+    '/projects': 'Projects | imluri',
   };
   if (pathname.startsWith('/project/')) {
     const slug = pathname.replace('/project/', '');
-    const project = typeof PROJECTS !== 'undefined' ? PROJECTS.find(p => p.slug === slug) : null;
-    document.title = project ? `${project.title} — imluri` : 'Project — imluri';
+    const allProjects = [
+      ...(typeof PROJECTS !== 'undefined' ? PROJECTS : []),
+      ...(typeof DESIGN_PROJECTS !== 'undefined' ? DESIGN_PROJECTS : []),
+    ];
+    const project = allProjects.find(p => p.slug === slug);
+    document.title = project ? `${project.title} | imluri` : 'Project — imluri';
   } else {
     document.title = titles[pathname] || 'imluri';
   }
@@ -216,14 +236,18 @@ function bindProjectCards(root) {
 const _origRenderProjectCard = typeof renderProjectCard !== 'undefined' ? renderProjectCard : null;
 function renderProjectCard(project) {
   const tags = project.tags.map(t => `<span class="tag-badge">${t}</span>`).join('');
-  const imageHTML = `<img src="${project.image}" alt="${project.imageAlt}" loading="lazy">`;
+  const fallbackIcon = project.icon || 'mdi:code-braces';
+  const imageHTML = project.image
+    ? `<img src="${project.image}" alt="${project.imageAlt}" loading="lazy" onerror="this.outerHTML='<iconify-icon icon=\\'${fallbackIcon}\\' width=\\'48\\' height=\\'48\\' style=\\'color:var(--accent)\\'></iconify-icon>'">`
+    : `<iconify-icon icon="${fallbackIcon}" width="48" height="48" style="color:var(--accent)"></iconify-icon>`;
+  const imgClass = project.fullscreen ? 'project-image project-image--full' : 'project-image';
 
   const card = document.createElement('div');
   card.className = 'bento-card project-card';
   card.dataset.slug = project.slug;
   card.style.cursor = 'pointer';
   card.innerHTML = `
-    <div class="project-image">${imageHTML}</div>
+    <div class="${imgClass}">${imageHTML}</div>
     <h3 class="project-title">${project.title}</h3>
     <p class="project-description">${project.description}</p>
     <div class="project-tags">${tags}</div>

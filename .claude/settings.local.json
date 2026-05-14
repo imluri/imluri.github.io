@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\luri\\\\Documents\\\\Programming\\\\imluri.github.io\" -Recurse -File)",
+      "Bash(Select-Object FullName)",
+      "Bash(Copy-Item \"C:\\\\Users\\\\luri\\\\Downloads\\\\lurimous.github.io-main\\\\assets\\\\cibot.png\" \"C:\\\\Users\\\\luri\\\\Documents\\\\Programming\\\\imluri.github.io\\\\assets\\\\cibot.png\")",
+      "Bash(cp \"C:/Users/luri/Downloads/lurimous.github.io-main/assets/cibot.png\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/cibot.png\")",
+      "Bash(ls -la \"C:/Users/luri/Downloads/just_a_girl/\")",
+      "Read(//c/Users/luri/Downloads/just_a_girl/**)",
+      "Bash(cp \"C:/Users/luri/Downloads/just_a_girl/scene.gltf\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/scene.gltf\")",
+      "Bash(cp \"C:/Users/luri/Downloads/just_a_girl/scene.bin\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/scene.bin\")",
+      "Bash(cp -r \"C:/Users/luri/Downloads/just_a_girl/textures\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/textures\")",
+      "Read(//c/Users/luri/Downloads/old_computers/**)",
+      "Read(//c/Users/luri/Downloads/old_computers/textures/**)",
+      "Bash(cp \"C:/Users/luri/Downloads/old_computers/scene.gltf\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/computers.gltf\")",
+      "Bash(cp \"C:/Users/luri/Downloads/old_computers/scene.bin\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/computers.bin\")",
+      "Bash(cp \"C:/Users/luri/Downloads/old_computers/textures/Texture_baseColor.jpeg\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/computers_textures/Texture_baseColor.jpeg\")",
+      "Bash(cp \"C:/Users/luri/Downloads/old_computers/scene.gltf\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/computers/scene.gltf\")",
+      "Bash(cp \"C:/Users/luri/Downloads/old_computers/scene.bin\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/computers/scene.bin\")",
+      "Bash(cp \"C:/Users/luri/Downloads/old_computers/textures/Texture_baseColor.jpeg\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/computers/textures/Texture_baseColor.jpeg\")"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\luri\\Downloads\\lurimous.github.io-main\\assets"
+    ]
+  }
+}

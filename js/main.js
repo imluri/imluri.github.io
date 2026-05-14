@@ -4,10 +4,14 @@
 
 function renderProjectCard(project) {
   const tags = project.tags.map(t => `<span class="tag-badge">${t}</span>`).join('');
-  const imageHTML = `<img src="${project.image}" alt="${project.imageAlt}" loading="lazy">`;
+  const fallbackIcon = project.icon || 'mdi:code-braces';
+  const imageHTML = project.image
+    ? `<img src="${project.image}" alt="${project.imageAlt}" loading="lazy" onerror="this.outerHTML='<iconify-icon icon=\\'${fallbackIcon}\\' width=\\'48\\' height=\\'48\\' style=\\'color:var(--accent)\\'></iconify-icon>'">`
+    : `<iconify-icon icon="${fallbackIcon}" width="48" height="48" style="color:var(--accent)"></iconify-icon>`;
+  const imgClass = project.fullscreen ? 'project-image project-image--full' : 'project-image';
 
   const inner = `
-    <div class="project-image">${imageHTML}</div>
+    <div class="${imgClass}">${imageHTML}</div>
     <h3 class="project-title">${project.title}</h3>
     <p class="project-description">${project.description}</p>
     <div class="project-tags">${tags}</div>
@@ -68,6 +72,32 @@ function renderAll() {
     toolsGrid.innerHTML = '';
     TOOLS.forEach(t => toolsGrid.appendChild(renderToolCard(t)));
   }
+
+  const designsGrid = document.getElementById('designs-grid');
+  if (designsGrid && typeof DESIGN_PROJECTS !== 'undefined') {
+    designsGrid.innerHTML = '';
+    DESIGN_PROJECTS.forEach(p => designsGrid.appendChild(renderProjectCard(p)));
+  }
+}
+
+// ── Image fade-in on load ─────────────────────────────────────
+
+function revealImg(img) {
+  img.style.opacity = '1';
+  const wrap = img.closest('.project-image, .project-detail-logo');
+  if (wrap) wrap.classList.add('img-loaded');
+}
+
+// Capture-phase listener catches load on any img anywhere in the doc
+document.addEventListener('load', (e) => {
+  if (e.target.tagName === 'IMG') revealImg(e.target);
+}, true);
+
+// Called after each page swap to reveal already-cached images
+function revealLoadedImages() {
+  document.querySelectorAll('.project-image img, .project-detail-logo img').forEach(img => {
+    if (img.complete && img.naturalWidth > 0) revealImg(img);
+  });
 }
 
 // ── Mobile menu ───────────────────────────────────────────────
