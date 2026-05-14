@@ -103,10 +103,8 @@ function revealLoadedImages() {
 // ── Mobile menu ───────────────────────────────────────────────
 
 function toggleMenu() {
-  const menu = document.getElementById('mobileMenu');
-  const toggle = document.querySelector('.menu-toggle');
-  menu.classList.toggle('active');
-  toggle.classList.toggle('active');
+  document.getElementById('mobileMenu')?.classList.toggle('active');
+  document.querySelector('.menu-toggle')?.classList.toggle('active');
 }
 
 // ── Smooth scroll (for same-page anchor links) ────────────────
