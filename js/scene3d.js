@@ -131,7 +131,6 @@ function onRouteChange() {
 
 // ── Animate ───────────────────────────────────────────────────
 const clock = new THREE.Clock();
-const debugEl = document.getElementById('scene-debug');
 
 (function animate() {
   requestAnimationFrame(animate);
@@ -150,17 +149,6 @@ const debugEl = document.getElementById('scene-debug');
   if (computers && computers.visible) {
     computers.rotation.y = computersBaseRotY + smoothMouseX * 0.06;
     computers.rotation.x = -smoothMouseY * 0.03;
-  }
-
-  if (debugEl) {
-    const m = girl?.visible ? girl : computers;
-    if (m) {
-      debugEl.innerHTML =
-        `page: ${currentPage}<br>` +
-        `x: ${m.position.x.toFixed(2)}<br>` +
-        `y: ${m.position.y.toFixed(2)}<br>` +
-        `scroll: ${scrollY}`;
-    }
   }
 
   renderer.render(scene, camera);

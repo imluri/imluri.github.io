@@ -19,7 +19,8 @@
       "Bash(cp \"C:/Users/luri/Downloads/old_computers/scene.bin\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/computers/scene.bin\")",
       "Bash(cp \"C:/Users/luri/Downloads/old_computers/textures/Texture_baseColor.jpeg\" \"C:/Users/luri/Documents/Programming/imluri.github.io/assets/model/computers/textures/Texture_baseColor.jpeg\")",
       "Bash(cmdkey /list)",
-      "Bash(findstr \"github\")"
+      "Bash(findstr \"github\")",
+      "WebFetch(domain:perekaperabot.com.my)"
     ],
     "additionalDirectories": [
       "C:\\Users\\luri\\Downloads\\lurimous.github.io-main\\assets"
