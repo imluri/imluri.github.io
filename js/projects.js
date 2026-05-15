@@ -4,6 +4,30 @@
 
 const PROJECTS = [
   {
+    slug: "qsm",
+    title: "QSM",
+    description: "A quantum programming language with Lua-like syntax, compiled down to Qiskit. Write quantum circuits without learning a whole new paradigm.",
+    tags: ["Python", "Qiskit", "Quantum Computing"],
+    link: "https://github.com/imluri/qsm",
+    image: "https://raw.githubusercontent.com/imluri/qsm/main/logo.png",
+    imageAlt: "QSM Logo",
+    icon: "mdi:atom",
+    details: {
+      year: "2025",
+      status: "Active",
+      summary: "QSM is a custom programming language I built that lets you write quantum circuits using Lua-like syntax. It compiles down to Qiskit under the hood, so you get the full power of quantum computing without having to learn Qiskit's API directly.",
+      highlights: [
+        "Custom parser and compiler written in Python",
+        "Supports Hadamard, X, Y, Z, S, T gates, CNOT, SWAP, and multi-controlled Z",
+        "Classical control flow: if/while/for loops and variable assignments inside quantum programs",
+        "User-defined functions and measurement operations",
+        "Includes a full Grover's algorithm example",
+        "Designed to make quantum computing accessible without prior Qiskit knowledge",
+      ],
+      tech: ["Python", "Qiskit", "Custom Parser", "Quantum Gates"],
+    },
+  },
+  {
     slug: "chessist",
     title: "Chessist",
     description: "Chrome extension that runs Stockfish inside Chess.com. Live eval bar, best move arrows, and auto-move, all in the browser.",

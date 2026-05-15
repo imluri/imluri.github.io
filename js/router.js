@@ -10,9 +10,9 @@ const app = document.getElementById('app');
 
 // Map URL pathnames to page fragment files
 const ROUTES = {
-  '/':         'pages/home.html',
-  '/projects': 'pages/projects.html',
-  '/project':  'pages/project.html',   // slug passed as ?slug=xxx
+  '/':         '/pages/home.html',
+  '/projects': '/pages/projects.html',
+  '/project':  '/pages/project.html',
 };
 
 // Cache fetched fragments so we don't re-fetch on back/forward
@@ -59,12 +59,15 @@ function initPage() {
   // Reveal any already-cached images (load event won't fire for them)
   if (typeof revealLoadedImages === 'function') revealLoadedImages();
 
+  if (typeof startShowcaseAnimations === 'function') startShowcaseAnimations();
+
   // Scroll to top on page swap
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Transition: fade out → swap → fade in
 async function swapContent(html) {
+  if (typeof stopShowcaseAnimations === 'function') stopShowcaseAnimations();
   app.classList.add('page-exit');
   await new Promise(r => setTimeout(r, 180));
   app.innerHTML = html;
@@ -178,7 +181,7 @@ async function navigate(pathname, pushState = true) {
     if (pathname.startsWith('/project/')) {
       const slug = pathname.replace('/project/', '');
       // Load the template fragment (for structure), then inject data
-      await fetchPage('pages/project.html');
+      await fetchPage('/pages/project.html');
       html = renderProjectDetail(slug);
     } else {
       const fragmentUrl = ROUTES[pathname] || ROUTES['/'];

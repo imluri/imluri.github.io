@@ -109,7 +109,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   function onRouteChange() {
     currentPage = window.location.pathname;
     scrollY = 0;
-    smoothScrollY = 0;
+    // Don't reset smoothScrollY yet — let the model stay where it is during fade-out
+    // so it doesn't snap back into view before the canvas goes transparent
 
     // Fade out fast
     canvas.style.transition = 'opacity 0.3s ease';
@@ -117,10 +118,13 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
     // After fade-out completes, swap model and fade back in slowly
     setTimeout(() => {
+      smoothScrollY = 0;
       if (girl)      girl.visible      = currentPage === '/';
       if (computers) computers.visible = currentPage === '/projects';
       canvas.style.transition = 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
-      canvas.style.opacity = currentPage === '/projects' ? '0.18' : '1';
+      if (currentPage === '/') canvas.style.opacity = '1';
+      else if (currentPage === '/projects') canvas.style.opacity = '0.18';
+      // else: stay hidden (detail pages, etc.)
     }, 320);
   }
 
@@ -140,6 +144,17 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
       girl.position.y = girlBaseY + Math.sin(t * 0.6) * 0.04;
       const scrollTurn = Math.min(smoothScrollY * 0.0008, 0.5);
       girl.rotation.y = -0.25 + -scrollTurn + Math.sin(t * 0.35) * 0.06;
+
+      // Fade out as scroll reaches the showcase snap point.
+      // Only take over opacity once scrolled (smoothScrollY > 2) so the
+      // route-change fade-in transition can complete uninterrupted.
+      const showcase = document.getElementById('showcase');
+      if (showcase && smoothScrollY > 2) {
+        const snapY = Math.max(showcase.offsetTop - 50, 1);
+        const fade = Math.max(0, 1 - smoothScrollY / snapY);
+        canvas.style.transition = 'none';
+        canvas.style.opacity = fade.toFixed(3);
+      }
     }
 
     if (computers && computers.visible) {

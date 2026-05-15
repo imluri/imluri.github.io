@@ -23,6 +23,179 @@
   </div>
 </section>
 
+<!-- Showcase -->
+<section id="showcase">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-label">// FEATURED</p>
+      <h2 class="gradient-text">Projects in Action</h2>
+      <p class="section-description">A peek at what some of these actually do.</p>
+    </div>
+    <div class="showcase-grid">
+
+      <!-- QSM — quantum circuit diagram -->
+      <div class="showcase-card glass-card section-enter">
+        <div class="showcase-label">
+          <iconify-icon icon="mdi:atom" width="14" height="14"></iconify-icon>
+          QSM
+        </div>
+        <div class="showcase-body">
+          <div class="qsm-anim">
+            <!-- Phase 1: typing -->
+            <div class="qsm-phase-code">
+              <div class="code-header">
+                <div class="code-dots">
+                  <span class="code-dot" style="background:#ff5f57;"></span>
+                  <span class="code-dot" style="background:#febc2e;"></span>
+                  <span class="code-dot" style="background:#28c840;"></span>
+                </div>
+                <span class="code-filename">bell.qsm</span>
+              </div>
+              <pre class="code-body qsm-typing"></pre>
+              <div class="qsm-status"></div>
+            </div>
+            <!-- Phase 2: circuit sketch -->
+            <div class="qsm-phase-circuit">
+              <div class="qsm-circuit">
+                <div class="qsm-row">
+                  <span class="qsm-qubit">q₀</span>
+                  <div class="qsm-wire">
+                    <span class="qc-wire qsm-line"></span>
+                    <span class="qc-gate qsm-gate qsm-h">H</span>
+                    <span class="qc-wire qsm-line"></span>
+                    <span class="qc-ctrl qsm-ctrl"></span>
+                    <span class="qc-wire qsm-line"></span>
+                    <span class="qc-meas qsm-measure">M</span>
+                  </div>
+                </div>
+                <div class="qsm-row">
+                  <span class="qsm-qubit">q₁</span>
+                  <div class="qsm-wire">
+                    <span class="qc-wire qsm-line qsm-long"></span>
+                    <span class="qc-gate qsm-gate qsm-x">X</span>
+                    <span class="qc-wire qsm-line"></span>
+                    <span class="qc-meas qsm-measure">M</span>
+                  </div>
+                </div>
+                <div class="qsm-row">
+                  <span class="qsm-qubit">q₂</span>
+                  <div class="qsm-wire">
+                    <span class="qc-gate qsm-gate qsm-z">Z</span>
+                    <span class="qc-wire qsm-line"></span>
+                    <span class="qc-gate qsm-gate qsm-t">T</span>
+                    <span class="qc-wire qsm-line"></span>
+                    <span class="qc-meas qsm-measure">M</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="showcase-caption">QSM compiles to Qiskit quantum circuits</div>
+          <a href="/project/qsm" class="showcase-btn" data-route>
+            View Project
+            <iconify-icon icon="mdi:arrow-right" width="13" height="13"></iconify-icon>
+          </a>
+        </div>
+      </div>
+
+      <!-- IYAI — chat window mockup -->
+      <div class="showcase-card glass-card section-enter">
+        <div class="showcase-label">
+          <iconify-icon icon="logos:lua" width="14" height="14"></iconify-icon>
+          IYAI
+        </div>
+        <div class="showcase-body">
+          <div class="iyai-chat iyai-anim">
+            <div class="iyai-msg iyai-user">
+              <span>tp all players to me</span>
+            </div>
+            <div class="iyai-msg iyai-ai">
+              <div class="iyai-tag">
+                <iconify-icon icon="mdi:robot-outline" width="12" height="12"></iconify-icon>
+                IYAI
+              </div>
+              <pre class="iyai-code"><span class="ck">for</span> <span class="cv">_</span>, <span class="cv">p</span> <span class="ck">in</span> <span class="cf">pairs</span><span class="cn">(</span>game<span class="cn">.</span>Players<span class="cn">:</span><span class="cf">GetPlayers</span><span class="cn">())</span> <span class="ck">do</span>
+  <span class="ck">if</span> p <span class="cn">~=</span> lplr <span class="ck">then</span>
+    p<span class="cn">.</span>Character<span class="cn">.</span>HumanoidRootPart<span class="cn">.</span>CFrame
+      <span class="cn">=</span> lplr<span class="cn">.</span>Character<span class="cn">.</span>HumanoidRootPart<span class="cn">.</span>CFrame
+  <span class="ck">end</span>
+<span class="ck">end</span></pre>
+            </div>
+            <div class="iyai-msg iyai-user">
+              <span>now freeze them</span>
+            </div>
+          </div>
+          <a href="/project/iyai" class="showcase-btn" data-route>
+            View Project
+            <iconify-icon icon="mdi:arrow-right" width="13" height="13"></iconify-icon>
+          </a>
+        </div>
+      </div>
+
+      <!-- Chessist — eval bar -->
+      <div class="showcase-card glass-card section-enter">
+        <div class="showcase-label">
+          <iconify-icon icon="mdi:chess-knight" width="14" height="14"></iconify-icon>
+          Chessist
+        </div>
+        <div class="showcase-body">
+          <div class="chess-ui chess-anim">
+            <div class="chess-eval-wrap">
+              <div class="chess-eval-bar">
+                <div class="chess-eval-fill" style="height:62%;"></div>
+              </div>
+              <div class="chess-eval-labels">
+                <span class="chess-eval-score">+2.3</span>
+                <span class="chess-eval-engine">Stockfish 18</span>
+              </div>
+            </div>
+            <div class="chess-board-mini">
+              <div class="chess-row">
+                <span class="cs-dark"></span><span class="cs-light"></span><span class="cs-dark"></span><span class="cs-light"></span>
+                <span class="cs-dark"></span><span class="cs-light cp">♛</span><span class="cs-dark"></span><span class="cs-light"></span>
+              </div>
+              <div class="chess-row">
+                <span class="cs-light"></span><span class="cs-dark"></span><span class="cs-light"></span><span class="cs-dark"></span>
+                <span class="cs-light"></span><span class="cs-dark"></span><span class="cs-light cp">♜</span><span class="cs-dark"></span>
+              </div>
+              <div class="chess-row">
+                <span class="cs-dark"></span><span class="cs-light"></span><span class="cs-dark cp">♙</span><span class="cs-light"></span>
+                <span class="cs-dark"></span><span class="cs-light"></span><span class="cs-dark"></span><span class="cs-light"></span>
+              </div>
+              <div class="chess-row">
+                <span class="cs-light"></span><span class="cs-dark"></span><span class="cs-light"></span><span class="cs-dark"></span>
+                <span class="cs-light cp best-sq">♞</span><span class="cs-dark"></span><span class="cs-light"></span><span class="cs-dark"></span>
+              </div>
+              <div class="chess-row">
+                <span class="cs-dark"></span><span class="cs-light"></span><span class="cs-dark"></span><span class="cs-light"></span>
+                <span class="cs-dark"></span><span class="cs-light"></span><span class="cs-dark"></span><span class="cs-light"></span>
+              </div>
+              <div class="chess-row">
+                <span class="cs-light"></span><span class="cs-dark"></span><span class="cs-light"></span><span class="cs-dark cp">♙</span>
+                <span class="cs-light"></span><span class="cs-dark"></span><span class="cs-light"></span><span class="cs-dark"></span>
+              </div>
+              <div class="chess-row">
+                <span class="cs-dark cp">♙</span><span class="cs-light cp">♙</span><span class="cs-dark"></span><span class="cs-light"></span>
+                <span class="cs-dark cp">♙</span><span class="cs-light cp">♙</span><span class="cs-dark cp">♙</span><span class="cs-light"></span>
+              </div>
+              <div class="chess-row">
+                <span class="cs-light"></span><span class="cs-dark"></span><span class="cs-light"></span><span class="cs-dark"></span>
+                <span class="cs-light cp">♔</span><span class="cs-dark"></span><span class="cs-light"></span><span class="cs-dark"></span>
+              </div>
+            </div>
+          </div>
+          <div class="showcase-caption">Live eval · best move highlighted</div>
+          <a href="/project/chessist" class="showcase-btn" data-route>
+            View Project
+            <iconify-icon icon="mdi:arrow-right" width="13" height="13"></iconify-icon>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- About -->
 <section id="about">
   <div class="container">
@@ -109,7 +282,7 @@
     <div class="about-stats">
       <div class="stat-item section-enter">
         <iconify-icon icon="mdi:calendar-outline" width="22" height="22" style="color:var(--accent);"></iconify-icon>
-        <span class="stat-value">4+</span>
+        <span class="stat-value">6+</span>
         <span class="stat-label">Years Coding</span>
       </div>
       <div class="stat-item section-enter">
@@ -119,7 +292,7 @@
       </div>
       <div class="stat-item section-enter">
         <iconify-icon icon="mdi:translate" width="22" height="22" style="color:var(--accent);"></iconify-icon>
-        <span class="stat-value">6+</span>
+        <span class="stat-value">10+</span>
         <span class="stat-label">Languages</span>
       </div>
       <div class="stat-item section-enter">

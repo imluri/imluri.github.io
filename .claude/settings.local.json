@@ -28,7 +28,10 @@
       "Bash(py \"C:\\\\Users\\\\luri\\\\.claude\\\\plugins\\\\cache\\\\ui-ux-pro-max-skill\\\\ui-ux-pro-max\\\\2.5.0\\\\.claude\\\\skills\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"developer portfolio dark minimal modern tech\" --design-system -p \"imluri portfolio\" -f markdown)",
       "Bash(py \"C:\\\\Users\\\\luri\\\\.claude\\\\plugins\\\\cache\\\\ui-ux-pro-max-skill\\\\ui-ux-pro-max\\\\2.5.0\\\\src\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"developer portfolio dark minimal modern tech\" --design-system -p \"imluri portfolio\" -f markdown)",
       "Bash(py \"C:\\\\Users\\\\luri\\\\.claude\\\\plugins\\\\cache\\\\ui-ux-pro-max-skill\\\\ui-ux-pro-max\\\\2.5.0\\\\src\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"portfolio developer landing hero\" --domain landing -n 3)",
-      "Bash(py \"C:\\\\Users\\\\luri\\\\.claude\\\\plugins\\\\cache\\\\ui-ux-pro-max-skill\\\\ui-ux-pro-max\\\\2.5.0\\\\src\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"animation hover transition loading\" --domain ux -n 5)"
+      "Bash(py \"C:\\\\Users\\\\luri\\\\.claude\\\\plugins\\\\cache\\\\ui-ux-pro-max-skill\\\\ui-ux-pro-max\\\\2.5.0\\\\src\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"animation hover transition loading\" --domain ux -n 5)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\luri\\\\Documents\\\\Programming\\\\IYPlugin\\\\IYAI\" -Recurse -Force)",
+      "Bash(Select-Object -First 100)",
+      "Bash(Format-Table FullName)"
     ],
     "additionalDirectories": [
       "C:\\Users\\luri\\Downloads\\lurimous.github.io-main\\assets"
