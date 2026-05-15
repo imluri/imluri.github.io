@@ -615,12 +615,21 @@ function startShowcaseAnimations() {
       else if (e.deltaY < 0 && sy > 0 && sy < s1 + vh * 0.2)         { snapTo(0);  return; }
     }
 
-    // Smooth scroll — sync current to real position if RAF was idle
-    if (!smoothRaf) smoothCurrent = window.scrollY;
+    // Smooth scroll — sync both targets from real position if RAF was idle
+    if (!smoothRaf) syncSmooth();
     const maxY = document.documentElement.scrollHeight - window.innerHeight;
     smoothTarget = Math.max(0, Math.min(maxY, smoothTarget + e.deltaY));
     if (!smoothRaf) smoothRaf = requestAnimationFrame(smoothStep);
   }, { passive: false });
+
+  // Keep state in sync when scrollbar drag or page navigation moves scrollY
+  // outside of our wheel handler (e.g. scrollbar, router scrollTo, touch)
+  window.addEventListener('scroll', () => {
+    if (!smoothRaf && !locked) syncSmooth();
+  }, { passive: true });
+
+  // Cancel + sync on back/forward navigation
+  window.addEventListener('popstate', () => { cancelSmooth(); syncSmooth(); });
 }());
 
 // ── Init ──────────────────────────────────────────────────────
