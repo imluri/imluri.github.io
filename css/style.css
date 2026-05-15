@@ -1114,7 +1114,8 @@ h2 {
   gap: 14px;
   padding: 20px;
   border-radius: 18px;
-  min-height: 260px;
+  height: 420px;
+  overflow: hidden;
 }
 
 .showcase-grid .showcase-card:nth-child(1) { animation-delay: 0.05s; }
