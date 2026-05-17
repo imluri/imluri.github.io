@@ -149,7 +149,7 @@ const PROJECTS = [
     description: "Full website for a Malaysian furniture and interior design company. Built the UI, database, AI chatbot assistant, and a 3D measurement tool.",
     tags: ["Python", "Supabase", "Gemini AI", "Tailwind"],
     link: "https://perekaperabot.com.my",
-    image: null,
+    image: "assets/perekaperabot.png",
     icon: "mdi:sofa-outline",
     details: {
       year: "2025",
