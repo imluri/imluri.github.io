@@ -306,9 +306,10 @@ async function ibConnect() {
     ibEnableControls(true);
     ibAddMsg('system', 'Bridge connected.');
     ibLog('Relay handshake OK — SSE stream open.', 'ok');
-    ibOpenEventStream();
-    ibSendCmd({ type: 'get_tree' });
-    ibSendCmd({ type: 'get_state' });
+    ibOpenEventStream(() => {
+      ibSendCmd({ type: 'get_tree' });
+      ibSendCmd({ type: 'get_state' });
+    });
   } catch {
     ibConnecting = false;
     ibSetStatus('disconnected');
@@ -326,10 +327,13 @@ function ibDisconnect() {
   ibLog('Disconnected.');
 }
 
-function ibOpenEventStream() {
+function ibOpenEventStream(onReady) {
   if (ibEventSource) { ibEventSource.close(); ibEventSource = null; }
   const es = new EventSource(`${ibBaseUrl}/browser/events`);
   ibEventSource = es;
+  es.onopen = () => {
+    if (onReady) { onReady(); onReady = null; }
+  };
   es.onmessage = (e) => {
     try {
       const msg = JSON.parse(e.data);
