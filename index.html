@@ -64,7 +64,15 @@
       <ul class="nav-links">
         <li><a href="/" data-route>Home</a></li>
         <li><a href="/projects" data-route>Projects</a></li>
-        <li><a href="/iyai" data-route>IYAI</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropdown-trigger" aria-haspopup="true" aria-expanded="false">
+            Integrations
+            <iconify-icon icon="mdi:chevron-down" width="13" height="13" class="nav-dropdown-chevron"></iconify-icon>
+          </button>
+          <ul class="nav-dropdown-menu" role="menu">
+            <li><a href="/iyai" data-route role="menuitem">IYAI</a></li>
+          </ul>
+        </li>
       </ul>
       <div class="nav-end">
         <a href="https://github.com/imluri" target="_blank" rel="noopener" class="nav-cta">
@@ -83,7 +91,15 @@
   <div class="mobile-menu" id="mobileMenu">
     <a href="/" data-route>Home</a>
     <a href="/projects" data-route>Projects</a>
-    <a href="/iyai" data-route>IYAI</a>
+    <div class="mobile-menu-group">
+      <button class="mobile-menu-group-trigger" onclick="this.parentElement.classList.toggle('open')">
+        Integrations
+        <iconify-icon icon="mdi:chevron-down" width="14" height="14"></iconify-icon>
+      </button>
+      <div class="mobile-menu-group-items">
+        <a href="/iyai" data-route>IYAI</a>
+      </div>
+    </div>
   </div>
 
   <!-- Page content swapped here by router -->

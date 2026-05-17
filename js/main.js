@@ -113,6 +113,46 @@ function toggleMenu() {
   document.querySelector('.menu-toggle')?.classList.toggle('active');
 }
 
+// ── Nav dropdown ──────────────────────────────────────────────
+
+(function () {
+  function open(li) {
+    li.setAttribute('data-open', '');
+    li.querySelector('.nav-dropdown-trigger')?.setAttribute('aria-expanded', 'true');
+  }
+
+  function close(li) {
+    li.removeAttribute('data-open');
+    li.querySelector('.nav-dropdown-trigger')?.setAttribute('aria-expanded', 'false');
+  }
+
+  function closeAll() {
+    document.querySelectorAll('.nav-dropdown[data-open]').forEach(close);
+  }
+
+  document.querySelectorAll('.nav-dropdown').forEach(li => {
+    li.addEventListener('mouseenter', () => open(li));
+    li.addEventListener('mouseleave', () => close(li));
+  });
+
+  document.addEventListener('click', (e) => {
+    // Close when clicking a menu item
+    if (e.target.closest('.nav-dropdown-menu')) { closeAll(); return; }
+    // Toggle on trigger click (keyboard / touch)
+    const trigger = e.target.closest('.nav-dropdown-trigger');
+    if (trigger) {
+      const li = trigger.closest('.nav-dropdown');
+      li.hasAttribute('data-open') ? close(li) : open(li);
+      return;
+    }
+    if (!e.target.closest('.nav-dropdown')) closeAll();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAll();
+  });
+}());
+
 // ── Smooth scroll (for same-page anchor links) ────────────────
 
 document.addEventListener('click', (e) => {

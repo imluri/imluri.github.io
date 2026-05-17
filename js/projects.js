@@ -150,6 +150,7 @@ const PROJECTS = [
     tags: ["Python", "Supabase", "Gemini AI", "Tailwind"],
     link: "https://perekaperabot.com.my",
     image: "assets/perekaperabot.png",
+    fullscreen: true,
     icon: "mdi:sofa-outline",
     details: {
       year: "2025",
