@@ -1,0 +1,1514 @@
+<section class="iyai-bridge-page">
+
+  <!-- Top bar -->
+  <div class="ib-topbar">
+    <div class="ib-conn-row">
+      <input class="ib-port-input" id="ibPortInput" type="text" value="http://localhost:7402" spellcheck="false">
+      <button class="ib-connect-btn" id="ibConnectBtn" onclick="ibConnect()">Connect</button>
+      <button class="ib-help-btn" onclick="ibToggleHelp()" title="How to connect">
+        <iconify-icon icon="mdi:help-circle-outline" width="15" height="15"></iconify-icon>
+      </button>
+      <button class="ib-help-btn" id="ibSettingsBtn" onclick="ibOpenSettings()" title="Settings">
+        <iconify-icon icon="mdi:cog-outline" width="15" height="15"></iconify-icon>
+      </button>
+      <div class="ib-status">
+        <span class="ib-status-dot" id="ibStatusDot"></span>
+        <span id="ibStatusText">Disconnected</span>
+      </div>
+    </div>
+    <div class="ib-win-toggles">
+      <button class="ib-toggle-btn" data-panel="ibWinExplorer" onclick="ibToggleWindow('ibWinExplorer')" title="Explorer">
+        <iconify-icon icon="mdi:file-tree-outline" width="14" height="14"></iconify-icon>
+      </button>
+      <button class="ib-toggle-btn" data-panel="ibWinProps" onclick="ibToggleWindow('ibWinProps')" title="Properties">
+        <iconify-icon icon="mdi:table-cog" width="14" height="14"></iconify-icon>
+      </button>
+      <button class="ib-toggle-btn" data-panel="ibWinOutput" onclick="ibToggleWindow('ibWinOutput')" title="Output">
+        <iconify-icon icon="mdi:console" width="14" height="14"></iconify-icon>
+      </button>
+      <button class="ib-toggle-btn" data-panel="ibWinHistory" onclick="ibToggleWindow('ibWinHistory')" title="History">
+        <iconify-icon icon="mdi:history" width="14" height="14"></iconify-icon>
+      </button>
+      <button class="ib-toggle-btn" data-panel="ibWinTools" onclick="ibToggleWindow('ibWinTools')" title="Tools">
+        <iconify-icon icon="mdi:tools" width="14" height="14"></iconify-icon>
+      </button>
+      <div class="ib-toggle-sep"></div>
+      <button class="ib-toggle-btn ib-preset-btn" id="ibPresetWide"   onclick="ibApplyPreset('wide')"    title="Wide layout">
+        <iconify-icon icon="mdi:view-split-vertical" width="14" height="14"></iconify-icon>
+      </button>
+      <button class="ib-toggle-btn ib-preset-btn" id="ibPresetMedium" onclick="ibApplyPreset('medium')"  title="Medium layout">
+        <iconify-icon icon="mdi:view-agenda-outline" width="14" height="14"></iconify-icon>
+      </button>
+      <button class="ib-toggle-btn ib-preset-btn" id="ibPresetCompact" onclick="ibApplyPreset('compact')" title="Compact layout">
+        <iconify-icon icon="mdi:dock-window" width="14" height="14"></iconify-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Floating windows container -->
+  <div class="ib-main" id="ibMain">
+
+    <!-- Explorer window -->
+    <div class="ib-window" id="ibWinExplorer">
+      <div class="ib-win-header">
+        <iconify-icon icon="mdi:file-tree-outline" width="12" height="12"></iconify-icon>
+        <span>Explorer</span>
+      </div>
+      <div class="ib-win-body">
+        <div class="ib-explorer" id="ibExplorer">
+          <div class="ib-empty-state">
+            <iconify-icon icon="mdi:connection" width="22" height="22"></iconify-icon>
+            <span>Connect to browse</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agent window -->
+    <div class="ib-window ib-window-chat" id="ibWinChat">
+      <div class="ib-win-header">
+        <iconify-icon icon="mdi:robot-outline" width="12" height="12" style="color:var(--accent-bright)"></iconify-icon>
+        <span>Agent</span>
+      </div>
+      <div class="ib-win-body ib-messages-body">
+        <div class="ib-messages" id="ibMessages">
+          <div class="ib-welcome">
+            <iconify-icon icon="mdi:robot-outline" width="28" height="28" style="color:var(--accent-bright);opacity:0.5"></iconify-icon>
+            <p>Start the local bridge, then connect above.</p>
+          </div>
+        </div>
+      </div>
+      <div class="ib-input-row">
+        <input class="ib-msg-input" id="ibMsgInput" type="text" placeholder="Ask IYAI anything…" disabled
+          onkeydown="if(event.key==='Enter')ibSend()">
+        <button class="ib-send-btn" id="ibSendBtn" onclick="ibSend()" disabled>
+          <iconify-icon icon="mdi:send" width="14" height="14"></iconify-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Properties window -->
+    <div class="ib-window" id="ibWinProps">
+      <div class="ib-win-header">
+        <iconify-icon icon="mdi:table-cog" width="12" height="12"></iconify-icon>
+        <span>Properties</span>
+      </div>
+      <div class="ib-win-body">
+        <div class="ib-props" id="ibProps">
+          <div class="ib-empty-state">
+            <iconify-icon icon="mdi:cursor-default-click-outline" width="22" height="22"></iconify-icon>
+            <span>Select an instance</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Output window -->
+    <div class="ib-window" id="ibWinOutput">
+      <div class="ib-win-header">
+        <iconify-icon icon="mdi:console" width="12" height="12"></iconify-icon>
+        <span>Output</span>
+        <button class="ib-logbar-clear" onclick="ibLogClear()" title="Clear" style="margin-left:auto">
+          <iconify-icon icon="mdi:trash-can-outline" width="11" height="11"></iconify-icon>
+        </button>
+      </div>
+      <div class="ib-win-body">
+        <div class="ib-log-entries" id="ibLogEntries"></div>
+      </div>
+    </div>
+
+    <!-- History window -->
+    <div class="ib-window" id="ibWinHistory">
+      <div class="ib-win-header">
+        <iconify-icon icon="mdi:history" width="12" height="12"></iconify-icon>
+        <span>History</span>
+      </div>
+      <div class="ib-win-body">
+        <div class="ib-history-list" id="ibHistoryList">
+          <div class="ib-empty-state">
+            <iconify-icon icon="mdi:history" width="22" height="22"></iconify-icon>
+            <span>No conversations yet</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tools window -->
+    <div class="ib-window" id="ibWinTools">
+      <div class="ib-win-header">
+        <iconify-icon icon="mdi:tools" width="12" height="12"></iconify-icon>
+        <span>Tools</span>
+      </div>
+      <div class="ib-win-body">
+        <div class="ib-tools-list" id="ibToolsList">
+          <div class="ib-empty-state">
+            <iconify-icon icon="mdi:connection" width="22" height="22"></iconify-icon>
+            <span>Connect to load tools</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- Settings modal -->
+<div class="ib-modal-backdrop" id="ibSettingsBackdrop" onclick="ibCloseSettings()"></div>
+<div class="ib-modal" id="ibSettingsModal" role="dialog" aria-modal="true" aria-label="Settings">
+  <div class="ib-modal-header">
+    <div class="ib-modal-title">
+      <iconify-icon icon="mdi:cog-outline" width="16" height="16" style="color:var(--accent-bright)"></iconify-icon>
+      Settings
+    </div>
+    <button class="ib-modal-close" onclick="ibCloseSettings()" aria-label="Close">
+      <iconify-icon icon="mdi:close" width="16" height="16"></iconify-icon>
+    </button>
+  </div>
+  <div class="ib-modal-body">
+    <div class="ib-settings-form">
+      <div class="ib-settings-field">
+        <label class="ib-settings-label">Host Provider</label>
+        <select class="ib-settings-select" id="ibSettingsHost"></select>
+      </div>
+      <div class="ib-settings-field">
+        <label class="ib-settings-label">Model</label>
+        <input class="ib-settings-input" id="ibSettingsModel" type="text" placeholder="e.g. openai/gpt-4o" spellcheck="false">
+      </div>
+      <div class="ib-settings-field">
+        <label class="ib-settings-label">API Key</label>
+        <div class="ib-api-key-row">
+          <input class="ib-settings-input" id="ibSettingsApiKey" type="password" placeholder="sk-..." spellcheck="false">
+          <button class="ib-apikey-toggle" id="ibApiKeyToggleBtn" onclick="ibToggleApiKeyVis()" title="Show/hide key">
+            <iconify-icon icon="mdi:eye-outline" width="14" id="ibApiKeyEyeIcon"></iconify-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="ib-settings-footer">
+      <span class="ib-settings-note">
+        <iconify-icon icon="mdi:sync" width="11"></iconify-icon>
+        Changes sync to the Roblox plugin
+      </span>
+      <div class="ib-settings-actions">
+        <button class="ib-settings-cancel" onclick="ibCloseSettings()">Cancel</button>
+        <button class="ib-settings-save" onclick="ibSaveSettings()">Save &amp; Sync</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Help modal (outside section so it overlays everything) -->
+<div class="ib-modal-backdrop" id="ibHelpBackdrop" onclick="ibToggleHelp()"></div>
+<div class="ib-modal" id="ibHelpModal" role="dialog" aria-modal="true" aria-label="How to connect">
+  <div class="ib-modal-header">
+    <div class="ib-modal-title">
+      <iconify-icon icon="mdi:connection" width="16" height="16" style="color:var(--accent-bright)"></iconify-icon>
+      How to Connect
+    </div>
+    <button class="ib-modal-close" onclick="ibToggleHelp()" aria-label="Close">
+      <iconify-icon icon="mdi:close" width="16" height="16"></iconify-icon>
+    </button>
+  </div>
+  <div class="ib-modal-body">
+    <ol class="ib-help-steps">
+      <li>
+        <span class="ib-help-step-num">1</span>
+        <div>
+          <strong>Install the IYAI plugin into Infinite Yield</strong>
+          <p>Download the plugin files from the <a href="https://github.com/imluri/iyai" target="_blank" rel="noopener">IYAI GitHub repository</a> and place them in your executor's <code>workspace/</code> folder. Inject your executor, open Infinite Yield, and run <code>plugin iyai</code> to install it. Then open the UI anytime with <code>;ai</code>. Configure your API key under its Settings tab.</p>
+        </div>
+      </li>
+      <li>
+        <span class="ib-help-step-num">2</span>
+        <div>
+          <strong>Start the local bridge server</strong>
+          <p>Run <code>iyai_bridge.py</code> (requires Python + Flask) <em>or</em> <code>iyai_bridge.ps1</code> (PowerShell, no dependencies) from the repo. The bridge listens on port <code>7402</code> and relays messages between this page and the plugin.</p>
+        </div>
+      </li>
+      <li>
+        <span class="ib-help-step-num">3</span>
+        <div>
+          <strong>Enable the bridge in IYAI</strong>
+          <p>In the Roblox plugin, go to the <strong>Browser</strong> page and click <strong>Connect to Browser</strong>. The plugin will begin polling the bridge for incoming messages.</p>
+        </div>
+      </li>
+      <li>
+        <span class="ib-help-step-num">4</span>
+        <div>
+          <strong>Connect this page</strong>
+          <p>Leave the URL as <code>http://localhost:7402</code> and click <strong>Connect</strong>. Settings, history, and tools will sync automatically from the plugin.</p>
+        </div>
+      </li>
+    </ol>
+    <div class="ib-help-note">
+      <iconify-icon icon="mdi:information-outline" width="13" height="13"></iconify-icon>
+      <span>Everything runs locally — the bridge only accepts connections from <code>localhost</code> and nothing is sent to any external server.</span>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+<script>
+// ── IYAI Bridge ───────────────────────────────────────────────
+// Wrapped in IIFE so `let` re-declarations don't throw on re-navigation
+(function () {
+document.body.classList.add('ib-page');
+
+let ibConnected   = false;
+let ibConnecting  = false;
+let ibPollTimer   = null;
+let ibPollGen     = 0;   // incremented on each connect; stale loops self-terminate
+let ibBaseUrl     = 'http://localhost:7402';
+let ibTopZ        = 10;
+let ibCurrentHistory = [];
+let ibSettings = { host: 'OpenRouter', model: '', apiKey: '' };
+const IB_HOSTS = ['OpenRouter', 'Groq', 'Mistral', 'Pollinations', 'HuggingFace', 'Google AI Studio', 'Ollama'];
+
+const SNAP_GRID = 8;
+const SNAP_EDGE = 14;
+
+
+// ── Log ───────────────────────────────────────────────────────
+function ibLog(text, level) {
+  const box = document.getElementById('ibLogEntries');
+  if (!box) return;
+  const el = document.createElement('div');
+  el.className = 'ib-log-entry' + (level ? ' ib-log-' + level : '');
+  const now = new Date();
+  const ts = now.toTimeString().slice(0,8);
+  el.innerHTML = `<span class="ib-log-ts">${ts}</span><span class="ib-log-msg">${text}</span>`;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+}
+function ibLogClear() {
+  const box = document.getElementById('ibLogEntries');
+  if (box) box.innerHTML = '';
+}
+
+// ── Connection ────────────────────────────────────────────────
+async function ibConnect() {
+  if (ibConnected) { ibDisconnect(); return; }
+  if (ibConnecting) return;
+  ibConnecting = true;
+  ibBaseUrl = (document.getElementById('ibPortInput').value || 'http://localhost:7402').trim();
+  ibSetStatus('connecting');
+  ibLog(`Connecting to ${ibBaseUrl}…`);
+  try {
+    const res = await fetch(`${ibBaseUrl}/ping`, { signal: AbortSignal.timeout(3000) });
+    if (!res.ok) throw new Error();
+    // Clear any stale state from a previous session
+    ibPollGen++;
+    ibTree = []; ibNodeMap.clear(); ibOpen.clear(); ibPendingLoads.clear(); ibSelectedKey = null;
+    ibToolFrames.clear();
+    ibRenderExplorer();
+    ibConnected  = true;
+    ibConnecting = false;
+    ibSetStatus('connected');
+    ibEnableControls(true);
+    ibAddMsg('system', 'Bridge connected.');
+    ibLog('Relay handshake OK — polling started.', 'ok');
+    ibStartPolling(ibPollGen);
+    ibSendCmd({ type: 'get_tree' });
+    ibSendCmd({ type: 'get_state' });
+  } catch {
+    ibConnecting = false;
+    ibSetStatus('disconnected');
+    ibAddMsg('system', 'Could not connect. Is the relay running?');
+    ibLog(`Connection failed. Relay not reachable at ${ibBaseUrl}.`, 'err');
+  }
+}
+
+function ibDisconnect() {
+  ibPollGen++;          // invalidates any in-flight poll loop
+  ibConnected  = false;
+  ibConnecting = false;
+  clearTimeout(ibPollTimer);
+  ibPollTimer = null;
+  ibSetStatus('disconnected');
+  ibEnableControls(false);
+  ibLog('Disconnected.');
+}
+
+function ibStartPolling(gen) {
+  const poll = async () => {
+    if (!ibConnected || ibPollGen !== gen) return;  // stale loop — die
+    try {
+      const res = await fetch(`${ibBaseUrl}/browser/poll`, { signal: AbortSignal.timeout(5000) });
+      if (res.ok) {
+        const msgs = await res.json();
+        if (Array.isArray(msgs) && msgs.length) {
+          msgs.forEach(m => { ibLog(`← ${m.type}${m.text ? ': ' + m.text.slice(0,80) : ''}`, 'in'); ibHandleMsg(m); });
+        }
+      }
+    } catch {}
+    if (ibConnected && ibPollGen === gen) ibPollTimer = setTimeout(poll, 500);
+  };
+  poll();
+}
+
+async function ibSendCmd(data) {
+  if (!ibConnected) return;
+  try {
+    await fetch(`${ibBaseUrl}/browser/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+  } catch { ibLog('Send failed.', 'err'); }
+}
+
+async function ibSend() {
+  if (!ibConnected) return;
+  const input = document.getElementById('ibMsgInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  ibAddMsg('user', text);
+  await ibSendCmd({ type: 'chat', text });
+  ibLog(`→ chat: ${text.slice(0,80)}`, 'out');
+}
+
+function ibHandleMsg(msg) {
+  if (msg.type === 'chat')         ibAddMsg('ai', null, msg.tool || null, msg.text);
+  if (msg.type === 'tool_start')   ibAddMsg('tool_start',  msg.name);
+  if (msg.type === 'tool_result')  ibAddMsg('tool_result', msg.name, msg.ok, msg.result);
+  if (msg.type === 'tree')         ibPopulateExplorer(msg.data);
+  if (msg.type === 'children')     ibDeliverChildren(msg.id, msg.data);
+  if (msg.type === 'props')        ibShowProps(msg.cls, msg.data);
+  if (msg.type === 'sync_state')   ibApplySyncState(msg);
+  if (msg.type === 'session_loaded') ibSessionLoaded(msg.id, msg.history);
+}
+
+// ── Status ────────────────────────────────────────────────────
+function ibSetStatus(state) {
+  const dot  = document.getElementById('ibStatusDot');
+  const txt  = document.getElementById('ibStatusText');
+  const btn  = document.getElementById('ibConnectBtn');
+  if (!dot) return;
+  dot.className = 'ib-status-dot ib-dot-' + state;
+  txt.textContent = state === 'connected' ? 'Connected' : state === 'connecting' ? 'Connecting…' : 'Disconnected';
+  btn.textContent = state === 'connected' ? 'Disconnect' : 'Connect';
+  btn.disabled    = state === 'connecting';
+  if (state !== 'connected') ibEnableControls(false);
+}
+
+function ibEnableControls(on) {
+  document.getElementById('ibMsgInput').disabled  = !on;
+  document.getElementById('ibSendBtn').disabled   = !on;
+  const settingsBtn = document.getElementById('ibSettingsBtn');
+  if (settingsBtn) settingsBtn.disabled = !on;
+}
+
+// ── Messages ──────────────────────────────────────────────────
+const ibToolFrames = new Map();  // name → pending tool_start element
+
+function ibAddMsg(role, text, tool, aiText) {
+  const box = document.getElementById('ibMessages');
+  const welcome = box.querySelector('.ib-welcome');
+  if (welcome) welcome.remove();
+  const el = document.createElement('div');
+  if (role === 'user') {
+    el.className = 'ib-msg ib-msg-user';
+    el.innerHTML = `<span>${text}</span>`;
+  } else if (role === 'ai') {
+    el.className = 'ib-msg ib-msg-ai';
+    const md = (typeof marked !== 'undefined' && aiText)
+      ? marked.parse(aiText, { breaks: true, gfm: true })
+      : (aiText || '');
+    el.innerHTML = `
+      <div class="ib-msg-tag"><iconify-icon icon="mdi:robot-outline" width="11"></iconify-icon> IYAI</div>
+      ${tool ? `<div class="ib-msg-tool"><span class="ib-tool-dot"></span>${tool}</div>` : ''}
+      <div class="ib-msg-text ib-md">${md}</div>`;
+  } else if (role === 'tool_start') {
+    el.className = 'ib-msg ib-msg-tool ib-tool-busy';
+    el.innerHTML = `
+      <iconify-icon icon="mdi:cog-outline" width="12" class="ib-tool-spin"></iconify-icon>
+      <span class="ib-tool-name">${text}</span>`;
+    ibToolFrames.set(text, el);
+  } else if (role === 'tool_result') {
+    // Resolve the pending tool_start bubble
+    const pending = ibToolFrames.get(text);
+    const target = pending || document.createElement('div');
+    if (!pending) box.appendChild(target);
+    ibToolFrames.delete(text);
+    target.className = `ib-msg ib-msg-tool ${tool ? 'ib-tool-ok' : 'ib-tool-fail'}`;
+    const preview = aiText ? aiText.slice(0, 120).replace(/\n/g, ' ') : '';
+    target.innerHTML = `
+      <iconify-icon icon="${tool ? 'mdi:check-circle-outline' : 'mdi:alert-circle-outline'}" width="12"></iconify-icon>
+      <span class="ib-tool-name">${text}</span>
+      ${preview ? `<span class="ib-tool-preview">${preview}</span>` : ''}`;
+    box.scrollTop = box.scrollHeight;
+    return;
+  } else {
+    el.className = 'ib-msg ib-msg-system';
+    el.textContent = text;
+  }
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+}
+
+// ── API Dump ──────────────────────────────────────────────────
+const IB_API_DUMP_URL = 'https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/roblox/Mini-API-Dump.json';
+let ibApiDump = null;  // ClassName → [{ name, type, category }]
+let ibApiDumpLoading = false;
+const ibApiDumpWaiters = [];
+
+async function ibLoadApiDump() {
+  if (ibApiDump) return;
+  if (ibApiDumpLoading) {
+    return new Promise(res => ibApiDumpWaiters.push(res));
+  }
+  ibApiDumpLoading = true;
+  try {
+    const r = await fetch(IB_API_DUMP_URL);
+    const raw = await r.json();
+    ibApiDump = ibBuildApiIndex(raw);
+  } catch {
+    ibLog('Could not load API dump — properties will show without schema.', 'err');
+    ibApiDump = {};
+  }
+  ibApiDumpLoading = false;
+  ibApiDumpWaiters.forEach(fn => fn());
+  ibApiDumpWaiters.length = 0;
+}
+
+function ibBuildApiIndex(raw) {
+  const classMap = {};
+  for (const cls of (raw.Classes || [])) {
+    classMap[cls.Name] = {
+      superclass: cls.Superclass,
+      members: (cls.Members || []).filter(m => m.MemberType === 'Property'),
+    };
+  }
+  const resolved = {};
+  function resolve(name) {
+    if (resolved[name]) return resolved[name];
+    const cls = classMap[name];
+    if (!cls) return (resolved[name] = []);
+    const parent = cls.superclass && cls.superclass !== '<<<ROOT>>>' ? resolve(cls.superclass) : [];
+    const own = cls.members.map(m => ({
+      name:     m.Name,
+      type:     m.ValueType?.Name || '',
+      category: m.Category || 'Data',
+    }));
+    return (resolved[name] = [...parent, ...own]);
+  }
+  for (const name of Object.keys(classMap)) resolve(name);
+  return resolved;
+}
+
+async function ibRequestProps(node) {
+  if (!ibConnected || node.id == null || !node.cls) return;
+  // Show loading state immediately
+  const el = document.getElementById('ibProps');
+  if (el) {
+    el.innerHTML = `
+      <div class="ib-props-cls">${ibIcon(node.cls, 13)} ${node.cls}</div>
+      <div class="ib-props-loading">
+        <iconify-icon icon="mdi:loading" width="14" class="ib-tool-spin"></iconify-icon>
+        <span>Loading properties…</span>
+      </div>`;
+  }
+  await ibLoadApiDump();
+  const schema = ibApiDump[node.cls] || [];
+  const props  = schema.map(p => p.name);
+  if (props.length > 0) {
+    ibSendCmd({ type: 'get_props', id: node.id, cls: node.cls, props });
+  } else if (el) {
+    el.innerHTML = `<div class="ib-props-cls">${ibIcon(node.cls, 13)} ${node.cls}</div>
+      <div class="ib-empty-state"><span>No schema for this class</span></div>`;
+  }
+}
+
+// ── Icons ─────────────────────────────────────────────────────
+const ICON_BASE = '/assets/icons/roblox/';
+const ICON_FALLBACK = ICON_BASE + 'Instance.png';
+
+function ibIcon(cls, size = 14) {
+  const src = ICON_BASE + cls + '.png';
+  return `<img class="ib-node-icon" src="${src}" width="${size}" height="${size}" onerror="this.src='${ICON_FALLBACK}'">`;
+}
+
+// ── Explorer ──────────────────────────────────────────────────
+const IB_PINNED = [
+  'Workspace','Players','Lighting','MaterialService',
+  'ReplicatedFirst','ReplicatedStorage','StarterGui',
+  'StarterPack','StarterPlayer','Teams','SoundService','TextChatService',
+];
+
+const ibOpen         = new Set();
+const ibPendingLoads = new Set();
+const ibNodeMap      = new Map();   // id → node
+let   ibTree         = [];
+let   ibSelectedKey  = null;
+
+function ibRegisterNodes(nodes) {
+  for (const n of nodes) {
+    if (n.id != null) ibNodeMap.set(n.id, n);
+    if (n.children) ibRegisterNodes(n.children);
+  }
+}
+
+function ibPopulateExplorer(tree) {
+  ibTree = tree;
+  ibNodeMap.clear();
+  ibRegisterNodes(tree);
+  ibRenderExplorer();
+}
+
+function ibDeliverChildren(id, children) {
+  const node = ibNodeMap.get(id);
+  if (!node) return;
+  node.lazy     = false;
+  node.children = children;
+  ibRegisterNodes(children);
+  ibPendingLoads.delete(id);
+  ibRenderExplorer();
+}
+
+function ibToggleExpand(key, node) {
+  const hasKids = node.children && node.children.length > 0;
+  if (ibOpen.has(key)) {
+    ibOpen.delete(key);
+  } else {
+    ibOpen.add(key);
+    if (node.lazy && !hasKids && !ibPendingLoads.has(node.id)) {
+      ibPendingLoads.add(node.id);
+      ibSendCmd({ type: 'get_children', id: node.id });
+    }
+  }
+  ibRenderExplorer();
+}
+
+function ibRenderExplorer() {
+  const el = document.getElementById('ibExplorer');
+  if (!el) return;
+  el.innerHTML = '';
+  if (!ibTree.length) {
+    el.innerHTML = `<div class="ib-empty-state">
+      <iconify-icon icon="mdi:connection" width="22" height="22"></iconify-icon>
+      <span>Connect to browse</span></div>`;
+    return;
+  }
+  function render(node, depth) {
+    const hasKids   = node.children && node.children.length > 0;
+    const canExpand = hasKids || node.lazy;
+    const key       = node.id != null ? node.id : node.name;
+    const open      = ibOpen.has(key);
+    const loading   = open && node.lazy && ibPendingLoads.has(node.id);
+    const row       = document.createElement('div');
+    row.className   = 'ib-node' + (ibSelectedKey === key ? ' ib-node-sel' : '');
+    row.style.paddingLeft = (6 + depth * 14) + 'px';
+    row.innerHTML = `
+      <span class="ib-node-arrow ${canExpand ? (open ? 'ib-open' : '') : 'ib-leaf'}">${canExpand ? '▶' : ''}</span>
+      ${ibIcon(node.cls, 14)}
+      <span class="ib-node-name">${node.name}</span>`;
+
+    // Arrow click → expand/collapse only
+    if (canExpand) {
+      row.querySelector('.ib-node-arrow').addEventListener('click', (e) => {
+        e.stopPropagation();
+        ibToggleExpand(key, node);
+      });
+    }
+
+    // Single click → select + load properties
+    row.addEventListener('click', (e) => {
+      e.stopPropagation();
+      ibSelectedKey = key;
+      el.querySelectorAll('.ib-node').forEach(n => n.classList.remove('ib-node-sel'));
+      row.classList.add('ib-node-sel');
+      ibRequestProps(node);
+    });
+
+    // Double click → expand/collapse
+    if (canExpand) {
+      row.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        ibToggleExpand(key, node);
+      });
+    }
+
+    el.appendChild(row);
+
+    if (open) {
+      if (hasKids) {
+        node.children.forEach(c => render(c, depth + 1));
+      } else if (loading) {
+        const spin = document.createElement('div');
+        spin.className = 'ib-node ib-node-loading';
+        spin.style.paddingLeft = (6 + (depth + 1) * 14) + 'px';
+        spin.innerHTML = `<iconify-icon icon="mdi:loading" width="12" class="ib-tool-spin"></iconify-icon><span class="ib-node-loading-label">Loading…</span>`;
+        el.appendChild(spin);
+      }
+    }
+  }
+  // ── Pinned services ──────────────────────────────────────────
+  const secPinned = document.createElement('div');
+  secPinned.className = 'ib-section-header';
+  secPinned.textContent = 'Pinned';
+  el.appendChild(secPinned);
+
+  IB_PINNED.forEach(name => {
+    const node = ibTree.find(n => n.name === name);
+    if (node) {
+      render(node, 0);
+    } else {
+      // placeholder when service isn't in tree yet
+      const row = document.createElement('div');
+      row.className = 'ib-node ib-node-ghost';
+      row.style.paddingLeft = '6px';
+      row.innerHTML = `<span class="ib-node-arrow ib-leaf"></span>${ibIcon(name, 14)}<span class="ib-node-name">${name}</span>`;
+      el.appendChild(row);
+    }
+  });
+
+  // ── Full game tree (non-pinned only) ─────────────────────────
+  const unpinned = ibTree.filter(n => !IB_PINNED.includes(n.name));
+  if (unpinned.length > 0) {
+    const secGame = document.createElement('div');
+    secGame.className = 'ib-section-header';
+    secGame.textContent = 'Explorer';
+    el.appendChild(secGame);
+    unpinned.forEach(n => render(n, 0));
+  }
+}
+
+// ── Properties ────────────────────────────────────────────────
+// msg.data is an object { PropName: "value", ... }
+function ibShowProps(cls, data) {
+  const el = document.getElementById('ibProps');
+  if (!el) return;
+  const header = `<div class="ib-props-cls">${ibIcon(cls, 13)} ${cls}</div>`;
+
+  if (!data || Object.keys(data).length === 0) {
+    el.innerHTML = header + `<div class="ib-empty-state"><span>No readable properties</span></div>`;
+    return;
+  }
+
+  // Use API dump schema to group by category
+  const schema    = ibApiDump?.[cls] || [];
+  const schemaMap = {};
+  schema.forEach(p => { schemaMap[p.name] = p; });
+
+  const byCategory = {};
+  for (const [name, value] of Object.entries(data)) {
+    const info = schemaMap[name];
+    const cat  = info?.category || 'Data';
+    if (!byCategory[cat]) byCategory[cat] = [];
+    byCategory[cat].push({ name, type: info?.type || '', value });
+  }
+
+  const CATEGORY_ORDER = ['Appearance','Data','Behavior','Transform','Part','Constraints','Character','Scripting'];
+  const cats = Object.keys(byCategory).sort((a, b) => {
+    const ai = CATEGORY_ORDER.indexOf(a), bi = CATEGORY_ORDER.indexOf(b);
+    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+  });
+
+  const rows = cats.map(cat =>
+    `<tr class="ib-prop-cat"><td colspan="2">${cat}</td></tr>` +
+    byCategory[cat].map(p =>
+      `<tr><td class="ib-prop-name">${p.name}</td><td class="ib-prop-val ib-pt-${p.type}">${p.value}</td></tr>`
+    ).join('')
+  ).join('');
+
+  el.innerHTML = header + `<table class="ib-props-table">${rows}</table>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  GoldenLayout-style Dock Engine
+//  Layout tree: { type:'leaf', panelId } | { type:'split', dir:'h'|'v', sizes:[], children:[] }
+//  Panels are DOM nodes moved between .ib-leaf-slot containers.
+//  During drag the panel floats fixed; on drop it is re-docked.
+// ══════════════════════════════════════════════════════════════
+
+// ── Layout presets (all 4 panels always visible) ───────────────
+const IB_PRESETS = {
+  // Studio ≥1200px — Explorer | Chat | Properties top, Output bottom
+  wide: {
+    type: 'split', dir: 'v', sizes: [0.72, 0.28],
+    children: [
+      {
+        type: 'split', dir: 'h', sizes: [0.18, 0.64, 0.18],
+        children: [
+          { type: 'leaf', panelId: 'ibWinExplorer' },
+          { type: 'leaf', panelId: 'ibWinChat'     },
+          { type: 'leaf', panelId: 'ibWinProps'    },
+        ],
+      },
+      { type: 'leaf', panelId: 'ibWinOutput' },
+    ],
+  },
+  // Medium 768–1199px — left col: Explorer over Properties | right col: Chat over Output
+  medium: {
+    type: 'split', dir: 'h', sizes: [0.22, 0.78],
+    children: [
+      {
+        type: 'split', dir: 'v', sizes: [0.55, 0.45],
+        children: [
+          { type: 'leaf', panelId: 'ibWinExplorer' },
+          { type: 'leaf', panelId: 'ibWinProps'    },
+        ],
+      },
+      {
+        type: 'split', dir: 'v', sizes: [0.72, 0.28],
+        children: [
+          { type: 'leaf', panelId: 'ibWinChat'   },
+          { type: 'leaf', panelId: 'ibWinOutput' },
+        ],
+      },
+    ],
+  },
+  // Compact <768px — Chat top, Explorer | Properties | Output across the bottom
+  compact: {
+    type: 'split', dir: 'v', sizes: [0.62, 0.38],
+    children: [
+      { type: 'leaf', panelId: 'ibWinChat' },
+      {
+        type: 'split', dir: 'h', sizes: [0.3, 0.4, 0.3],
+        children: [
+          { type: 'leaf', panelId: 'ibWinExplorer' },
+          { type: 'leaf', panelId: 'ibWinOutput'   },
+          { type: 'leaf', panelId: 'ibWinProps'    },
+        ],
+      },
+    ],
+  },
+};
+
+function ibPickPreset() {
+  const w = window.innerWidth;
+  if (w >= 1200) return 'wide';
+  if (w >= 768)  return 'medium';
+  return 'compact';
+}
+
+// Deep-clone a preset so mutations don't corrupt the originals
+function ibCloneLayout(node) {
+  if (node.type === 'leaf') return { type: 'leaf', panelId: node.panelId };
+  return {
+    type: node.type, dir: node.dir,
+    sizes: [...node.sizes],
+    children: node.children.map(ibCloneLayout),
+  };
+}
+
+// ── Layout tree (auto-selected from preset on load) ────────────
+let ibLayout = ibCloneLayout(IB_PRESETS[ibPickPreset()]);
+
+// ── Drag state ────────────────────────────────────────────────
+let ibDragPanelId    = null;   // id of panel being dragged
+let ibDragOffX       = 0, ibDragOffY = 0;
+let ibDragActive     = false;
+let ibCurrentSlot    = null;   // .ib-leaf-slot the cursor is over
+let ibHoveredZone    = null;   // 'n'|'s'|'e'|'w'|'c' within slot compass
+let ibHoveredEdge    = null;   // 'n'|'s'|'e'|'w' workspace-edge zone
+let ibNearResizer    = null;   // resizer DOM element when cursor is close to one
+const EDGE_T         = 50;     // px from workspace edge to trigger edge zone
+const RESIZER_T      = 20;     // px from a resizer to trigger insert-between
+
+// ══ TREE HELPERS ══════════════════════════════════════════════
+
+function ibFindLeaf(node, panelId, parent, idx) {
+  if (node.type === 'leaf') return node.panelId === panelId ? { node, parent, idx } : null;
+  for (let i = 0; i < node.children.length; i++) {
+    const r = ibFindLeaf(node.children[i], panelId, node, i);
+    if (r) return r;
+  }
+  return null;
+}
+
+// Remove panel from tree; collapse single-child splits in-place
+function ibRemoveFromTree(panelId) {
+  const f = ibFindLeaf(ibLayout, panelId, null, -1);
+  if (!f || !f.parent) return;
+  const { parent, idx } = f;
+  parent.children.splice(idx, 1);
+  parent.sizes.splice(idx, 1);
+  // Renormalize sizes
+  const tot = parent.sizes.reduce((a, b) => a + b, 0) || 1;
+  parent.sizes = parent.sizes.map(s => s / tot);
+  // Collapse if only one child remains
+  if (parent.children.length === 1) {
+    const only = parent.children[0];
+    Object.keys(parent).forEach(k => delete parent[k]);
+    Object.assign(parent, only);
+  }
+}
+
+// Insert dragged panel adjacent to target at compass zone
+function ibInsertPanel(draggedId, targetId, zone) {
+  if (draggedId === targetId) return;
+  const newLeaf = { type: 'leaf', panelId: draggedId };
+  const f = ibFindLeaf(ibLayout, targetId, null, -1);
+  if (!f) return;
+  const { node: target, parent, idx } = f;
+
+  const dir   = (zone === 'n' || zone === 's') ? 'v' : 'h';
+  const first = (zone === 'n' || zone === 'w');
+  const split = {
+    type: 'split', dir, sizes: [0.5, 0.5],
+    children: first ? [newLeaf, { type: 'leaf', panelId: targetId }]
+                    : [{ type: 'leaf', panelId: targetId }, newLeaf],
+  };
+  if (!parent) { ibLayout = split; }
+  else         { parent.children[idx] = split; }
+}
+
+// Insert panel at workspace edge (wraps entire current layout)
+function ibInsertAtEdge(draggedId, edge) {
+  const newLeaf = { type: 'leaf', panelId: draggedId };
+  const dir     = (edge === 'n' || edge === 's') ? 'v' : 'h';
+  const first   = (edge === 'n' || edge === 'w');
+  const oldRoot = ibLayout;
+  ibLayout = {
+    type: 'split', dir, sizes: first ? [0.28, 0.72] : [0.72, 0.28],
+    children: first ? [newLeaf, oldRoot] : [oldRoot, newLeaf],
+  };
+}
+
+// ══ RENDER ════════════════════════════════════════════════════
+
+function ibRenderNode(node) {
+  if (node.type === 'leaf') {
+    const slot = document.createElement('div');
+    slot.className = 'ib-leaf-slot';
+    slot.dataset.panelId = node.panelId;
+    const panel = document.getElementById(node.panelId);
+    // Don't touch the panel currently floating in a drag
+    if (panel && panel.id !== ibDragPanelId) {
+      panel.style.cssText = '';
+      slot.appendChild(panel);
+    }
+    return slot;
+  }
+  const el = document.createElement('div');
+  el.className = `ib-split ib-split-${node.dir}`;
+  el._ibNode = node;
+  node.children.forEach((child, i) => {
+    if (i > 0) {
+      const r = document.createElement('div');
+      r.className = `ib-resizer ib-resizer-${node.dir}`;
+      r.dataset.splitIdx = String(i); // index of the child AFTER this resizer
+      el.appendChild(r);
+    }
+    const childEl = ibRenderNode(child);
+    childEl.style.flex      = String(node.sizes ? node.sizes[i] : 1);
+    childEl.style.minWidth  = '0';
+    childEl.style.minHeight = '0';
+    el.appendChild(childEl);
+  });
+  return el;
+}
+
+function ibRenderLayout() {
+  const main = document.getElementById('ibMain');
+  if (!main) return;
+  // Move all known panels to body temporarily (preserves DOM state)
+  const ALL_PANEL_IDS = ['ibWinExplorer', 'ibWinChat', 'ibWinProps', 'ibWinOutput', 'ibWinHistory', 'ibWinTools'];
+  ALL_PANEL_IDS.forEach(id => {
+    const w = document.getElementById(id);
+    if (w && w.id !== ibDragPanelId) {
+      w.style.display = '';
+      document.body.appendChild(w);
+    }
+  });
+  main.innerHTML = '';
+  const root = ibRenderNode(ibLayout);
+  root.style.flex      = '1';
+  root.style.minHeight = '0';
+  root.style.minWidth  = '0';
+  main.appendChild(root);
+  ibBindResizers(main);
+  // Re-attach header listeners on newly rendered panels
+  main.querySelectorAll('.ib-leaf-slot > .ib-window').forEach(ibBindHeader);
+  // Hide panels not placed in the layout tree (orphaned in body)
+  ALL_PANEL_IDS.forEach(id => {
+    const w = document.getElementById(id);
+    if (w && w.parentElement === document.body && w.id !== ibDragPanelId) {
+      w.style.display = 'none';
+    }
+  });
+
+  ibUpdateToggleStates();
+}
+
+function ibUpdateToggleStates() {
+  document.querySelectorAll('.ib-toggle-btn[data-panel]').forEach(btn => {
+    const inTree = !!ibFindLeaf(ibLayout, btn.dataset.panel, null, -1);
+    btn.classList.toggle('ib-toggle-active', inTree);
+  });
+}
+
+// ══ DOCK TARGET COMPASS ═══════════════════════════════════════
+
+function ibShowDockTargets(slot) {
+  if (slot === ibCurrentSlot) return;
+  ibHideDockTargets();
+  ibCurrentSlot = slot;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'ibDockOverlay';
+  overlay.className = 'ib-dock-overlay';
+
+  const compass = document.createElement('div');
+  compass.className = 'ib-dock-compass';
+
+  ['n', 'w', 'c', 'e', 's'].forEach(z => {
+    const btn = document.createElement('div');
+    btn.className = `ib-dock-zone ib-dock-${z}`;
+    btn.dataset.zone = z;
+    // Show drop-ghost preview on hover of each compass arrow
+    btn.addEventListener('mouseenter', () => {
+      ibHoveredZone = z;
+      ibShowDropGhost(slot, z);
+    });
+    btn.addEventListener('mouseleave', () => {
+      ibHoveredZone = null;
+      document.getElementById('ibDropGhost')?.remove();
+    });
+    compass.appendChild(btn);
+  });
+
+  overlay.appendChild(compass);
+  slot.appendChild(overlay);
+}
+
+function ibHideDockTargets() {
+  document.getElementById('ibDockOverlay')?.remove();
+  document.getElementById('ibDropGhost')?.remove();
+  ibCurrentSlot = null;
+  ibHoveredZone = null;
+}
+
+// Semi-transparent preview of exactly where the panel will land
+function ibShowDropGhost(slot, zone) {
+  document.getElementById('ibDropGhost')?.remove();
+  const g = document.createElement('div');
+  g.id = 'ibDropGhost';
+  g.className = `ib-drop-ghost ib-drop-${zone}`;
+  slot.appendChild(g);
+}
+
+// Workspace-edge zone preview (wraps full layout)
+function ibShowEdgeGhost(edge) {
+  document.getElementById('ibEdgeGhost')?.remove();
+  const g = document.createElement('div');
+  g.id = 'ibEdgeGhost';
+  g.className = `ib-edge-ghost ib-edge-ghost-${edge}`;
+  document.getElementById('ibMain').appendChild(g);
+}
+
+// Find the nearest resizer within RESIZER_T px of the cursor
+function ibGetNearResizer(cx, cy) {
+  const main = document.getElementById('ibMain');
+  if (!main) return null;
+  const mr = main.getBoundingClientRect();
+  let best = null, bestDist = RESIZER_T;
+  main.querySelectorAll('.ib-resizer').forEach(r => {
+    const rr = r.getBoundingClientRect();
+    const rx = rr.left - mr.left, ry = rr.top - mr.top;
+    let dist;
+    if (r.classList.contains('ib-resizer-h')) {
+      // horizontal split → vertical bar → close if X is near
+      const midX = rx + rr.width / 2;
+      const inY  = cy >= ry && cy <= ry + rr.height;
+      dist = inY ? Math.abs(cx - midX) : Infinity;
+    } else {
+      // vertical split → horizontal bar → close if Y is near
+      const midY = ry + rr.height / 2;
+      const inX  = cx >= rx && cx <= rx + rr.width;
+      dist = inX ? Math.abs(cy - midY) : Infinity;
+    }
+    if (dist < bestDist) { bestDist = dist; best = r; }
+  });
+  return best;
+}
+
+function ibShowInsertGhost(resizerEl) {
+  document.getElementById('ibInsertGhost')?.remove();
+  const main = document.getElementById('ibMain');
+  if (!main) return;
+  const mr = main.getBoundingClientRect();
+  const rr = resizerEl.getBoundingClientRect();
+  const g  = document.createElement('div');
+  g.id = 'ibInsertGhost';
+  g.className = 'ib-insert-ghost';
+  if (resizerEl.classList.contains('ib-resizer-h')) {
+    // vertical bar — show as a vertical strip at same X
+    const midX = rr.left - mr.left + rr.width / 2;
+    g.style.cssText = `position:absolute;top:${rr.top - mr.top}px;left:${midX - 2}px;width:4px;height:${rr.height}px;`;
+  } else {
+    // horizontal bar — show as a horizontal strip at same Y
+    const midY = rr.top - mr.top + rr.height / 2;
+    g.style.cssText = `position:absolute;left:${rr.left - mr.left}px;top:${midY - 2}px;width:${rr.width}px;height:4px;`;
+  }
+  main.appendChild(g);
+}
+
+function ibHideInsertGhost() {
+  document.getElementById('ibInsertGhost')?.remove();
+}
+
+// Splice dragged panel as a sibling in the parent split at the resizer boundary
+function ibInsertBetween(draggedId, resizerEl) {
+  const parentEl = resizerEl.parentElement;
+  const node     = parentEl?._ibNode;
+  if (!node || node.type !== 'split') return;
+
+  const afterIdx = parseInt(resizerEl.dataset.splitIdx, 10); // child index after resizer
+  const newLeaf  = { type: 'leaf', panelId: draggedId };
+
+  // Insert before the child at afterIdx
+  node.children.splice(afterIdx, 0, newLeaf);
+  // Give equal weight to the new slot taken from both neighbors proportionally
+  const share = (node.sizes[afterIdx - 1] + node.sizes[afterIdx]) / 3;
+  node.sizes[afterIdx - 1] -= share / 2;
+  node.sizes[afterIdx]     -= share / 2;
+  node.sizes.splice(afterIdx, 0, share);
+  // Renormalize
+  const tot = node.sizes.reduce((a, b) => a + b, 0) || 1;
+  node.sizes = node.sizes.map(s => s / tot);
+}
+
+// ══ SHARED MOUSE HANDLERS ═════════════════════════════════════
+
+function ibOnMouseMove(e) {
+  if (!ibDragActive) return;
+
+  // Float the panel with the cursor
+  const panel = document.getElementById(ibDragPanelId);
+  if (panel) {
+    panel.style.left = (e.clientX - ibDragOffX) + 'px';
+    panel.style.top  = (e.clientY - ibDragOffY) + 'px';
+  }
+
+  const main = document.getElementById('ibMain');
+  if (!main) return;
+  const mr = main.getBoundingClientRect();
+  const cx = e.clientX - mr.left, cy = e.clientY - mr.top;
+  const mw = mr.width,  mh = mr.height;
+
+  // Detect workspace edge zones
+  let edge = null;
+  if      (cx < EDGE_T)      edge = 'w';
+  else if (cx > mw - EDGE_T) edge = 'e';
+  else if (cy < EDGE_T)      edge = 'n';
+  else if (cy > mh - EDGE_T) edge = 's';
+
+  if (edge !== ibHoveredEdge) {
+    ibHoveredEdge = edge;
+    document.getElementById('ibEdgeGhost')?.remove();
+    ibHideDockTargets();
+    ibHideInsertGhost();
+    ibNearResizer = null;
+    if (edge) ibShowEdgeGhost(edge);
+  }
+  if (edge) return; // workspace-edge takes priority
+
+  // Check for resizer proximity (insert-between, second priority)
+  const nearR = ibGetNearResizer(cx, cy);
+  if (nearR !== ibNearResizer) {
+    ibNearResizer = nearR;
+    ibHideInsertGhost();
+    ibHideDockTargets();
+    if (nearR) {
+      ibShowInsertGhost(nearR);
+      return; // resizer takes priority over slot compass
+    }
+  }
+  if (ibNearResizer) return;
+
+  // Find leaf slot under cursor (panel has pointer-events:none so we see through it)
+  const under = document.elementFromPoint(e.clientX, e.clientY);
+  const slot  = under?.closest('.ib-leaf-slot');
+  if (slot !== ibCurrentSlot) {
+    ibHideDockTargets();
+    if (slot) ibShowDockTargets(slot);
+  }
+}
+
+function ibOnMouseUp() {
+  if (!ibDragActive) return;
+  ibDragActive = false;
+  document.body.style.userSelect = '';
+  document.body.style.cursor = '';
+
+  const panelId    = ibDragPanelId;
+  ibDragPanelId    = null;
+  const targetSlot = ibCurrentSlot;
+  const zone       = ibHoveredZone;
+  const edge       = ibHoveredEdge;
+
+  ibHideDockTargets();
+  ibHideInsertGhost();
+  document.getElementById('ibEdgeGhost')?.remove();
+  ibHoveredEdge = null;
+  const nearR   = ibNearResizer;
+  ibNearResizer = null;
+
+  // Re-enable flex transitions now that drag ended
+  document.getElementById('ibMain')?.classList.remove('ib-dragging');
+
+  // Capture floating rect BEFORE clearing styles — this is where the panel is right now
+  const panel    = document.getElementById(panelId);
+  const fromRect = panel?.getBoundingClientRect();
+
+  // Clear floating styles and re-insert into tree
+  if (panel) { panel.style.cssText = ''; panel.classList.remove('ib-win-floating'); }
+
+  if (edge) {
+    ibInsertAtEdge(panelId, edge);
+  } else if (nearR) {
+    ibInsertBetween(panelId, nearR);
+  } else if (targetSlot && zone) {
+    ibInsertPanel(panelId, targetSlot.dataset.panelId, zone);
+  } else {
+    ibLayout = {
+      type: 'split', dir: 'h', sizes: [0.72, 0.28],
+      children: [ibLayout, { type: 'leaf', panelId }],
+    };
+  }
+
+  ibRenderLayout();
+  ibMarkActivePreset(null); // user moved a panel — no preset is active
+
+  // FLIP flight: ghost flies from floating position to the docked slot
+  if (panel && fromRect && fromRect.width > 0) {
+    const toRect = panel.getBoundingClientRect();
+    const dx = toRect.left - fromRect.left;
+    const dy = toRect.top  - fromRect.top;
+    const sx = toRect.width  / fromRect.width;
+    const sy = toRect.height / fromRect.height;
+
+    // Ghost sits at the floating position, then transforms to docked rect
+    const ghost = document.createElement('div');
+    ghost.style.cssText = `
+      position:fixed;left:${fromRect.left}px;top:${fromRect.top}px;
+      width:${fromRect.width}px;height:${fromRect.height}px;
+      transform-origin:top left;
+      background:rgba(10,11,16,0.92);
+      border:1px solid rgba(255,255,255,0.15);
+      border-radius:8px;
+      box-shadow:0 16px 48px rgba(0,0,0,0.6);
+      pointer-events:none;z-index:9999;
+    `;
+    document.body.appendChild(ghost);
+
+    // Hide real panel while ghost is in flight
+    panel.style.opacity = '0';
+
+    void ghost.offsetWidth; // force reflow so starting position is painted
+
+    ghost.style.transition = 'transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.12s ease 0.22s';
+    ghost.style.transform  = `translate(${dx}px,${dy}px) scale(${sx},${sy})`;
+    ghost.style.opacity    = '0';
+
+    const onDone = (e) => {
+      if (e.propertyName !== 'opacity') return;
+      ghost.removeEventListener('transitionend', onDone);
+      ghost.remove();
+      panel.style.opacity = '';
+    };
+    ghost.addEventListener('transitionend', onDone);
+  }
+}
+
+document.addEventListener('mousemove', ibOnMouseMove);
+document.addEventListener('mouseup',   ibOnMouseUp);
+
+// ══ HEADER BIND ═══════════════════════════════════════════════
+
+function ibBindHeader(panel) {
+  const header = panel.querySelector('.ib-win-header');
+  if (!header || header._ibBound) return;
+  header._ibBound = true;
+  header.style.cursor = 'grab';
+
+  header.addEventListener('mousedown', (e) => {
+    if (e.target.closest('button')) return;
+    e.preventDefault();
+
+    const panelId = panel.id;
+    const rect    = panel.getBoundingClientRect();
+
+    // Lift panel out of layout tree (the gap closes on re-render)
+    ibRemoveFromTree(panelId);
+    ibDragPanelId = panelId;
+
+    // Float the panel under the cursor
+    panel.classList.add('ib-win-floating');
+    Object.assign(panel.style, {
+      position:      'fixed',
+      left:          rect.left + 'px',
+      top:           rect.top  + 'px',
+      width:         rect.width + 'px',
+      height:        rect.height + 'px',
+      zIndex:        '9999',
+      opacity:       '0.88',
+      pointerEvents: 'none',
+      boxShadow:     '0 24px 72px rgba(0,0,0,0.65)',
+      borderRadius:  '8px',
+      border:        '1px solid rgba(255,255,255,0.13)',
+    });
+    document.body.appendChild(panel);
+
+    // Disable flex transitions during drag so sibling slots snap instantly
+    document.getElementById('ibMain')?.classList.add('ib-dragging');
+
+    // Re-render layout without this panel (closes the empty slot)
+    ibRenderLayout();
+
+    ibDragOffX   = e.clientX - rect.left;
+    ibDragOffY   = e.clientY - rect.top;
+    ibDragActive = true;
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor     = 'grabbing';
+    header.style.cursor = 'grabbing';
+  });
+}
+
+// ══ RESIZE HANDLES ════════════════════════════════════════════
+
+function ibBindResizers(container) {
+  container.querySelectorAll('.ib-resizer').forEach(resizer => {
+    if (resizer._ibBound) return;
+    resizer._ibBound = true;
+
+    resizer.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      document.body.style.userSelect = 'none';
+      document.getElementById('ibMain')?.classList.add('ib-dragging');
+
+      const isH     = resizer.classList.contains('ib-resizer-h');
+      const prev    = resizer.previousElementSibling;
+      const next    = resizer.nextElementSibling;
+      const parent  = resizer.parentElement;
+      const startX  = e.clientX, startY = e.clientY;
+      const pf      = parseFloat(prev.style.flex) || 1;
+      const nf      = parseFloat(next.style.flex) || 1;
+      // totalPx = full parent size; flex values are normalized to sum=1.0
+      // so delta (px/totalPx) directly maps to flex units — no extra multiplier
+      const totalPx = isH ? parent.offsetWidth : parent.offsetHeight;
+      const total   = pf + nf;
+
+      const onMove = ev => {
+        const delta = (isH ? ev.clientX - startX : ev.clientY - startY) / totalPx;
+        const np    = Math.max(0.08, Math.min(total - 0.08, pf + delta));
+        prev.style.flex = String(np);
+        next.style.flex = String(total - np);
+      };
+      const onUp = () => {
+        document.body.style.userSelect = '';
+        document.getElementById('ibMain')?.classList.remove('ib-dragging');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup',   onUp);
+        ibMarkActivePreset(null); // user resized — no preset is active
+      };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup',   onUp);
+    });
+  });
+}
+
+// ══ TOGGLE ════════════════════════════════════════════════════
+
+function ibToggleWindow(id) {
+  const inTree = !!ibFindLeaf(ibLayout, id, null, -1);
+  if (inTree) {
+    ibRemoveFromTree(id);
+  } else {
+    ibLayout = {
+      type: 'split', dir: 'h', sizes: [0.75, 0.25],
+      children: [ibLayout, { type: 'leaf', panelId: id }],
+    };
+  }
+  ibRenderLayout();
+  ibMarkActivePreset(null); // user toggled a panel — no preset is active
+}
+
+// ══ PRESET SWITCHER ═══════════════════════════════════════════
+
+function ibApplyPreset(name) {
+  if (!IB_PRESETS[name]) return;
+  ibLayout = ibCloneLayout(IB_PRESETS[name]);
+  ibRenderLayout();
+  ibMarkActivePreset(name);
+}
+
+function ibMarkActivePreset(name) {
+  document.querySelectorAll('.ib-preset-btn').forEach(b => b.classList.remove('ib-preset-active'));
+  if (!name) return;
+  const ids = { wide: 'ibPresetWide', medium: 'ibPresetMedium', compact: 'ibPresetCompact' };
+  document.getElementById(ids[name])?.classList.add('ib-preset-active');
+}
+
+// ══ INIT ══════════════════════════════════════════════════════
+
+function ibInitWindows() {
+  ibRenderLayout();
+  ibMarkActivePreset(ibPickPreset());
+}
+
+// ══ HELP MODAL ════════════════════════════════════════════════
+
+function ibToggleHelp() {
+  const modal    = document.getElementById('ibHelpModal');
+  const backdrop = document.getElementById('ibHelpBackdrop');
+  if (!modal) return;
+  const open = modal.classList.toggle('ib-modal-open');
+  backdrop?.classList.toggle('ib-modal-open', open);
+  if (open) {
+    // Close on Escape
+    const onKey = e => { if (e.key === 'Escape') { ibToggleHelp(); document.removeEventListener('keydown', onKey); } };
+    document.addEventListener('keydown', onKey);
+  }
+}
+
+// Cleanup on navigation away
+window.__ibCleanup = function() {
+  clearTimeout(ibPollTimer);
+  ibConnected  = false;
+  ibDragActive = false;
+  document.removeEventListener('mousemove', ibOnMouseMove);
+  document.removeEventListener('mouseup',   ibOnMouseUp);
+  // Remove any panels stranded in body from a mid-drag navigation
+  document.querySelectorAll('body > .ib-window').forEach(w => w.remove());
+  delete window.__ibCleanup;
+  delete window.ibConnect;
+  delete window.ibSend;
+  delete window.ibToggleWindow;
+  delete window.ibLogClear;
+  delete window.ibApplyPreset;
+  delete window.ibToggleHelp;
+};
+
+// ── Sync state ────────────────────────────────────────────────
+function ibApplySyncState(data) {
+  if (data.config) ibSettings = { ...ibSettings, ...data.config };
+  if (data.tools)    ibRenderTools(data.tools);
+  if (data.sessions) ibRenderHistory(data.sessions, data.activeId);
+  if (data.history)  ibCurrentHistory = data.history;
+}
+
+// ── History ───────────────────────────────────────────────────
+function ibRenderHistory(sessions, activeId) {
+  const el = document.getElementById('ibHistoryList');
+  if (!el) return;
+  if (!sessions || !sessions.length) {
+    el.innerHTML = `<div class="ib-empty-state"><iconify-icon icon="mdi:history" width="22" height="22"></iconify-icon><span>No conversations yet</span></div>`;
+    return;
+  }
+  el.innerHTML = sessions.map(s => {
+    const d = s.timestamp ? new Date(s.timestamp * 1000) : null;
+    const date = d ? d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '';
+    const active = s.id === activeId;
+    return `<div class="ib-hist-item${active ? ' ib-hist-active' : ''}" onclick="ibLoadSession(${s.id})">
+      <div class="ib-hist-title">${s.title || 'Untitled'}</div>
+      <div class="ib-hist-meta">${date}${date && s.msgCount ? ' · ' : ''}${s.msgCount ? s.msgCount + ' msg' + (s.msgCount !== 1 ? 's' : '') : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+function ibLoadSession(id) {
+  ibSendCmd({ type: 'load_session', id });
+  ibLog(`Loading session ${id}…`);
+}
+
+function ibSessionLoaded(id, history) {
+  ibCurrentHistory = history || [];
+  const box = document.getElementById('ibMessages');
+  if (!box) return;
+  box.innerHTML = '';
+  for (const m of ibCurrentHistory) {
+    if (m.role === 'user')      ibAddMsg('user', m.content);
+    else if (m.role === 'assistant') ibAddMsg('ai', null, null, m.content);
+  }
+  ibLog(`Session ${id} loaded (${ibCurrentHistory.length} messages).`, 'ok');
+  // Refresh history list to update active marker — request fresh sync
+  ibSendCmd({ type: 'get_state' });
+}
+
+// ── Tools ─────────────────────────────────────────────────────
+function ibRenderTools(tools) {
+  const el = document.getElementById('ibToolsList');
+  if (!el) return;
+  if (!tools || !tools.length) {
+    el.innerHTML = `<div class="ib-empty-state"><span>No tools loaded</span></div>`;
+    return;
+  }
+  const groups = {};
+  for (const t of tools) {
+    const g = t.group || 'Other';
+    if (!groups[g]) groups[g] = [];
+    groups[g].push(t);
+  }
+  el.innerHTML = Object.entries(groups).map(([group, items]) =>
+    `<div class="ib-tools-group">
+      <div class="ib-tools-group-title">${group}</div>
+      ${items.map(t => `<div class="ib-tool-item">
+        <div class="ib-tool-item-name">${t.name}</div>
+        ${t.desc ? `<div class="ib-tool-item-desc">${t.desc}</div>` : ''}
+      </div>`).join('')}
+    </div>`
+  ).join('');
+}
+
+// ── Settings modal ────────────────────────────────────────────
+function ibOpenSettings() {
+  const modal    = document.getElementById('ibSettingsModal');
+  const backdrop = document.getElementById('ibSettingsBackdrop');
+  if (!modal) return;
+  // Populate host dropdown
+  const sel = document.getElementById('ibSettingsHost');
+  sel.innerHTML = IB_HOSTS.map(h => `<option${h === ibSettings.host ? ' selected' : ''}>${h}</option>`).join('');
+  document.getElementById('ibSettingsModel').value  = ibSettings.model  || '';
+  document.getElementById('ibSettingsApiKey').value = ibSettings.apiKey || '';
+  document.getElementById('ibSettingsApiKey').type  = 'password';
+  document.getElementById('ibApiKeyEyeIcon').setAttribute('icon', 'mdi:eye-outline');
+  modal.classList.add('ib-modal-open');
+  backdrop?.classList.add('ib-modal-open');
+  const onKey = e => { if (e.key === 'Escape') { ibCloseSettings(); document.removeEventListener('keydown', onKey); } };
+  document.addEventListener('keydown', onKey);
+}
+
+function ibCloseSettings() {
+  document.getElementById('ibSettingsModal')?.classList.remove('ib-modal-open');
+  document.getElementById('ibSettingsBackdrop')?.classList.remove('ib-modal-open');
+}
+
+function ibToggleApiKeyVis() {
+  const inp  = document.getElementById('ibSettingsApiKey');
+  const icon = document.getElementById('ibApiKeyEyeIcon');
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  icon.setAttribute('icon', show ? 'mdi:eye-off-outline' : 'mdi:eye-outline');
+}
+
+function ibSaveSettings() {
+  const host   = document.getElementById('ibSettingsHost').value;
+  const model  = document.getElementById('ibSettingsModel').value.trim();
+  const apiKey = document.getElementById('ibSettingsApiKey').value.trim();
+  ibSettings = { host, model, apiKey };
+  ibSendCmd({ type: 'settings_update', host, model, apiKey });
+  ibLog('Settings saved and synced to plugin.', 'ok');
+  ibCloseSettings();
+}
+
+requestAnimationFrame(() => requestAnimationFrame(ibInitWindows));
+
+// Expose functions called from inline onclick attributes
+window.ibConnect      = ibConnect;
+window.ibSend         = ibSend;
+window.ibToggleWindow = ibToggleWindow;
+window.ibLogClear     = ibLogClear;
+window.ibApplyPreset  = ibApplyPreset;
+window.ibToggleHelp   = ibToggleHelp;
+window.ibOpenSettings  = ibOpenSettings;
+window.ibCloseSettings = ibCloseSettings;
+window.ibSaveSettings  = ibSaveSettings;
+window.ibToggleApiKeyVis = ibToggleApiKeyVis;
+window.ibLoadSession   = ibLoadSession;
+})();
+</script>

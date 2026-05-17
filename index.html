@@ -55,21 +55,23 @@
 
   <!-- Navigation -->
   <nav>
-    <div class="container">
+    <div class="nav-inner">
       <a href="/" class="logo" data-route>imluri</a>
       <ul class="nav-links">
         <li><a href="/" data-route>Home</a></li>
         <li><a href="/projects" data-route>Projects</a></li>
-        <li>
-          <span class="nav-dots" onclick="toggleMenu()" aria-label="Toggle menu">
-            <iconify-icon icon="ph:dots-nine-bold" width="18" height="18"></iconify-icon>
-          </span>
-        </li>
+        <li><a href="/iyai" data-route>IYAI</a></li>
       </ul>
-      <button class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle menu">
-        <iconify-icon class="menu-open-icon" icon="mdi:menu" width="24" height="24"></iconify-icon>
-        <iconify-icon class="menu-close-icon" icon="mdi:close" width="24" height="24"></iconify-icon>
-      </button>
+      <div class="nav-end">
+        <a href="https://github.com/imluri" target="_blank" rel="noopener" class="nav-cta">
+          <iconify-icon icon="mdi:github" width="14" height="14"></iconify-icon>
+          GitHub
+        </a>
+        <button class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle menu">
+          <iconify-icon class="menu-open-icon" icon="mdi:menu" width="22" height="22"></iconify-icon>
+          <iconify-icon class="menu-close-icon" icon="mdi:close" width="22" height="22"></iconify-icon>
+        </button>
+      </div>
     </div>
   </nav>
 
@@ -77,6 +79,7 @@
   <div class="mobile-menu" id="mobileMenu">
     <a href="/" data-route>Home</a>
     <a href="/projects" data-route>Projects</a>
+    <a href="/iyai" data-route>IYAI</a>
   </div>
 
   <!-- Page content swapped here by router -->

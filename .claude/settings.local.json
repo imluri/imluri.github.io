@@ -31,7 +31,14 @@
       "Bash(py \"C:\\\\Users\\\\luri\\\\.claude\\\\plugins\\\\cache\\\\ui-ux-pro-max-skill\\\\ui-ux-pro-max\\\\2.5.0\\\\src\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"animation hover transition loading\" --domain ux -n 5)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\luri\\\\Documents\\\\Programming\\\\IYPlugin\\\\IYAI\" -Recurse -Force)",
       "Bash(Select-Object -First 100)",
-      "Bash(Format-Table FullName)"
+      "Bash(Format-Table FullName)",
+      "WebFetch(domain:gfxcomet.com)",
+      "Bash(curl -s \"https://gfxcomet.com/\")",
+      "Bash(curl -L \"https://gfxcomet.com/\")",
+      "PowerShell($response = Invoke-WebRequest -Uri \"https://gfxcomet.com/\" -UseBasicParsing; $response.Content | Select-String -Pattern '<nav|<header|<div class=\"nav|<div class=\"header' -Context 2 | Select-Object -First 100)",
+      "Bash(ls \"C:\\\\Users\\\\luri\\\\Downloads\\\\Vanilla 3 for Roblox Studio v544\\\\Colourful\\\\Dark\\\\RobloxCustom\\\\instance\\\\16x\\\\200\" | head -60)",
+      "Read(//c/Users/luri/Downloads/Vanilla 3 for Roblox Studio v544/Colourful/Dark/RobloxCustom/instance/16x/200/**)",
+      "Bash(Sort-Object FullName)"
     ],
     "additionalDirectories": [
       "C:\\Users\\luri\\Downloads\\lurimous.github.io-main\\assets"

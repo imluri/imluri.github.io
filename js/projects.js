@@ -77,6 +77,7 @@ const PROJECTS = [
     description: "Lua plugin for Infinite Yield that adds a full AI assistant. It can explore the game tree, run Lua, search the web, and fire IY commands, all from a chat UI.",
     tags: ["Lua", "AI", "Plugin"],
     link: "https://github.com/imluri/IYAI",
+    webLink: "/iyai",
     image: "https://raw.githubusercontent.com/imluri/IYAI/main/logo.png",
     imageAlt: "IYAI Logo",
     details: {

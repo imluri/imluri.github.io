@@ -13,6 +13,7 @@ const ROUTES = {
   '/':         '/pages/home.html',
   '/projects': '/pages/projects.html',
   '/project':  '/pages/project.html',
+  '/iyai':     '/pages/iyai.html',
 };
 
 // Cache fetched fragments so we don't re-fetch on back/forward
@@ -56,6 +57,10 @@ function initPage() {
   // Bind all [data-route] links inside the new content
   bindLinks(app);
 
+  // Show footer once content is ready
+  document.body.classList.remove('page-ready');
+  requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.add('page-ready')));
+
   // Reveal any already-cached images (load event won't fire for them)
   if (typeof revealLoadedImages === 'function') revealLoadedImages();
 
@@ -68,6 +73,8 @@ function initPage() {
 // Transition: fade out → swap → fade in
 async function swapContent(html) {
   if (typeof stopShowcaseAnimations === 'function') stopShowcaseAnimations();
+  if (typeof window.__ibCleanup === 'function') window.__ibCleanup();
+  document.body.classList.remove('ib-page');
   app.classList.add('page-exit');
   await new Promise(r => setTimeout(r, 180));
   app.innerHTML = html;
@@ -137,6 +144,11 @@ function renderProjectDetail(slug) {
                 ${project.link.includes('github.com') ? 'View on GitHub' : 'View Project'}
                 <iconify-icon icon="${project.link.includes('github.com') ? 'mdi:github' : 'mdi:open-in-new'}" width="16" height="16"></iconify-icon>
               </a>
+              ${project.webLink ? `
+              <a href="${project.webLink}" data-route class="btn btn-secondary">
+                Open Web UI
+                <iconify-icon icon="mdi:open-in-new" width="16" height="16"></iconify-icon>
+              </a>` : ''}
             </div>` : ''}
           </div>
         </div>
@@ -201,6 +213,7 @@ async function navigate(pathname, pushState = true) {
   const titles = {
     '/':         'imluri',
     '/projects': 'Projects | imluri',
+    '/iyai':     'IYAI Bridge | imluri',
   };
   if (pathname.startsWith('/project/')) {
     const slug = pathname.replace('/project/', '');
