@@ -257,8 +257,7 @@ document.body.classList.add('ib-page');
 
 let ibConnected   = false;
 let ibConnecting  = false;
-let ibPollTimer   = null;
-let ibPollGen     = 0;   // incremented on each connect; stale loops self-terminate
+let ibEventSource = null;
 let ibBaseUrl     = 'http://localhost:7402';
 let ibTopZ        = 10;
 let ibCurrentHistory = [];
@@ -298,7 +297,6 @@ async function ibConnect() {
     const res = await fetch(`${ibBaseUrl}/ping`, { signal: AbortSignal.timeout(3000) });
     if (!res.ok) throw new Error();
     // Clear any stale state from a previous session
-    ibPollGen++;
     ibTree = []; ibNodeMap.clear(); ibOpen.clear(); ibPendingLoads.clear(); ibSelectedKey = null;
     ibToolFrames.clear();
     ibRenderExplorer();
@@ -307,8 +305,8 @@ async function ibConnect() {
     ibSetStatus('connected');
     ibEnableControls(true);
     ibAddMsg('system', 'Bridge connected.');
-    ibLog('Relay handshake OK — polling started.', 'ok');
-    ibStartPolling(ibPollGen);
+    ibLog('Relay handshake OK — SSE stream open.', 'ok');
+    ibOpenEventStream();
     ibSendCmd({ type: 'get_tree' });
     ibSendCmd({ type: 'get_state' });
   } catch {
@@ -320,31 +318,29 @@ async function ibConnect() {
 }
 
 function ibDisconnect() {
-  ibPollGen++;          // invalidates any in-flight poll loop
   ibConnected  = false;
   ibConnecting = false;
-  clearTimeout(ibPollTimer);
-  ibPollTimer = null;
+  if (ibEventSource) { ibEventSource.close(); ibEventSource = null; }
   ibSetStatus('disconnected');
   ibEnableControls(false);
   ibLog('Disconnected.');
 }
 
-function ibStartPolling(gen) {
-  const poll = async () => {
-    if (!ibConnected || ibPollGen !== gen) return;  // stale loop — die
+function ibOpenEventStream() {
+  if (ibEventSource) { ibEventSource.close(); ibEventSource = null; }
+  const es = new EventSource(`${ibBaseUrl}/browser/events`);
+  ibEventSource = es;
+  es.onmessage = (e) => {
     try {
-      const res = await fetch(`${ibBaseUrl}/browser/poll`, { signal: AbortSignal.timeout(5000) });
-      if (res.ok) {
-        const msgs = await res.json();
-        if (Array.isArray(msgs) && msgs.length) {
-          msgs.forEach(m => { ibLog(`← ${m.type}${m.text ? ': ' + m.text.slice(0,80) : ''}`, 'in'); ibHandleMsg(m); });
-        }
-      }
+      const msg = JSON.parse(e.data);
+      ibLog(`← ${msg.type}${msg.text ? ': ' + msg.text.slice(0,80) : ''}`, 'in');
+      ibHandleMsg(msg);
     } catch {}
-    if (ibConnected && ibPollGen === gen) ibPollTimer = setTimeout(poll, 500);
   };
-  poll();
+  es.onerror = () => {
+    if (!ibConnected) return;
+    ibLog('SSE stream lost — reconnecting…', 'err');
+  };
 }
 
 async function ibSendCmd(data) {
@@ -1368,7 +1364,7 @@ function ibToggleHelp() {
 
 // Cleanup on navigation away
 window.__ibCleanup = function() {
-  clearTimeout(ibPollTimer);
+  if (ibEventSource) { ibEventSource.close(); ibEventSource = null; }
   ibConnected  = false;
   ibDragActive = false;
   document.removeEventListener('mousemove', ibOnMouseMove);
