@@ -2059,6 +2059,21 @@ body.ib-page #app {
 }
 .ib-win-header:hover { background: rgba(255,255,255,0.045); color: var(--foreground); }
 .ib-win-header:active { cursor: grabbing; }
+.ib-header-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.5;
+  cursor: pointer;
+  padding: 2px 3px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.15s, background 0.15s;
+}
+.ib-header-btn:hover { opacity: 1; background: rgba(255,255,255,0.08); }
+.ib-header-btn:disabled { opacity: 0.2; pointer-events: none; }
 
 .ib-win-body {
   flex: 1;

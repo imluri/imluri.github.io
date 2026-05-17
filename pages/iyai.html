@@ -53,6 +53,9 @@
       <div class="ib-win-header">
         <iconify-icon icon="mdi:file-tree-outline" width="12" height="12"></iconify-icon>
         <span>Explorer</span>
+        <button class="ib-header-btn" id="ibExplorerRefreshBtn" onclick="ibRefreshExplorer()" title="Refresh" disabled>
+          <iconify-icon icon="mdi:refresh" width="13" height="13"></iconify-icon>
+        </button>
       </div>
       <div class="ib-win-body">
         <div class="ib-explorer" id="ibExplorer">
@@ -248,8 +251,53 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
 <script>
+// ── Minimal CSP-safe markdown renderer ───────────────────────
+function ibParseMarkdown(md) {
+  if (!md) return '';
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const inline = s => {
+    s = esc(s);
+    s = s.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+    s = s.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    s = s.replace(/~~(.+?)~~/g, '<del>$1</del>');
+    s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    return s;
+  };
+  const lines = md.split('\n');
+  let html = '', inCode = false, codeBuf = [], inList = false, listTag = 'ul';
+  const closeList = () => { if (inList) { html += `</${listTag}>`; inList = false; } };
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith('```')) {
+      if (!inCode) { closeList(); inCode = true; codeBuf = []; }
+      else { html += `<pre><code>${esc(codeBuf.join('\n'))}</code></pre>`; inCode = false; }
+      continue;
+    }
+    if (inCode) { codeBuf.push(line); continue; }
+    if (line.startsWith('### ')) { closeList(); html += `<h3>${inline(line.slice(4))}</h3>`; continue; }
+    if (line.startsWith('## '))  { closeList(); html += `<h2>${inline(line.slice(3))}</h2>`; continue; }
+    if (line.startsWith('# '))   { closeList(); html += `<h1>${inline(line.slice(2))}</h1>`; continue; }
+    const olMatch = line.match(/^(\d+)\. (.+)/);
+    if (olMatch) {
+      if (!inList || listTag !== 'ol') { closeList(); html += '<ol>'; inList = true; listTag = 'ol'; }
+      html += `<li>${inline(olMatch[2])}</li>`; continue;
+    }
+    const ulMatch = line.match(/^[-*+] (.+)/);
+    if (ulMatch) {
+      if (!inList || listTag !== 'ul') { closeList(); html += '<ul>'; inList = true; listTag = 'ul'; }
+      html += `<li>${inline(ulMatch[1])}</li>`; continue;
+    }
+    closeList();
+    if (line.trim() === '') { html += '<br>'; continue; }
+    html += `<p>${inline(line)}</p>`;
+  }
+  closeList();
+  return html;
+}
+
 // ── IYAI Bridge ───────────────────────────────────────────────
 // Wrapped in IIFE so `let` re-declarations don't throw on re-navigation
 (function () {
@@ -306,10 +354,7 @@ async function ibConnect() {
     ibEnableControls(true);
     ibAddMsg('system', 'Bridge connected.');
     ibLog('Relay handshake OK — SSE stream open.', 'ok');
-    ibOpenEventStream(() => {
-      ibSendCmd({ type: 'get_tree' });
-      ibSendCmd({ type: 'get_state' });
-    });
+    ibOpenEventStream();
   } catch {
     ibConnecting = false;
     ibSetStatus('disconnected');
@@ -327,13 +372,10 @@ function ibDisconnect() {
   ibLog('Disconnected.');
 }
 
-function ibOpenEventStream(onReady) {
+function ibOpenEventStream() {
   if (ibEventSource) { ibEventSource.close(); ibEventSource = null; }
   const es = new EventSource(`${ibBaseUrl}/browser/events`);
   ibEventSource = es;
-  es.onopen = () => {
-    if (onReady) { onReady(); onReady = null; }
-  };
   es.onmessage = (e) => {
     try {
       const msg = JSON.parse(e.data);
@@ -398,6 +440,15 @@ function ibEnableControls(on) {
   document.getElementById('ibSendBtn').disabled   = !on;
   const settingsBtn = document.getElementById('ibSettingsBtn');
   if (settingsBtn) settingsBtn.disabled = !on;
+  const refreshBtn = document.getElementById('ibExplorerRefreshBtn');
+  if (refreshBtn) refreshBtn.disabled = !on;
+}
+
+function ibRefreshExplorer() {
+  if (!ibConnected) return;
+  ibTree = []; ibNodeMap.clear(); ibOpen.clear(); ibPendingLoads.clear(); ibSelectedKey = null;
+  ibRenderExplorer();
+  ibSendCmd({ type: 'get_tree' });
 }
 
 // ── Messages ──────────────────────────────────────────────────
@@ -413,9 +464,7 @@ function ibAddMsg(role, text, tool, aiText) {
     el.innerHTML = `<span>${text}</span>`;
   } else if (role === 'ai') {
     el.className = 'ib-msg ib-msg-ai';
-    const md = (typeof marked !== 'undefined' && aiText)
-      ? marked.parse(aiText, { breaks: true, gfm: true })
-      : (aiText || '');
+    const md = ibParseMarkdown(aiText || '');
     el.innerHTML = `
       <div class="ib-msg-tag"><iconify-icon icon="mdi:robot-outline" width="11"></iconify-icon> IYAI</div>
       ${tool ? `<div class="ib-msg-tool"><span class="ib-tool-dot"></span>${tool}</div>` : ''}
@@ -1382,6 +1431,7 @@ window.__ibCleanup = function() {
   delete window.ibLogClear;
   delete window.ibApplyPreset;
   delete window.ibToggleHelp;
+  delete window.ibRefreshExplorer;
 };
 
 // ── Sync state ────────────────────────────────────────────────
@@ -1499,16 +1549,17 @@ function ibSaveSettings() {
 requestAnimationFrame(() => requestAnimationFrame(ibInitWindows));
 
 // Expose functions called from inline onclick attributes
-window.ibConnect      = ibConnect;
-window.ibSend         = ibSend;
-window.ibToggleWindow = ibToggleWindow;
-window.ibLogClear     = ibLogClear;
-window.ibApplyPreset  = ibApplyPreset;
-window.ibToggleHelp   = ibToggleHelp;
-window.ibOpenSettings  = ibOpenSettings;
-window.ibCloseSettings = ibCloseSettings;
-window.ibSaveSettings  = ibSaveSettings;
+window.ibConnect         = ibConnect;
+window.ibSend            = ibSend;
+window.ibToggleWindow    = ibToggleWindow;
+window.ibLogClear        = ibLogClear;
+window.ibApplyPreset     = ibApplyPreset;
+window.ibToggleHelp      = ibToggleHelp;
+window.ibOpenSettings    = ibOpenSettings;
+window.ibCloseSettings   = ibCloseSettings;
+window.ibSaveSettings    = ibSaveSettings;
 window.ibToggleApiKeyVis = ibToggleApiKeyVis;
-window.ibLoadSession   = ibLoadSession;
+window.ibLoadSession     = ibLoadSession;
+window.ibRefreshExplorer = ibRefreshExplorer;
 })();
 </script>
