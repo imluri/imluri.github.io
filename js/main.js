@@ -545,9 +545,11 @@ function startShowcaseAnimations() {
   let smoothTarget  = window.scrollY;
   let smoothCurrent = window.scrollY;
   let smoothRaf     = null;
+  let smoothLastT   = null;
 
   function cancelSmooth() {
     if (smoothRaf) { cancelAnimationFrame(smoothRaf); smoothRaf = null; }
+    smoothLastT = null;
   }
 
   function syncSmooth() {
@@ -572,16 +574,19 @@ function startShowcaseAnimations() {
         requestAnimationFrame(step);
       } else {
         window.scrollTo(0, y);
-        syncSmooth();   // re-sync smooth state to snap destination
+        syncSmooth();
         locked = false;
       }
     }
     requestAnimationFrame(step);
   }
 
-  // Smooth: lerp toward accumulated target
-  function smoothStep() {
-    smoothCurrent += (smoothTarget - smoothCurrent) * 0.12;
+  // Smooth: exponential decay lerp — frame-rate independent (k≈8 ≈ 0.12 factor at 60fps)
+  function smoothStep(now) {
+    const dt = smoothLastT ? Math.min((now - smoothLastT) / 1000, 0.1) : 1 / 60;
+    smoothLastT = now;
+    const factor = 1 - Math.exp(-8 * dt);
+    smoothCurrent += (smoothTarget - smoothCurrent) * factor;
     window.scrollTo(0, smoothCurrent);
     if (Math.abs(smoothTarget - smoothCurrent) > 0.5) {
       smoothRaf = requestAnimationFrame(smoothStep);
@@ -589,7 +594,15 @@ function startShowcaseAnimations() {
       window.scrollTo(0, smoothTarget);
       smoothCurrent = smoothTarget;
       smoothRaf = null;
+      smoothLastT = null;
     }
+  }
+
+  // Normalize wheel delta to pixels regardless of deltaMode
+  function normalizeDelta(e) {
+    if (e.deltaMode === 1) return e.deltaY * 24;   // line mode (~24px/line)
+    if (e.deltaMode === 2) return e.deltaY * window.innerHeight; // page mode
+    return e.deltaY;                                // pixel mode (default)
   }
 
   window.addEventListener('wheel', (e) => {
@@ -619,8 +632,9 @@ function startShowcaseAnimations() {
 
     // Smooth scroll — sync both targets from real position if RAF was idle
     if (!smoothRaf) syncSmooth();
+    const delta = normalizeDelta(e);
     const maxY = document.documentElement.scrollHeight - window.innerHeight;
-    smoothTarget = Math.max(0, Math.min(maxY, smoothTarget + e.deltaY));
+    smoothTarget = Math.max(0, Math.min(maxY, smoothTarget + delta));
     if (!smoothRaf) smoothRaf = requestAnimationFrame(smoothStep);
   }, { passive: false });
 
