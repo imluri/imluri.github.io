@@ -75,9 +75,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     computers.scale.setScalar(scale);
     computers.position.sub(centre.multiplyScalar(scale));
     computersBaseRotY = 0;
-    computers.visible = currentPage === '/projects';
+    computers.visible = false;
     scene.add(computers);
-    if (currentPage === '/projects') canvas.style.opacity = '0.18';
   });
 
   // ── Input tracking ──────────────────────────────────────────
@@ -120,10 +119,9 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     setTimeout(() => {
       smoothScrollY = 0;
       if (girl)      girl.visible      = currentPage === '/';
-      if (computers) computers.visible = currentPage === '/projects';
+      if (computers) computers.visible = false;
       canvas.style.transition = 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
       if (currentPage === '/') canvas.style.opacity = '1';
-      else if (currentPage === '/projects') canvas.style.opacity = '0.18';
       // else: stay hidden (detail pages, etc.)
     }, 320);
   }

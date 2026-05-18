@@ -5,30 +5,50 @@
 function renderProjectCard(project) {
   const tags = project.tags.map(t => `<span class="tag-badge">${t}</span>`).join('');
   const fallbackIcon = project.icon || 'mdi:code-braces';
-  const imageHTML = project.image
-    ? `<img src="${project.image}" alt="${project.imageAlt}" loading="lazy" onerror="this.outerHTML='<iconify-icon icon=\\'${fallbackIcon}\\' width=\\'48\\' height=\\'48\\' style=\\'color:var(--accent)\\'></iconify-icon>'">`
-    : `<iconify-icon icon="${fallbackIcon}" width="48" height="48" style="color:var(--accent)"></iconify-icon>`;
-  const imgClass = project.fullscreen ? 'project-image project-image--full' : 'project-image';
 
-  const inner = `
-    <div class="${imgClass}">${imageHTML}</div>
-    <h3 class="project-title">${project.title}</h3>
-    <p class="project-description">${project.description}</p>
-    <div class="project-tags">${tags}</div>
-  `;
+  let inner, extraClass;
+
+  if (project.image) {
+    // Cover layout: full-bleed image, text overlay at bottom
+    extraClass = project.fullscreen ? 'project-card--cover' : 'project-card--cover project-card--contain';
+    inner = `
+      <div class="project-card-bg">
+        <img src="${project.image}" alt="${project.imageAlt}" loading="lazy"
+          onerror="this.closest('.project-card-bg').innerHTML='<iconify-icon icon=\\'${fallbackIcon}\\' width=\\'48\\' height=\\'48\\' style=\\'color:var(--accent)\\'></iconify-icon>'">
+      </div>
+      <div class="project-card-overlay">
+        <h3 class="project-title">${project.title}</h3>
+        <p class="project-description">${project.description}</p>
+        <div class="project-tags">${tags}</div>
+      </div>
+    `;
+  } else {
+    // Icon layout: original stack
+    extraClass = '';
+    inner = `
+      <div class="project-image">
+        <iconify-icon icon="${fallbackIcon}" width="48" height="48" style="color:var(--accent)"></iconify-icon>
+      </div>
+      <h3 class="project-title">${project.title}</h3>
+      <p class="project-description">${project.description}</p>
+      <div class="project-tags">${tags}</div>
+    `;
+  }
+
+  const className = `bento-card project-card ${extraClass}`.trim();
 
   if (project.link) {
     const card = document.createElement('a');
     card.href = project.link;
     card.target = '_blank';
     card.rel = 'noopener noreferrer';
-    card.className = 'bento-card project-card';
+    card.className = className;
     card.innerHTML = inner;
     return card;
   }
 
   const card = document.createElement('div');
-  card.className = 'bento-card project-card';
+  card.className = className;
   card.innerHTML = inner;
   return card;
 }
@@ -361,7 +381,7 @@ function _buildBoard(board) {
     '<div class="chess-row">' + row.map((piece, c) => {
       const isDark = (r + c) % 2 === 0;
       const cls = (isDark ? 'cs-dark' : 'cs-light') + (piece ? ' cp' : '');
-      const col = piece && _BLACK_PIECES.has(piece) ? ' style="color:#818cf8;"' : '';
+      const col = piece && _BLACK_PIECES.has(piece) ? ' style="color:#e35f5f;"' : '';
       return `<span class="${cls}" data-r="${r}" data-c="${c}"${col}>${piece}</span>`;
     }).join('') + '</div>'
   ).join('');
@@ -396,7 +416,7 @@ function _animateChessMove(boardEl, from, to, onDone) {
   const srcRect   = src.getBoundingClientRect();
   const dstRect   = dst.getBoundingClientRect();
 
-  src.style.background = 'rgba(119,132,255,0.35)';
+  src.style.background = 'rgba(227,95,95,0.35)';
   dst.classList.add('best-sq');
   src.textContent = '';
   dst.textContent = '';  // clear any captured piece
@@ -413,7 +433,7 @@ function _animateChessMove(boardEl, from, to, onDone) {
     'font-size:0.85rem','line-height:1',
     'pointer-events:none','z-index:10','will-change:transform',
     'transition:transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94)',
-    isBlack ? 'color:#818cf8' : 'color:#f0ede0',
+    isBlack ? 'color:#e35f5f' : 'color:#f0ede0',
   ].join(';');
   boardEl.appendChild(fly);
 
@@ -423,7 +443,7 @@ function _animateChessMove(boardEl, from, to, onDone) {
 
   const id = setTimeout(() => {
     dst.textContent = piece;
-    dst.style.color = isBlack ? '#818cf8' : '';
+    dst.style.color = isBlack ? '#e35f5f' : '';
     src.style.background = '';
     dst.classList.remove('best-sq');
     fly.remove();

@@ -253,21 +253,39 @@ const _origRenderProjectCard = typeof renderProjectCard !== 'undefined' ? render
 function renderProjectCard(project) {
   const tags = project.tags.map(t => `<span class="tag-badge">${t}</span>`).join('');
   const fallbackIcon = project.icon || 'mdi:code-braces';
-  const imageHTML = project.image
-    ? `<img src="${project.image}" alt="${project.imageAlt}" loading="lazy" onerror="this.outerHTML='<iconify-icon icon=\\'${fallbackIcon}\\' width=\\'48\\' height=\\'48\\' style=\\'color:var(--accent)\\'></iconify-icon>'">`
-    : `<iconify-icon icon="${fallbackIcon}" width="48" height="48" style="color:var(--accent)"></iconify-icon>`;
-  const imgClass = project.fullscreen ? 'project-image project-image--full' : 'project-image';
+
+  let inner, extraClass;
+
+  if (project.image) {
+    extraClass = project.fullscreen ? 'project-card--cover' : 'project-card--cover project-card--contain';
+    inner = `
+      <div class="project-card-bg">
+        <img src="${project.image}" alt="${project.imageAlt}" loading="lazy"
+          onerror="this.closest('.project-card-bg').innerHTML='<iconify-icon icon=\\'${fallbackIcon}\\' width=\\'48\\' height=\\'48\\' style=\\'color:var(--accent)\\'></iconify-icon>'">
+      </div>
+      <div class="project-card-overlay">
+        <h3 class="project-title">${project.title}</h3>
+        <p class="project-description">${project.description}</p>
+        <div class="project-tags">${tags}</div>
+      </div>
+    `;
+  } else {
+    extraClass = '';
+    inner = `
+      <div class="project-image">
+        <iconify-icon icon="${fallbackIcon}" width="48" height="48" style="color:var(--accent)"></iconify-icon>
+      </div>
+      <h3 class="project-title">${project.title}</h3>
+      <p class="project-description">${project.description}</p>
+      <div class="project-tags">${tags}</div>
+    `;
+  }
 
   const card = document.createElement('div');
-  card.className = 'bento-card project-card';
+  card.className = `bento-card project-card ${extraClass}`.trim();
   card.dataset.slug = project.slug;
   card.style.cursor = 'pointer';
-  card.innerHTML = `
-    <div class="${imgClass}">${imageHTML}</div>
-    <h3 class="project-title">${project.title}</h3>
-    <p class="project-description">${project.description}</p>
-    <div class="project-tags">${tags}</div>
-  `;
+  card.innerHTML = inner;
   card.addEventListener('click', () => navigate(`/project/${project.slug}`));
   return card;
 }
