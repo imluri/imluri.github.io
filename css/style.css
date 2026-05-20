@@ -2548,6 +2548,7 @@ body.bm-page #app {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  flex: 1;
   height: 100%;
   color: var(--foreground-muted);
   font-size: 0.7rem;

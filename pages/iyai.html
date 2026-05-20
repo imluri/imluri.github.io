@@ -32,6 +32,12 @@
       <button class="ib-toggle-btn" data-panel="ibWinTools" onclick="ibToggleWindow('ibWinTools')" title="Tools">
         <iconify-icon icon="mdi:tools" width="14" height="14"></iconify-icon>
       </button>
+      <button class="ib-toggle-btn" data-panel="ibWinCode" onclick="ibToggleWindow('ibWinCode')" title="Code">
+        <iconify-icon icon="mdi:code-braces" width="14" height="14"></iconify-icon>
+      </button>
+      <button class="ib-toggle-btn" data-panel="ibWinSkills" onclick="ibToggleWindow('ibWinSkills')" title="Skills">
+        <iconify-icon icon="mdi:puzzle-outline" width="14" height="14"></iconify-icon>
+      </button>
       <div class="ib-toggle-sep"></div>
       <button class="ib-toggle-btn ib-preset-btn" id="ibPresetWide"   onclick="ibApplyPreset('wide')"    title="Wide layout">
         <iconify-icon icon="mdi:view-split-vertical" width="14" height="14"></iconify-icon>
@@ -126,12 +132,10 @@
         <iconify-icon icon="mdi:history" width="12" height="12"></iconify-icon>
         <span>History</span>
       </div>
-      <div class="ib-win-body">
-        <div class="ib-history-list" id="ibHistoryList">
-          <div class="ib-empty-state">
-            <iconify-icon icon="mdi:history" width="22" height="22"></iconify-icon>
-            <span>No conversations yet</span>
-          </div>
+      <div class="ib-win-body" id="ibHistoryList" style="overflow-y:auto">
+        <div class="ib-empty-state">
+          <iconify-icon icon="mdi:history" width="22" height="22"></iconify-icon>
+          <span>No conversations yet</span>
         </div>
       </div>
     </div>
@@ -142,12 +146,46 @@
         <iconify-icon icon="mdi:tools" width="12" height="12"></iconify-icon>
         <span>Tools</span>
       </div>
-      <div class="ib-win-body">
-        <div class="ib-tools-list" id="ibToolsList">
-          <div class="ib-empty-state">
-            <iconify-icon icon="mdi:connection" width="22" height="22"></iconify-icon>
-            <span>Connect to load tools</span>
-          </div>
+      <div class="ib-win-body" id="ibToolsList" style="overflow-y:auto">
+        <div class="ib-empty-state">
+          <iconify-icon icon="mdi:connection" width="22" height="22"></iconify-icon>
+          <span>Connect to load tools</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Code window -->
+    <div class="ib-window" id="ibWinCode">
+      <div class="ib-win-header">
+        <iconify-icon icon="mdi:code-braces" width="12" height="12"></iconify-icon>
+        <span>Code</span>
+        <button class="ib-header-btn" id="ibCodeRunBtn" onclick="ibRunCode()" title="Run" disabled>
+          <iconify-icon icon="mdi:play" width="13" height="13"></iconify-icon>
+        </button>
+      </div>
+      <div class="ib-win-body ib-code-body" id="ibCodeBody">
+        <div class="ib-empty-state" id="ibCodeEmpty">
+          <iconify-icon icon="mdi:code-braces" width="22" height="22"></iconify-icon>
+          <span>Connect to load code</span>
+        </div>
+        <div class="ib-code-editor-wrap" id="ibCodeEditorWrap" style="display:none;flex:1;flex-direction:column;min-height:0">
+          <div class="ib-code-tabs" id="ibCodeTabs"></div>
+          <textarea class="ib-code-editor" id="ibCodeEditor" spellcheck="false" oninput="ibCodeEditorInput()"></textarea>
+          <div class="ib-code-output" id="ibCodeOutput"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills window -->
+    <div class="ib-window" id="ibWinSkills">
+      <div class="ib-win-header">
+        <iconify-icon icon="mdi:puzzle-outline" width="12" height="12"></iconify-icon>
+        <span>Skills</span>
+      </div>
+      <div class="ib-win-body" id="ibSkillsList" style="overflow-y:auto">
+        <div class="ib-empty-state">
+          <iconify-icon icon="mdi:connection" width="22" height="22"></iconify-icon>
+          <span>Connect to load skills</span>
         </div>
       </div>
     </div>
@@ -420,6 +458,9 @@ function ibHandleMsg(msg) {
   if (msg.type === 'props')        ibShowProps(msg.cls, msg.data);
   if (msg.type === 'sync_state')   ibApplySyncState(msg);
   if (msg.type === 'session_loaded') ibSessionLoaded(msg.id, msg.history);
+  if (msg.type === 'tabs_state')   ibApplyTabsState(msg.tabs || []);
+  if (msg.type === 'run_result')   ibShowRunResult(msg.output || '');
+  if (msg.type === 'skills_state') ibRenderSkills(msg.skills || []);
 }
 
 // ── Status ────────────────────────────────────────────────────
@@ -442,6 +483,7 @@ function ibEnableControls(on) {
   if (settingsBtn) settingsBtn.disabled = !on;
   const refreshBtn = document.getElementById('ibExplorerRefreshBtn');
   if (refreshBtn) refreshBtn.disabled = !on;
+  if (on) { ibSendCmd({ type: 'get_tabs' }); ibSendCmd({ type: 'get_skills' }); }
 }
 
 function ibRefreshExplorer() {
@@ -955,7 +997,7 @@ function ibRenderLayout() {
   const main = document.getElementById('ibMain');
   if (!main) return;
   // Move all known panels to body temporarily (preserves DOM state)
-  const ALL_PANEL_IDS = ['ibWinExplorer', 'ibWinChat', 'ibWinProps', 'ibWinOutput', 'ibWinHistory', 'ibWinTools'];
+  const ALL_PANEL_IDS = ['ibWinExplorer', 'ibWinChat', 'ibWinProps', 'ibWinOutput', 'ibWinHistory', 'ibWinTools', 'ibWinCode', 'ibWinSkills'];
   ALL_PANEL_IDS.forEach(id => {
     const w = document.getElementById(id);
     if (w && w.id !== ibDragPanelId) {
@@ -1432,6 +1474,8 @@ window.__ibCleanup = function() {
   delete window.ibApplyPreset;
   delete window.ibToggleHelp;
   delete window.ibRefreshExplorer;
+  delete window.ibRunCode;
+  delete window.ibToggleSkill;
 };
 
 // ── Sync state ────────────────────────────────────────────────
@@ -1440,6 +1484,8 @@ function ibApplySyncState(data) {
   if (data.tools)    ibRenderTools(data.tools);
   if (data.sessions) ibRenderHistory(data.sessions, data.activeId);
   if (data.history)  ibCurrentHistory = data.history;
+  if (data.tabs)     ibApplyTabsState(data.tabs);
+  if (data.skills)   ibRenderSkills(data.skills);
 }
 
 // ── History ───────────────────────────────────────────────────
@@ -1485,7 +1531,7 @@ function ibRenderTools(tools) {
   const el = document.getElementById('ibToolsList');
   if (!el) return;
   if (!tools || !tools.length) {
-    el.innerHTML = `<div class="ib-empty-state"><span>No tools loaded</span></div>`;
+    el.innerHTML = `<div class="ib-empty-state"><iconify-icon icon="mdi:tools" width="22" height="22"></iconify-icon><span>No tools loaded</span></div>`;
     return;
   }
   const groups = {};
@@ -1503,6 +1549,104 @@ function ibRenderTools(tools) {
       </div>`).join('')}
     </div>`
   ).join('');
+}
+
+// ── Code dock ─────────────────────────────────────────────────
+let ibCodeTabsData = [];
+let ibCodeActiveIdx = 0;
+let ibCodeSaveTimer = null;
+
+function ibApplyTabsState(tabs) {
+  ibCodeTabsData = tabs;
+  const activeIdx = tabs.findIndex(t => t.active);
+  ibCodeActiveIdx = activeIdx >= 0 ? activeIdx : 0;
+  // Switch from empty-state to editor
+  const empty = document.getElementById('ibCodeEmpty');
+  const wrap  = document.getElementById('ibCodeEditorWrap');
+  if (empty) empty.style.display = 'none';
+  if (wrap)  wrap.style.display  = 'flex';
+  ibRenderCodeTabBar();
+  const editor = document.getElementById('ibCodeEditor');
+  if (editor) editor.value = tabs[ibCodeActiveIdx]?.code || '';
+  const runBtn = document.getElementById('ibCodeRunBtn');
+  if (runBtn) runBtn.disabled = false;
+  const output = document.getElementById('ibCodeOutput');
+  if (output) output.textContent = '';
+}
+
+function ibRenderCodeTabBar() {
+  const el = document.getElementById('ibCodeTabs');
+  if (!el) return;
+  el.innerHTML = ibCodeTabsData.map((t, i) =>
+    `<button class="ib-code-tab${i === ibCodeActiveIdx ? ' ib-code-tab-active' : ''}" onclick="ibSwitchCodeTab(${i})">${t.name}</button>`
+  ).join('');
+}
+
+function ibSwitchCodeTab(idx) {
+  const editor = document.getElementById('ibCodeEditor');
+  if (editor && ibCodeTabsData[ibCodeActiveIdx]) {
+    ibCodeTabsData[ibCodeActiveIdx].code = editor.value;
+  }
+  ibCodeActiveIdx = idx;
+  ibCodeTabsData.forEach((t, i) => t.active = i === idx);
+  ibRenderCodeTabBar();
+  if (editor) editor.value = ibCodeTabsData[idx]?.code || '';
+  ibSendCmd({ type: 'switch_tab', tabIndex: idx + 1 });
+}
+
+function ibCodeEditorInput() {
+  clearTimeout(ibCodeSaveTimer);
+  ibCodeSaveTimer = setTimeout(() => {
+    const editor = document.getElementById('ibCodeEditor');
+    if (!editor || ibCodeActiveIdx >= ibCodeTabsData.length) return;
+    const code = editor.value;
+    ibCodeTabsData[ibCodeActiveIdx].code = code;
+    ibSendCmd({ type: 'set_code', tabIndex: ibCodeActiveIdx + 1, code });
+  }, 300);
+}
+
+function ibRunCode() {
+  if (!ibConnected) return;
+  const editor = document.getElementById('ibCodeEditor');
+  if (editor && ibCodeTabsData[ibCodeActiveIdx] != null) {
+    const code = editor.value;
+    ibCodeTabsData[ibCodeActiveIdx].code = code;
+    ibSendCmd({ type: 'set_code', tabIndex: ibCodeActiveIdx + 1, code });
+  }
+  ibSendCmd({ type: 'run_code' });
+  const output = document.getElementById('ibCodeOutput');
+  if (output) { output.className = 'ib-code-output'; output.textContent = 'Running…'; }
+}
+
+function ibShowRunResult(out) {
+  const el = document.getElementById('ibCodeOutput');
+  if (!el) return;
+  const isErr = out.startsWith('Runtime error') || out.startsWith('Compile error');
+  el.className = 'ib-code-output' + (isErr ? ' ib-code-err' : '');
+  el.textContent = out;
+}
+
+// ── Skills dock ───────────────────────────────────────────────
+function ibRenderSkills(skills) {
+  const el = document.getElementById('ibSkillsList');
+  if (!el) return;
+  if (!skills || !skills.length) {
+    el.innerHTML = `<div class="ib-empty-state"><iconify-icon icon="mdi:puzzle-outline" width="22" height="22"></iconify-icon><span>No skills found</span></div>`;
+    return;
+  }
+  el.innerHTML = skills.map(s =>
+    `<div class="ib-skill-item">
+      <div class="ib-skill-info">
+        <div class="ib-skill-name">${s.name}</div>
+        ${s.desc ? `<div class="ib-skill-desc">${s.desc}</div>` : ''}
+      </div>
+      <button class="ib-skill-toggle${s.enabled ? ' ib-skill-on' : ''}" onclick="ibToggleSkill(${JSON.stringify(s.name)})">${s.enabled ? 'On' : 'Off'}</button>
+    </div>`
+  ).join('');
+}
+
+function ibToggleSkill(name) {
+  ibSendCmd({ type: 'toggle_skill', name });
 }
 
 // ── Settings modal ────────────────────────────────────────────
@@ -1561,5 +1705,9 @@ window.ibSaveSettings    = ibSaveSettings;
 window.ibToggleApiKeyVis = ibToggleApiKeyVis;
 window.ibLoadSession     = ibLoadSession;
 window.ibRefreshExplorer = ibRefreshExplorer;
+window.ibRunCode         = ibRunCode;
+window.ibSwitchCodeTab   = ibSwitchCodeTab;
+window.ibCodeEditorInput = ibCodeEditorInput;
+window.ibToggleSkill     = ibToggleSkill;
 })();
 </script>
