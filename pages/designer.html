@@ -109,10 +109,16 @@
         <button class="bm-btn bm-btn-secondary" id="bmImportJsonBtn"><iconify-icon icon="mdi:upload" width="14" height="14"></iconify-icon> Import JSON</button>
         <input type="file" id="bmJsonFileInput" accept=".json" style="display:none">
       </div>
-      <button class="bm-btn bm-btn-secondary" id="bmLoadTestSceneBtn" style="width:100%;margin-top:4px;opacity:0.6;">
-        <iconify-icon icon="mdi:bug-outline" width="14" height="14"></iconify-icon>
-        Load Test Scene
-      </button>
+      <div class="bm-btn-row" style="margin-top:4px;">
+        <button class="bm-btn bm-btn-secondary" id="bmClearBtn" style="flex:1;color:rgba(227,95,95,0.8);">
+          <iconify-icon icon="mdi:trash-can-outline" width="14" height="14"></iconify-icon>
+          Clear
+        </button>
+        <button class="bm-btn bm-btn-secondary" id="bmLoadTestSceneBtn" style="flex:1;opacity:0.6;">
+          <iconify-icon icon="mdi:bug-outline" width="14" height="14"></iconify-icon>
+          Test Scene
+        </button>
+      </div>
     </div>
   </aside>
 
@@ -138,6 +144,9 @@
       <input class="bm-snap-input" id="bmSnapSize" type="number" value="5" min="1" max="200" title="Snap grid (px)">
       <span class="bm-tool-hint">px</span>
       <div class="bm-toolbar-sep"></div>
+      <button class="bm-tool-btn" id="bmSafeViewToggle" title="Toggle safe zone">
+        <iconify-icon icon="mdi:crop-free" width="14" height="14"></iconify-icon>
+      </button>
       <button class="bm-tool-btn" id="bmRulerToggle" title="Toggle ruler">
         <iconify-icon icon="mdi:ruler-square" width="14" height="14"></iconify-icon>
       </button>
@@ -282,6 +291,10 @@
           <div class="bm-grid-layer" id="bmGridLayer"></div>
           <div id="bmBgPattern" style="position:absolute;inset:0;pointer-events:none;z-index:0;"></div>
           <div class="bm-noise-layer"></div>
+          <!-- Alignment guides — drawn during drag -->
+          <svg id="bmAlignGuides" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:500;overflow:visible;"></svg>
+          <!-- Safe zone overlay -->
+          <div id="bmSafeView" style="display:none;position:absolute;pointer-events:none;z-index:98;border:1.5px dashed rgba(100,200,255,0.35);box-shadow:inset 0 0 0 40px rgba(100,200,255,0.03);"></div>
 
           <div class="bm-el bm-rings" id="elRings">
             <div class="bm-ring" style="width:340px;height:340px;left:0;top:0;"></div>
@@ -1385,13 +1398,13 @@
     const p = data.props;
     switch (data.type) {
       case 'text-heading':
-        return `<div style="font-family:'Syne',sans-serif;font-weight:${p.fontWeight};font-size:${p.fontSize}px;color:${p.color};opacity:${p.opacity};letter-spacing:${p.letterSpacing}em;line-height:1.2;${p.width ? `width:${p.width}px;word-wrap:break-word;` : 'white-space:nowrap;'}">${textToDisplayHtml(p.text)}</div>`;
+        return `<div style="font-family:'Syne',sans-serif;font-weight:${p.fontWeight};font-size:${p.fontSize}px;color:${p.color};opacity:${p.opacity};letter-spacing:${p.letterSpacing}em;line-height:1.2;font-style:${p.fontStyle||'normal'};text-decoration:${p.textDecoration||'none'};${p.width ? `width:${p.width}px;word-wrap:break-word;` : 'white-space:nowrap;'}">${textToDisplayHtml(p.text)}</div>`;
       case 'text-mono':
-        return `<div style="font-family:'JetBrains Mono',monospace;font-size:${p.fontSize}px;font-weight:${p.fontWeight||400};color:${p.color};opacity:${p.opacity};letter-spacing:${p.letterSpacing}em;${p.width ? `width:${p.width}px;word-wrap:break-word;` : 'white-space:nowrap;'}">${textToDisplayHtml(p.text)}</div>`;
+        return `<div style="font-family:'JetBrains Mono',monospace;font-size:${p.fontSize}px;font-weight:${p.fontWeight||400};color:${p.color};opacity:${p.opacity};letter-spacing:${p.letterSpacing}em;font-style:${p.fontStyle||'normal'};text-decoration:${p.textDecoration||'none'};${p.width ? `width:${p.width}px;word-wrap:break-word;` : 'white-space:nowrap;'}">${textToDisplayHtml(p.text)}</div>`;
       case 'text-label':
-        return `<div style="font-family:'JetBrains Mono',monospace;font-size:${p.fontSize}px;font-weight:${p.fontWeight||400};color:${p.color};opacity:${p.opacity};letter-spacing:${p.letterSpacing}em;text-transform:uppercase;${p.width ? `width:${p.width}px;word-wrap:break-word;` : 'white-space:nowrap;'}">${textToDisplayHtml(p.text)}</div>`;
+        return `<div style="font-family:'JetBrains Mono',monospace;font-size:${p.fontSize}px;font-weight:${p.fontWeight||400};color:${p.color};opacity:${p.opacity};letter-spacing:${p.letterSpacing}em;text-transform:uppercase;font-style:${p.fontStyle||'normal'};text-decoration:${p.textDecoration||'none'};${p.width ? `width:${p.width}px;word-wrap:break-word;` : 'white-space:nowrap;'}">${textToDisplayHtml(p.text)}</div>`;
       case 'text-url':
-        return `<div style="font-family:'JetBrains Mono',monospace;font-size:${p.fontSize}px;font-weight:${p.fontWeight||400};color:${p.color};opacity:${p.opacity};letter-spacing:${p.letterSpacing}em;${p.width ? `width:${p.width}px;word-wrap:break-word;` : 'white-space:nowrap;'}">${textToDisplayHtml(p.text)}</div>`;
+        return `<div style="font-family:'JetBrains Mono',monospace;font-size:${p.fontSize}px;font-weight:${p.fontWeight||400};color:${p.color};opacity:${p.opacity};letter-spacing:${p.letterSpacing}em;font-style:${p.fontStyle||'normal'};text-decoration:${p.textDecoration||'none'};${p.width ? `width:${p.width}px;word-wrap:break-word;` : 'white-space:nowrap;'}">${textToDisplayHtml(p.text)}</div>`;
       case 'bar-v':
         return `<div style="width:${p.width}px;height:${p.height}px;border-radius:9999px;opacity:${p.opacity};background:linear-gradient(to bottom,transparent,${p.color} 40%,${p.color} 60%,transparent);"></div>`;
       case 'bar-h':
@@ -1944,8 +1957,6 @@
       if (statusEl) {
         statusEl.classList.remove('bm-save-error');
         statusEl.classList.add('bm-save-flash');
-        clearTimeout(statusEl._flashTimer);
-        statusEl._flashTimer = setTimeout(() => statusEl.classList.remove('bm-save-flash'), 1200);
       }
     } catch {
       if (statusEl) { statusEl.classList.add('bm-save-error'); statusEl.classList.remove('bm-save-flash'); }
@@ -2085,6 +2096,99 @@
     const g = S.cfg.snapGrid;
     return (S.cfg.snapEnabled && g > 1) ? Math.round(v / g) * g : Math.round(v);
   }
+
+  // ── Align snap (Canva-style) ──────────────────────────────────
+  const ALIGN_THRESH = 6; // canvas-space pixels
+
+  function getElSize(id) {
+    const dom = document.getElementById('bmel-' + id);
+    return dom ? { w: dom.offsetWidth, h: dom.offsetHeight } : { w: 0, h: 0 };
+  }
+
+  function computeAlignSnap(dragId, rawX, rawY) {
+    const { w: dw, h: dh } = getElSize(dragId);
+    const W = S.cfg.canvasW, H = S.cfg.canvasH;
+
+    // X and Y snap candidate positions (canvas-space)
+    const xCands = [0, W / 2, W];       // canvas left / center / right
+    const yCands = [0, H / 2, H];       // canvas top  / center / bottom
+
+    S.elements.forEach(el => {
+      if (el.id === dragId) return;
+      const { w: ew, h: eh } = getElSize(el.id);
+      xCands.push(el.x, el.x + ew / 2, el.x + ew);
+      yCands.push(el.y, el.y + eh / 2, el.y + eh);
+    });
+
+    // Anchors of the dragged element to test against candidates
+    const xAnchors = [{ v: rawX,          off: 0      },   // left edge
+                      { v: rawX + dw / 2, off: dw / 2 },   // center x
+                      { v: rawX + dw,     off: dw     }];  // right edge
+    const yAnchors = [{ v: rawY,          off: 0      },
+                      { v: rawY + dh / 2, off: dh / 2 },
+                      { v: rawY + dh,     off: dh     }];
+
+    let snapX = null, snapXGuide = null, snapXDist = ALIGN_THRESH + 1;
+    xCands.forEach(cand => {
+      xAnchors.forEach(({ v, off }) => {
+        const d = Math.abs(v - cand);
+        if (d < snapXDist) { snapXDist = d; snapX = cand - off; snapXGuide = cand; }
+      });
+    });
+
+    let snapY = null, snapYGuide = null, snapYDist = ALIGN_THRESH + 1;
+    yCands.forEach(cand => {
+      yAnchors.forEach(({ v, off }) => {
+        const d = Math.abs(v - cand);
+        if (d < snapYDist) { snapYDist = d; snapY = cand - off; snapYGuide = cand; }
+      });
+    });
+
+    const guides = [];
+    if (snapXGuide !== null) guides.push({ type: 'v', pos: snapXGuide });
+    if (snapYGuide !== null) guides.push({ type: 'h', pos: snapYGuide });
+    return { x: snapX, y: snapY, guides };
+  }
+
+  function drawAlignGuides(guides) {
+    const svg = document.getElementById('bmAlignGuides');
+    if (!svg) return;
+    const W = S.cfg.canvasW, H = S.cfg.canvasH;
+    const sw = (1 / S.zoom).toFixed(3);
+    svg.innerHTML = guides.map(g =>
+      g.type === 'h'
+        ? `<line x1="-9999" y1="${g.pos}" x2="9999" y2="${g.pos}" stroke="#e35f5f" stroke-width="${sw}" opacity="0.9"/>`
+        : `<line x1="${g.pos}" y1="-9999" x2="${g.pos}" y2="9999" stroke="#e35f5f" stroke-width="${sw}" opacity="0.9"/>`
+    ).join('');
+  }
+
+  function clearAlignGuides() {
+    const svg = document.getElementById('bmAlignGuides');
+    if (svg) svg.innerHTML = '';
+  }
+
+  // ── Safe view ─────────────────────────────────────────────────
+  let safeViewOn = false;
+  const safeMargin = 40;
+
+  function applySafeView() {
+    const el = document.getElementById('bmSafeView');
+    if (!el) return;
+    if (!safeViewOn) { el.style.display = 'none'; return; }
+    const W = S.cfg.canvasW, H = S.cfg.canvasH;
+    const m = safeMargin;
+    el.style.display  = 'block';
+    el.style.left     = m + 'px';
+    el.style.top      = m + 'px';
+    el.style.width    = (W - m * 2) + 'px';
+    el.style.height   = (H - m * 2) + 'px';
+  }
+
+  document.getElementById('bmSafeViewToggle').addEventListener('click', () => {
+    safeViewOn = !safeViewOn;
+    document.getElementById('bmSafeViewToggle').classList.toggle('bm-snap-active', safeViewOn);
+    applySafeView();
+  });
 
   const snapToggleBtn = document.getElementById('bmSnapToggle');
   const snapSizeInput = document.getElementById('bmSnapSize');
@@ -2385,11 +2489,22 @@
       const dy = (e.clientY - S.dragStartMY) / S.zoom;
       if (S.draggingDyn) {
         if (S.selectedIds.size > 1 && S.dragStartPositions) {
-          // Multi-drag: move all selected by same delta
+          // Multi-drag: align-snap the primary element, apply same delta to rest
+          const rawPX = S.dragStartPX + dx, rawPY = S.dragStartPY + dy;
+          let sdx, sdy;
+          if (e.ctrlKey) {
+            clearAlignGuides();
+            sdx = snapVal(rawPX) - S.dragStartPX; sdy = snapVal(rawPY) - S.dragStartPY;
+          } else {
+            const aSnap = computeAlignSnap(S.dragging, rawPX, rawPY);
+            sdx = (aSnap.x !== null ? aSnap.x : snapVal(rawPX)) - S.dragStartPX;
+            sdy = (aSnap.y !== null ? aSnap.y : snapVal(rawPY)) - S.dragStartPY;
+            drawAlignGuides(aSnap.guides);
+          }
           S.dragStartPositions.forEach((startPos, sid) => {
             const sd = S.elements.find(el => el.id === sid);
             if (!sd) return;
-            sd.x = snapVal(startPos.x + dx); sd.y = snapVal(startPos.y + dy);
+            sd.x = Math.round(startPos.x + sdx); sd.y = Math.round(startPos.y + sdy);
             const sdom = document.getElementById('bmel-' + sid);
             if (sdom) { sdom.style.left = sd.x + 'px'; sdom.style.top = sd.y + 'px'; }
           });
@@ -2401,7 +2516,17 @@
             if (px) px.value = pd.x; if (py) py.value = pd.y;
           }
         } else {
-          const nx = snapVal(S.dragStartPX + dx), ny = snapVal(S.dragStartPY + dy);
+          const rawX = S.dragStartPX + dx, rawY = S.dragStartPY + dy;
+          let nx, ny;
+          if (e.ctrlKey) {
+            clearAlignGuides();
+            nx = snapVal(rawX); ny = snapVal(rawY);
+          } else {
+            const aSnap = computeAlignSnap(S.dragging, rawX, rawY);
+            nx = aSnap.x !== null ? Math.round(aSnap.x) : snapVal(rawX);
+            ny = aSnap.y !== null ? Math.round(aSnap.y) : snapVal(rawY);
+            drawAlignGuides(aSnap.guides);
+          }
           const data = S.elements.find(el => el.id === S.dragging);
           if (data) {
             data.x = nx; data.y = ny;
@@ -2422,6 +2547,7 @@
   });
 
   window.addEventListener('mouseup', (e) => {
+    if (S.dragging) clearAlignGuides();
     if (S.rotating) { stopRotate(); return; }
     if (S.resizing) { stopResize(); return; }
     if (S.panning) { S.panning = false; scroll.classList.remove('bm-panning'); }
@@ -2707,6 +2833,57 @@
         pre.replaceWith(img);
       });
 
+      // Fix object-fit on image elements — html2canvas ignores object-fit and
+      // stretches every <img> to its box size. Rasterize each one to a canvas
+      // with the correct cover/contain math, then swap in a plain <img>.
+      await Promise.all(Array.from(clone.querySelectorAll('.bm-el img')).map(img => {
+        const fit = img.style.objectFit || 'cover';
+        const tw  = parseFloat(img.style.width);
+        const th  = parseFloat(img.style.height);
+        if (!tw || !th || !img.src) return Promise.resolve();
+
+        return new Promise(res => {
+          const draw = () => {
+            const iw = img.naturalWidth, ih = img.naturalHeight;
+            if (!iw || !ih) { res(); return; }
+            const c   = document.createElement('canvas');
+            c.width = tw; c.height = th;
+            const ctx = c.getContext('2d');
+            const br  = parseFloat(img.style.borderRadius) || 0;
+            const op  = parseFloat(img.style.opacity) ?? 1;
+
+            if (br > 0) {
+              ctx.beginPath();
+              ctx.roundRect(0, 0, tw, th, br);
+              ctx.clip();
+            }
+            ctx.globalAlpha = op;
+
+            let dx = 0, dy = 0, dw = tw, dh = th;
+            if (fit === 'cover') {
+              const s = Math.max(tw / iw, th / ih);
+              dw = iw * s; dh = ih * s;
+              dx = (tw - dw) / 2; dy = (th - dh) / 2;
+            } else if (fit === 'contain') {
+              const s = Math.min(tw / iw, th / ih);
+              dw = iw * s; dh = ih * s;
+              dx = (tw - dw) / 2; dy = (th - dh) / 2;
+            }
+
+            try {
+              ctx.drawImage(img, dx, dy, dw, dh);
+              const out = document.createElement('img');
+              out.src = c.toDataURL();
+              out.style.cssText = `width:${tw}px;height:${th}px;display:block;`;
+              img.replaceWith(out);
+            } catch { /* cross-origin — leave as-is, html2canvas allowTaint handles it */ }
+            res();
+          };
+          if (img.complete && img.naturalWidth) draw();
+          else { img.onload = draw; img.onerror = res; }
+        });
+      }));
+
       // Capture at scale:1. html2canvas may output at device pixels (css*DPR),
       // so we draw the result into a fixed-size output canvas to guarantee
       // the PNG is exactly W×H regardless of DPR or browser zoom.
@@ -2769,6 +2946,22 @@
     };
     reader.readAsText(file);
     e.target.value = '';
+  });
+
+  // ── Clear / Start Over ────────────────────────────────────────
+  document.getElementById('bmClearBtn').addEventListener('click', () => {
+    if (!confirm('Clear all elements and reset the canvas? This cannot be undone.')) return;
+    S.elements.forEach(el => document.getElementById('bmel-' + el.id)?.remove());
+    S.elements = [];
+    S.selectedIds.clear();
+    S.primaryId = null;
+    S.activeGroupId = null;
+    removeHandles();
+    document.getElementById('bmSidebarMain').classList.remove('bm-panel-hidden');
+    document.getElementById('bmPropsPane').classList.add('bm-panel-hidden');
+    refreshLayersPanel();
+    histSnapshot();
+    scheduleSave();
   });
 
   // ── Load Test Scene ───────────────────────────────────────────
@@ -2892,6 +3085,7 @@
     const isEl   = !!targetId;
     const hasClip = !!clipboard;
 
+    const TEXT_TYPES = new Set(['text-heading','text-mono','text-label','text-url']);
     let html = '';
     if (isEl) {
       const data    = S.elements.find(e => e.id === targetId);
@@ -2907,6 +3101,15 @@
       html += row('backward', 'Send Backward');
       html += row('front',    'Bring to Front');
       html += row('back',     'Send to Back');
+      if (data && TEXT_TYPES.has(data.type)) {
+        html += sep();
+        const isBold      = (data.props.fontWeight || 400) >= 700;
+        const isItalic    = data.props.fontStyle === 'italic';
+        const isUnderline = data.props.textDecoration === 'underline';
+        html += row('fmt-bold',      (isBold      ? '✓ ' : '') + 'Bold',      'B');
+        html += row('fmt-italic',    (isItalic    ? '✓ ' : '') + 'Italic',    'I');
+        html += row('fmt-underline', (isUnderline ? '✓ ' : '') + 'Underline', 'U');
+      }
       html += sep();
       html += row('delete',   'Delete', 'Del', false, true);
     } else {
@@ -2914,6 +3117,10 @@
       html += sep();
       html += row('fit',     'Fit to View','Ctrl+0');
       html += row('zoom100', '100% Zoom',  'Ctrl+1');
+      html += sep();
+      html += row('toggleLayers', S.showRuler ? '✓ Ruler' : 'Ruler');
+      html += row('toggleSnap',   S.cfg.snapEnabled ? '✓ Snap' : 'Snap');
+      html += row('toggleLayersPanel', 'View Layers');
     }
 
     ctxMenu.innerHTML = html;
@@ -2963,7 +3170,31 @@
       case 'fit':
         S.zoom = Math.min((scroll.clientWidth - 80) / 960, (scroll.clientHeight - 80) / 480);
         centerBanner(); break;
-      case 'zoom100':   S.zoom = 1; centerBanner(); break;
+      case 'zoom100': S.zoom = 1; centerBanner(); break;
+      case 'toggleLayers':
+        S.showRuler = !S.showRuler;
+        applyRulerVisibility();
+        centerBanner(); break;
+      case 'toggleSnap':
+        S.cfg.snapEnabled = !S.cfg.snapEnabled;
+        refreshSnapBtn(); break;
+      case 'toggleLayersPanel':
+        document.getElementById('bmLayersPanel')?.classList.toggle('bm-panel-hidden'); break;
+      case 'fmt-bold': {
+        const d = S.elements.find(e => e.id === cmTarget); if (!d) break;
+        d.props.fontWeight = (d.props.fontWeight || 400) >= 700 ? 400 : 700;
+        updateDynEl(d); buildPropsPanel(d); scheduleSave(); break;
+      }
+      case 'fmt-italic': {
+        const d = S.elements.find(e => e.id === cmTarget); if (!d) break;
+        d.props.fontStyle = d.props.fontStyle === 'italic' ? 'normal' : 'italic';
+        updateDynEl(d); buildPropsPanel(d); scheduleSave(); break;
+      }
+      case 'fmt-underline': {
+        const d = S.elements.find(e => e.id === cmTarget); if (!d) break;
+        d.props.textDecoration = d.props.textDecoration === 'underline' ? 'none' : 'underline';
+        updateDynEl(d); buildPropsPanel(d); scheduleSave(); break;
+      }
     }
   }
 
@@ -3486,6 +3717,7 @@
     S.zoom = Math.max(0.05, Math.round(fit * 20) / 20);
     centerBanner();
     buildSizeDrop();
+    applySafeView();
     scheduleSave();
   }
 
