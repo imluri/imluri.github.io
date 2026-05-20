@@ -1,0 +1,3926 @@
+<!-- Designer — full-screen editor -->
+<div class="bm-editor">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────── -->
+  <aside class="bm-sidebar">
+    <div class="bm-sidebar-header">
+      <span class="bm-sidebar-title">Designer</span>
+      <span class="bm-sidebar-sub">960 × 480</span>
+    </div>
+
+    <!-- Tabs + panels (hidden when element selected) -->
+    <div class="bm-sidebar-main" id="bmSidebarMain">
+      <div class="bm-tabs">
+        <button class="bm-tab bm-tab-active" data-tab="elements">Elements</button>
+        <button class="bm-tab" data-tab="style">Style</button>
+      </div>
+
+      <!-- Elements / Library tab -->
+      <div class="bm-panel" id="bm-tab-elements">
+        <div class="bm-lib-view-toggle">
+          <button class="bm-lib-view-btn bm-lib-view-active" id="bmLibViewGrid" title="Grid view"><iconify-icon icon="mdi:view-grid-outline" width="15" height="15"></iconify-icon></button>
+          <button class="bm-lib-view-btn" id="bmLibViewList" title="List view"><iconify-icon icon="mdi:view-list-outline" width="15" height="15"></iconify-icon></button>
+        </div>
+        <div class="bm-lib-section">Text</div>
+        <div class="bm-lib-grid">
+          <button class="bm-lib-item" data-add="text-heading"><iconify-icon icon="mdi:format-header-1" width="20" height="20"></iconify-icon><span>Heading</span></button>
+          <button class="bm-lib-item" data-add="text-mono"><iconify-icon icon="mdi:format-text" width="20" height="20"></iconify-icon><span>Mono</span></button>
+          <button class="bm-lib-item" data-add="text-label"><iconify-icon icon="mdi:label-outline" width="20" height="20"></iconify-icon><span>Label</span></button>
+          <button class="bm-lib-item" data-add="text-url"><iconify-icon icon="mdi:link-variant" width="20" height="20"></iconify-icon><span>URL</span></button>
+        </div>
+        <div class="bm-lib-section">Decorative</div>
+        <div class="bm-lib-grid">
+          <button class="bm-lib-item" data-add="line"><iconify-icon icon="mdi:minus" width="20" height="20"></iconify-icon><span>Line</span></button>
+          <button class="bm-lib-item" data-add="ring"><iconify-icon icon="mdi:circle-outline" width="20" height="20"></iconify-icon><span>Ring</span></button>
+          <button class="bm-lib-item" data-add="dot"><iconify-icon icon="mdi:circle" width="20" height="20"></iconify-icon><span>Dot</span></button>
+          <button class="bm-lib-item" data-add="rect"><iconify-icon icon="mdi:rectangle-outline" width="20" height="20"></iconify-icon><span>Box</span></button>
+          <button class="bm-lib-item" data-add="divider"><iconify-icon icon="mdi:ray-start-end" width="20" height="20"></iconify-icon><span>Divider</span></button>
+          <button class="bm-lib-item" data-add="glow"><iconify-icon icon="mdi:flare" width="20" height="20"></iconify-icon><span>Glow</span></button>
+        </div>
+        <div class="bm-lib-section">Shapes</div>
+        <div class="bm-lib-grid">
+          <button class="bm-lib-item" data-add="polygon" data-sides="3"><iconify-icon icon="mdi:triangle-outline" width="20" height="20"></iconify-icon><span>Triangle</span></button>
+          <button class="bm-lib-item" data-add="polygon" data-sides="4"><iconify-icon icon="mdi:square-outline" width="20" height="20"></iconify-icon><span>Square</span></button>
+          <button class="bm-lib-item" data-add="polygon" data-sides="5"><iconify-icon icon="mdi:pentagon-outline" width="20" height="20"></iconify-icon><span>Pentagon</span></button>
+        </div>
+        <div class="bm-lib-section">Code</div>
+        <div class="bm-lib-grid">
+          <button class="bm-lib-item" data-add="code-block"><iconify-icon icon="mdi:code-braces" width="20" height="20"></iconify-icon><span>Code Block</span></button>
+          <button class="bm-lib-item" data-add="tagline"><iconify-icon icon="mdi:dots-horizontal" width="20" height="20"></iconify-icon><span>Tagline</span></button>
+        </div>
+        <div class="bm-lib-section">Media</div>
+        <div class="bm-lib-grid">
+          <button class="bm-lib-item" data-add="image"><iconify-icon icon="mdi:image-outline" width="20" height="20"></iconify-icon><span>Image</span></button>
+        </div>
+      </div>
+
+      <!-- Content tab -->
+      <div class="bm-panel bm-panel-hidden" id="bm-tab-content">
+        <div class="bm-group">
+          <div class="bm-field"><label class="bm-flabel">Name</label><input class="bm-input" id="ctrlName" value="imluri" maxlength="24"></div>
+          <div class="bm-field"><label class="bm-flabel">Accent split (last N chars)</label><input class="bm-input" id="ctrlAccentSplit" type="number" value="3" min="0" max="20"></div>
+          <div class="bm-field"><label class="bm-flabel">Label</label><input class="bm-input" id="ctrlLabel" value="// developer &amp; builder"></div>
+          <div class="bm-field"><label class="bm-flabel">Tagline</label><input class="bm-input" id="ctrlTagline" value="builder · modder · developer · designer"></div>
+          <div class="bm-field"><label class="bm-flabel">URL</label><input class="bm-input" id="ctrlUrl" value="imluri.github.io"></div>
+        </div>
+        <div class="bm-group-label">Code block</div>
+        <div class="bm-group">
+          <div class="bm-field"><label class="bm-flabel">Variable name</label><input class="bm-input" id="ctrlCodeVar" value="imluri"></div>
+          <div class="bm-field"><label class="bm-flabel">role</label><input class="bm-input" id="ctrlCodeRole" value='"builder"'></div>
+          <div class="bm-field"><label class="bm-flabel">stack</label><input class="bm-input" id="ctrlCodeStack" value='["C#", "JS", "Python"]'></div>
+          <div class="bm-field"><label class="bm-flabel">ships</label><input class="bm-input" id="ctrlCodeShips" value="true"></div>
+          <div class="bm-field"><label class="bm-flabel">sleeps</label><input class="bm-input" id="ctrlCodeSleeps" value="false"></div>
+        </div>
+      </div>
+
+      <!-- Style tab -->
+      <div class="bm-panel bm-panel-hidden" id="bm-tab-style">
+        <div class="bm-group">
+          <div class="bm-field">
+            <label class="bm-flabel">Accent color</label>
+            <div class="bm-color-row">
+              <input class="bm-color-swatch" id="ctrlAccent" type="color" value="#e35f5f">
+              <input class="bm-input bm-input-hex" id="ctrlAccentHex" value="#e35f5f" maxlength="7">
+            </div>
+          </div>
+          <div class="bm-field"><label class="bm-flabel">Name font size (px)</label><input class="bm-input" id="ctrlNameSize" type="number" value="88" min="24" max="180"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Properties pane — shown when a dynamic element is selected -->
+    <div class="bm-props-pane bm-panel-hidden" id="bmPropsPane">
+      <div class="bm-props-header">
+        <button class="bm-icon-btn" id="bmPropsBack"><iconify-icon icon="mdi:arrow-left" width="14" height="14"></iconify-icon></button>
+        <span class="bm-props-title" id="bmPropsTitle">Element</span>
+        <button class="bm-icon-btn bm-icon-btn-danger" id="bmPropsDelete"><iconify-icon icon="mdi:trash-can-outline" width="14" height="14"></iconify-icon></button>
+      </div>
+      <div class="bm-panel" id="bmPropsBody"></div>
+    </div>
+
+    <!-- Footer actions -->
+    <div class="bm-sidebar-footer">
+      <button class="bm-btn bm-btn-primary" id="bmExportPngBtn">
+        <iconify-icon icon="mdi:download" width="14" height="14"></iconify-icon>
+        Export PNG
+      </button>
+      <div class="bm-btn-row">
+        <button class="bm-btn bm-btn-secondary" id="bmExportJsonBtn"><iconify-icon icon="mdi:code-json" width="14" height="14"></iconify-icon> Export JSON</button>
+        <button class="bm-btn bm-btn-secondary" id="bmImportJsonBtn"><iconify-icon icon="mdi:upload" width="14" height="14"></iconify-icon> Import JSON</button>
+        <input type="file" id="bmJsonFileInput" accept=".json" style="display:none">
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Canvas area ──────────────────────────────────────────── -->
+  <div class="bm-canvas-area">
+    <div class="bm-toolbar">
+      <button class="bm-tool-btn bm-bg-btn" id="bmBgColorBtn" title="Background color">
+        <div id="bmBgCircle" class="bm-bg-circle" style="background:#ffffff;"></div>
+      </button>
+      <button class="bm-tool-btn" id="bmPatBtn" title="Background pattern">
+        <iconify-icon icon="mdi:texture-box" width="14" height="14"></iconify-icon>
+      </button>
+      <div class="bm-toolbar-sep"></div>
+      <button class="bm-tool-btn" id="bmZoomOut"><iconify-icon icon="mdi:minus" width="14" height="14"></iconify-icon></button>
+      <span class="bm-zoom-label" id="bmZoomLabel">70%</span>
+      <button class="bm-tool-btn" id="bmZoomIn"><iconify-icon icon="mdi:plus" width="14" height="14"></iconify-icon></button>
+      <button class="bm-tool-btn bm-tool-text" id="bmZoomFit">Fit</button>
+      <button class="bm-tool-btn bm-tool-text" id="bmZoom100">100%</button>
+      <div class="bm-toolbar-sep"></div>
+      <button class="bm-tool-btn bm-snap-active" id="bmSnapToggle" title="Toggle snap (currently on)">
+        <iconify-icon icon="mdi:magnet" width="14" height="14"></iconify-icon>
+      </button>
+      <input class="bm-snap-input" id="bmSnapSize" type="number" value="5" min="1" max="200" title="Snap grid (px)">
+      <span class="bm-tool-hint">px</span>
+      <div class="bm-toolbar-sep"></div>
+      <button class="bm-tool-btn" id="bmRulerToggle" title="Toggle ruler">
+        <iconify-icon icon="mdi:ruler-square" width="14" height="14"></iconify-icon>
+      </button>
+      <button class="bm-tool-btn bm-tool-text" id="bmSizeBtn" title="Canvas size" style="min-width:72px;font-size:0.62rem;letter-spacing:0.02em;" id="bmSizeBtn">
+        <span id="bmSizeLabel">960 × 480</span>
+      </button>
+      <span class="bm-tool-hint" style="margin-right:auto;"></span>
+      <div class="bm-toolbar-sep"></div>
+      <button class="bm-tool-btn" id="bmLayersBtn" title="Layers (Alt+1)">
+        <iconify-icon icon="mdi:layers-outline" width="15" height="15"></iconify-icon>
+      </button>
+      <button class="bm-tool-btn bm-tool-text bm-shortcuts-btn" id="bmShortcutsBtn" title="Keyboard shortcuts">
+        <iconify-icon icon="mdi:keyboard-outline" width="15" height="15"></iconify-icon>
+      </button>
+      <div class="bm-toolbar-sep"></div>
+      <span class="bm-save-status" id="bmSaveStatus" title="Auto-saved to browser">
+        <iconify-icon icon="mdi:cloud-check-outline" width="14" height="14"></iconify-icon>
+      </span>
+    </div>
+    <!-- Shortcuts overlay -->
+    <div class="bm-shortcuts-overlay bm-panel-hidden" id="bmShortcutsOverlay">
+      <div class="bm-shortcuts-header">
+        <span>Keyboard Shortcuts</span>
+        <button class="bm-icon-btn" id="bmShortcutsClose"><iconify-icon icon="mdi:close" width="13" height="13"></iconify-icon></button>
+      </div>
+      <div class="bm-shortcuts-grid">
+        <div class="bm-sc-group">Editing</div>
+        <div class="bm-sc-row"><kbd>Ctrl</kbd><kbd>A</kbd><span>Select all</span></div>
+        <div class="bm-sc-row"><kbd>Ctrl</kbd><kbd>D</kbd><span>Duplicate</span></div>
+        <div class="bm-sc-row"><kbd>Ctrl</kbd><kbd>C</kbd><span>Copy</span></div>
+        <div class="bm-sc-row"><kbd>Ctrl</kbd><kbd>V</kbd><span>Paste</span></div>
+        <div class="bm-sc-row"><kbd>Del</kbd><span>Delete</span></div>
+        <div class="bm-sc-row"><kbd>Esc</kbd><span>Deselect</span></div>
+        <div class="bm-sc-group">Text formatting</div>
+        <div class="bm-sc-row"><kbd>Ctrl</kbd><kbd>B</kbd><span>Toggle bold</span></div>
+        <div class="bm-sc-row"><kbd>Ctrl</kbd><kbd>[</kbd><span>Decrease size</span></div>
+        <div class="bm-sc-row"><kbd>Ctrl</kbd><kbd>]</kbd><span>Increase size</span></div>
+        <div class="bm-sc-group">Move</div>
+        <div class="bm-sc-row"><kbd>↑↓←→</kbd><span>Nudge 1 px</span></div>
+        <div class="bm-sc-row"><kbd>Shift</kbd><kbd>↑↓←→</kbd><span>Nudge 10 px</span></div>
+        <div class="bm-sc-group">Selection</div>
+        <div class="bm-sc-row"><kbd>Shift</kbd><kbd>Click</kbd><span>Add / remove</span></div>
+        <div class="bm-sc-row"><kbd>Drag</kbd><span>Box select</span></div>
+        <div class="bm-sc-group">Canvas</div>
+        <div class="bm-sc-row"><kbd>Scroll</kbd><span>Zoom in / out</span></div>
+        <div class="bm-sc-row"><kbd>Space</kbd><kbd>Drag</kbd><span>Pan</span></div>
+        <div class="bm-sc-row"><kbd>Ctrl</kbd><kbd>0</kbd><span>Fit to view</span></div>
+        <div class="bm-sc-row"><kbd>Ctrl</kbd><kbd>1</kbd><span>100% zoom</span></div>
+        <div class="bm-sc-row"><kbd>Alt</kbd><kbd>1</kbd><span>Toggle layers</span></div>
+      </div>
+    </div>
+    <!-- BG color dropdown -->
+    <div class="bm-toolbar-drop bm-panel-hidden" id="bmBgDrop">
+      <div class="bm-drop-tabs">
+        <button class="bm-drop-tab bm-drop-tab-active" data-dtab="solid">Solid</button>
+        <button class="bm-drop-tab" data-dtab="gradient">Gradient</button>
+      </div>
+      <!-- Solid panel -->
+      <div id="bmBgSolidPanel">
+        <div class="bm-drop-color-row">
+          <input class="bm-color-swatch" id="bmBgSwatch" type="color" value="#ffffff">
+          <input class="bm-input bm-input-hex" id="bmBgHex" value="#ffffff" maxlength="7">
+        </div>
+        <div class="bm-group-label" style="margin:8px 0 6px;">Presets</div>
+        <div class="bm-tpl-grid" id="bmTplGrid"><!-- filled by JS --></div>
+      </div>
+      <!-- Gradient panel -->
+      <div id="bmBgGradPanel" style="display:none;">
+        <div class="bm-grad-preview" id="bmGradPreview"></div>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:10px;">
+          <div class="bm-grad-dir-btns" id="bmGradDirBtns">
+            <button class="bm-grad-dir" data-angle="90"  title="→">→</button>
+            <button class="bm-grad-dir" data-angle="135" title="↘">↘</button>
+            <button class="bm-grad-dir" data-angle="180" title="↓">↓</button>
+            <button class="bm-grad-dir" data-angle="225" title="↙">↙</button>
+            <button class="bm-grad-dir" data-angle="45"  title="↗">↗</button>
+            <button class="bm-grad-dir" data-angle="0"   title="↑">↑</button>
+          </div>
+          <input class="bm-input" id="bmGradAngle" type="number" value="135" min="0" max="359" style="width:54px;flex-shrink:0;" title="Angle (deg)">
+          <span class="bm-tool-hint">°</span>
+        </div>
+        <div class="bm-grad-stops-list" id="bmGradStops"></div>
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <button class="bm-btn bm-btn-secondary" id="bmGradAddStop" style="flex:1;padding:6px;">+ Stop</button>
+          <button class="bm-btn bm-btn-secondary" id="bmGradDistribute" style="flex:1;padding:6px;">Even</button>
+        </div>
+        <div class="bm-group-label" style="margin:10px 0 6px;">Presets</div>
+        <div class="bm-grad-presets" id="bmGradPresets"></div>
+      </div>
+    </div>
+    <!-- Size dropdown -->
+    <div class="bm-toolbar-drop bm-panel-hidden bm-size-drop" id="bmSizeDrop">
+      <div id="bmSizePresetList"></div>
+      <div class="bm-group-label" style="margin:10px 0 6px;">Custom</div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <input class="bm-input" id="bmCustomW" type="number" min="100" max="5000" placeholder="W" style="flex:1;min-width:0;">
+        <span class="bm-tool-hint">×</span>
+        <input class="bm-input" id="bmCustomH" type="number" min="100" max="5000" placeholder="H" style="flex:1;min-width:0;">
+      </div>
+      <button class="bm-btn bm-btn-primary" id="bmCustomSizeApply" style="width:100%;margin-top:6px;">Apply</button>
+    </div>
+    <!-- Pattern dropdown -->
+    <div class="bm-toolbar-drop bm-panel-hidden" id="bmPatDrop">
+      <div class="bm-pat-grid" id="bmPatGrid"><!-- filled by JS --></div>
+      <div class="bm-pat-controls">
+        <div class="bm-field" style="margin-top:10px;">
+          <label class="bm-flabel">Pattern color</label>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input type="color" id="ctrlPatColor" value="#808080" style="width:36px;height:28px;border:none;background:none;cursor:pointer;padding:0;">
+            <input class="bm-input" id="ctrlPatColorHex" type="text" value="#808080" maxlength="7" style="flex:1;">
+          </div>
+        </div>
+        <div class="bm-field" style="margin-top:6px;">
+          <label class="bm-flabel">Pattern opacity</label>
+          <input class="bm-input" id="ctrlPatOpacity" type="number" value="0.05" min="0.01" max="1" step="0.01">
+        </div>
+        <div class="bm-field" style="margin-top:6px;">
+          <label class="bm-flabel">Pattern size (px)</label>
+          <input class="bm-input" id="ctrlPatSize" type="number" value="40" min="8" max="200">
+        </div>
+      </div>
+    </div>
+    <!-- Layers panel -->
+    <div class="bm-layers-panel bm-panel-hidden" id="bmLayersPanel">
+      <div class="bm-layers-header">
+        <span>Layers</span>
+        <button class="bm-icon-btn" id="bmLayersClose"><iconify-icon icon="mdi:close" width="13" height="13"></iconify-icon></button>
+      </div>
+      <div class="bm-layers-list" id="bmLayersList"></div>
+    </div>
+    <div class="bm-scroll" id="bmScroll">
+      <!-- Rulers -->
+      <div id="bmRulerCorner" class="bm-ruler-corner bm-panel-hidden"></div>
+      <canvas id="bmRulerH" class="bm-ruler bm-ruler-h bm-panel-hidden"></canvas>
+      <canvas id="bmRulerV" class="bm-ruler bm-ruler-v bm-panel-hidden"></canvas>
+      <!-- Rubber band selection rect -->
+      <div id="bmRubberBand" style="display:none;position:absolute;border:1.5px solid rgba(110,170,255,0.75);background:rgba(100,150,255,0.07);pointer-events:none;z-index:50;border-radius:2px;"></div>
+      <div class="bm-banner-outer" id="bmBannerOuter">
+        <div class="bm-banner" id="bmBanner">
+
+          <div class="bm-glow" id="bmGlow"></div>
+          <div class="bm-grid-layer" id="bmGridLayer"></div>
+          <div class="bm-noise-layer"></div>
+
+          <div class="bm-el bm-rings" id="elRings">
+            <div class="bm-ring" style="width:340px;height:340px;left:0;top:0;"></div>
+            <div class="bm-ring" style="width:200px;height:200px;left:80px;top:270px;opacity:.7;"></div>
+            <div class="bm-ring" style="width:90px;height:90px;left:230px;top:150px;opacity:.8;"></div>
+          </div>
+
+<div class="bm-el" id="elBar"><div class="bm-bar-inner" id="bmBarInner"></div></div>
+
+          <div class="bm-el" id="elContent">
+            <div class="bm-el-label" id="bmElLabel">// developer &amp; builder</div>
+            <div class="bm-el-name" id="bmElName">iml<span id="bmElNameAccent">uri</span></div>
+            <div class="bm-el-tagline">
+              <span class="bm-tdot"></span>
+              <span id="bmElTagline">builder · modder · developer · designer</span>
+            </div>
+          </div>
+
+          <div class="bm-el" id="elCode"><pre class="bm-code-pre" id="bmCodePre"></pre></div>
+          <div class="bm-el" id="elUrl"><span class="bm-url-text" id="bmElUrl">imluri.github.io</span></div>
+
+          <!-- Ghost group selection box -->
+          <div id="bmGroupSelBox"><span class="bm-group-sel-label"></span></div>
+
+          <!-- Dynamic elements appended here by JS -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Context menu -->
+  <div class="bm-ctx-menu bm-panel-hidden" id="bmCtxMenu"></div>
+
+  <!-- Floating text format toolbar -->
+  <div id="bmFormatToolbar">
+    <button class="bm-fmt-btn" data-cmd="bold"          title="Bold"><b>B</b></button>
+    <button class="bm-fmt-btn" data-cmd="italic"        title="Italic"><i>I</i></button>
+    <button class="bm-fmt-btn" data-cmd="underline"     title="Underline"><u>U</u></button>
+    <button class="bm-fmt-btn" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+    <div class="bm-fmt-sep"></div>
+    <input type="color" id="bmFmtColor" class="bm-fmt-color" title="Character color" value="#ffffff">
+  </div>
+</div>
+
+<style>
+.bm-editor {
+  position: fixed;
+  top: 58px; left: 0; right: 0; bottom: 0;
+  display: flex;
+  overflow: hidden;
+  z-index: 10;
+  background: var(--bg-deep);
+}
+
+/* ── Sidebar ── */
+.bm-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-default);
+  background: var(--bg-elevated);
+  min-height: 0;
+}
+.bm-sidebar-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border-default);
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.bm-sidebar-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--foreground);
+}
+.bm-sidebar-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem; color: var(--foreground-muted);
+}
+
+/* Sidebar main (tabs + panels) */
+.bm-sidebar-main {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.bm-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-default);
+  flex-shrink: 0;
+}
+.bm-tab {
+  flex: 1; padding: 9px;
+  background: none; border: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--foreground-muted); cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.bm-tab-active { color: var(--foreground); border-bottom-color: var(--accent); }
+
+.bm-panel {
+  flex: 1; overflow-y: auto;
+  padding: 12px;
+  display: flex; flex-direction: column; gap: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+.bm-panel-hidden { display: none !important; }
+
+/* Library */
+.bm-lib-section {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--foreground-muted);
+  padding: 2px 2px 6px;
+  margin-top: 4px;
+}
+.bm-lib-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.bm-lib-item {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 5px;
+  padding: 10px 6px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  color: var(--foreground-muted);
+  cursor: grab;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.05em;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  user-select: none;
+}
+.bm-lib-item:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: var(--accent);
+  color: var(--foreground);
+}
+.bm-lib-item:active { cursor: grabbing; }
+
+/* Library view toggle */
+.bm-lib-view-toggle {
+  display: flex; gap: 4px; justify-content: flex-end;
+  margin-bottom: 8px;
+}
+.bm-lib-view-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 6px;
+  border: 1px solid var(--border-default);
+  background: transparent; color: var(--foreground-muted);
+  cursor: pointer; transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.bm-lib-view-btn:hover { background: rgba(255,255,255,0.06); color: var(--foreground); }
+.bm-lib-view-btn.bm-lib-view-active { border-color: var(--accent); color: var(--accent); background: rgba(227,95,95,0.08); }
+
+/* Syntax highlighting */
+.hl-pre { font-family:'JetBrains Mono',monospace; white-space:pre; margin:0; color:rgba(255,255,255,0.45); }
+.hl-k  { color:rgba(175,130,255,0.75); }
+.hl-s  { color:rgba(220,175,95,0.75); }
+.hl-c  { color:rgba(255,255,255,0.28); font-style:italic; }
+.hl-n  { color:rgba(227,95,95,0.75); }
+.hl-a  { color:rgba(130,210,255,0.75); }
+
+/* List view overrides */
+.bm-lib-list .bm-lib-grid {
+  display: flex; flex-direction: column; gap: 3px;
+}
+.bm-lib-list .bm-lib-item {
+  flex-direction: row; gap: 8px;
+  padding: 7px 10px; justify-content: flex-start;
+  font-size: 0.7rem;
+}
+.bm-lib-list .bm-lib-item iconify-icon { flex-shrink: 0; }
+
+/* Properties pane */
+.bm-props-pane {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.bm-props-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-default);
+  flex-shrink: 0;
+}
+.bm-props-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--foreground); flex: 1;
+}
+.bm-icon-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  border: 1px solid var(--border-default); border-radius: 6px;
+  background: rgba(255,255,255,0.03);
+  color: var(--foreground-muted); cursor: pointer;
+  flex-shrink: 0; transition: background 0.15s, color 0.15s;
+}
+.bm-icon-btn:hover { background: rgba(255,255,255,0.07); color: var(--foreground); }
+.bm-icon-btn-danger { color: #e35f5f; }
+.bm-icon-btn-danger:hover { background: rgba(227,95,95,0.12); color: #ff7070; }
+
+/* Form controls */
+.bm-group {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border-default);
+  border-radius: 10px; padding: 10px;
+  display: flex; flex-direction: column; gap: 10px;
+  margin-bottom: 8px;
+}
+.bm-group-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--foreground-muted);
+  padding: 0 2px; margin-top: 4px;
+}
+.bm-field { display: flex; flex-direction: column; gap: 4px; }
+.bm-flabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--foreground-muted);
+}
+.bm-input {
+  background: var(--bg-base); border: 1px solid var(--border-default);
+  border-radius: 6px; padding: 7px 10px;
+  color: var(--foreground);
+  font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+  outline: none; width: 100%; transition: border-color 0.15s;
+}
+.bm-input:focus { border-color: var(--accent); }
+.bm-input-hex { width: 90px; }
+.bm-color-row { display: flex; gap: 8px; align-items: center; }
+.bm-color-swatch {
+  width: 36px; height: 32px;
+  border: 1px solid var(--border-default); border-radius: 6px;
+  background: none; cursor: pointer; padding: 2px; flex-shrink: 0;
+}
+.bm-check {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+  color: var(--foreground-muted); cursor: pointer;
+}
+.bm-check input { accent-color: var(--accent); cursor: pointer; }
+
+/* Sidebar footer */
+.bm-sidebar-footer {
+  padding: 12px; border-top: 1px solid var(--border-default);
+  display: flex; flex-direction: column; gap: 8px; flex-shrink: 0;
+}
+.bm-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 9px 16px; border-radius: 8px; border: none; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.bm-btn:hover { opacity: 0.82; }
+.bm-btn:active { transform: scale(0.97); }
+.bm-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.bm-btn-primary { background: var(--accent); color: #fff; width: 100%; }
+.bm-btn-secondary {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border-default);
+  color: var(--foreground-muted); flex: 1;
+}
+.bm-btn-row { display: flex; gap: 6px; }
+
+/* ── Canvas area ── */
+.bm-canvas-area {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column;
+  background: var(--bg-deep);
+  position: relative;
+}
+.bm-toolbar {
+  display: flex; align-items: center; gap: 4px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-elevated); flex-shrink: 0;
+}
+.bm-tool-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  border: 1px solid var(--border-default); border-radius: 6px;
+  background: rgba(255,255,255,0.03);
+  color: var(--foreground-muted); cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.bm-tool-btn:hover { background: rgba(255,255,255,0.07); color: var(--foreground); }
+.bm-tool-text { width: auto; padding: 0 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 0.06em; }
+.bm-zoom-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+  color: var(--foreground-muted); min-width: 38px; text-align: center;
+}
+.bm-toolbar-sep { width: 1px; height: 20px; background: var(--border-default); margin: 0 6px; }
+.bm-save-status {
+  display: flex; align-items: center; gap: 4px;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;
+  color: rgba(255,255,255,0.2); letter-spacing: 0.04em;
+  transition: color 0.3s;
+  white-space: nowrap; cursor: default;
+}
+.bm-save-status.bm-save-flash { color: #6fcf97; }
+.bm-save-status.bm-save-error { color: #e35f5f; }
+.bm-tool-hint {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;
+  color: rgba(255,255,255,0.2); letter-spacing: 0.04em;
+}
+
+/* Rulers */
+.bm-ruler { position: absolute; pointer-events: none; z-index: 40; }
+.bm-ruler-h { top: 0; left: 20px; right: 0; height: 20px; }
+.bm-ruler-v { top: 20px; left: 0; width: 20px; bottom: 0; }
+.bm-ruler-corner {
+  position: absolute; top: 0; left: 0; width: 20px; height: 20px;
+  background: #111014; border-right: 1px solid rgba(255,255,255,0.07);
+  border-bottom: 1px solid rgba(255,255,255,0.07); z-index: 41;
+}
+.bm-scroll.bm-show-ruler .bm-banner-outer { margin-top: 0; margin-left: 0; }
+
+/* Size dropdown */
+.bm-size-drop { width: 260px; }
+.bm-size-group-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.55rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--foreground-muted); padding: 4px 0 4px; margin-top: 4px;
+}
+.bm-size-preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 2px; }
+.bm-size-preset-btn {
+  display: flex; flex-direction: column; align-items: flex-start;
+  padding: 7px 10px; border-radius: 6px; cursor: pointer;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border-default);
+  transition: background 0.12s, border-color 0.12s;
+  text-align: left;
+}
+.bm-size-preset-btn:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.15); }
+.bm-size-preset-btn.bm-size-active { border-color: var(--accent); background: rgba(227,95,95,0.08); }
+.bm-size-preset-name { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--foreground); }
+.bm-size-preset-dim  { font-family: 'JetBrains Mono', monospace; font-size: 0.52rem; color: var(--foreground-muted); margin-top: 1px; }
+
+/* Infinite canvas */
+.bm-scroll { flex: 1; overflow: hidden; position: relative; cursor: default; }
+.bm-scroll.bm-panning { cursor: grabbing; }
+.bm-banner-outer { position: absolute; top: 0; left: 0; transform-origin: 0 0; will-change: transform; }
+
+/* The banner */
+.bm-banner {
+  width: 960px; height: 480px;
+  position: relative; overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+}
+.bm-glow { position: absolute; inset: 0; pointer-events: none; }
+.bm-grid-layer {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 48px 48px; pointer-events: none;
+}
+.bm-noise-layer {
+  position: absolute; inset: 0; opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* Draggable elements */
+.bm-el {
+  position: absolute; cursor: move; user-select: none;
+}
+.bm-el:not(.bm-selected):hover::after {
+  content: ''; position: absolute; inset: -10px;
+  border: 1px dashed rgba(255,255,255,0.25);
+  border-radius: 6px; pointer-events: none;
+}
+.bm-el.bm-dragging::after {
+  content: ''; position: absolute; inset: -10px;
+  border: 1.5px solid var(--accent);
+  border-radius: 6px; pointer-events: none; opacity: 0.6;
+}
+/* CSS border on every selected element — covers single-select and text-edit mode */
+.bm-el.bm-selected::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border: 1.5px solid var(--accent);
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 100;
+}
+/* When multiple selected, hide individual borders — ghost group box takes over */
+.bm-multi-sel .bm-el.bm-selected::before { display: none; }
+
+/* Ghost group selection box */
+#bmGroupSelBox {
+  display: none;
+  position: absolute;
+  pointer-events: auto;
+  cursor: move;
+  z-index: 201;
+  border: 1.5px dashed var(--accent);
+  border-radius: 6px;
+  opacity: 0.85;
+}
+
+/* Group label badge inside ghost box */
+#bmGroupSelBox .bm-group-sel-label {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+/* Layers panel group styles */
+.bm-layer-group-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 6px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--foreground-muted);
+  user-select: none;
+}
+.bm-layer-group-header:hover,
+.bm-layer-group-header.bm-layer-selected { background: rgba(255,255,255,0.06); color: var(--foreground); }
+.bm-layer-collapse-btn {
+  background: none; border: none; color: inherit; cursor: pointer;
+  font-size: 10px; padding: 0 2px; line-height: 1; flex-shrink: 0;
+}
+.bm-layer-count {
+  margin-left: auto;
+  font-size: 0.6rem;
+  opacity: 0.45;
+  flex-shrink: 0;
+}
+.bm-layer-child { padding-left: 18px !important; }
+
+/* ── Selection handles ── */
+.bm-sel-border {
+  position: absolute;
+  inset: -10px;
+  border: 1.5px solid var(--accent);
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 100;
+}
+.bm-sel-handle {
+  position: absolute;
+  width: 9px; height: 9px;
+  background: #fff;
+  border: 1.5px solid var(--accent);
+  border-radius: 50%;
+  z-index: 101;
+  pointer-events: all;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  transform: scale(var(--bm-inv-zoom, 1.43));
+  transform-origin: center;
+}
+.bm-sel-h-rotate {
+  position: absolute;
+  width: 13px; height: 13px;
+  top: -38px; left: calc(50% - 6.5px);
+  background: #fff; border-radius: 50%; cursor: grab;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: #444;
+  transform: scale(var(--bm-inv-zoom, 1.43)); transform-origin: center center;
+  z-index: 102; box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+}
+.bm-sel-rot-line {
+  position: absolute;
+  width: 1px; height: 24px;
+  top: -24px; left: calc(50% - 0.5px);
+  background: var(--accent); opacity: 0.45;
+  pointer-events: none;
+  transform: scaleX(var(--bm-inv-zoom, 1.43)); transform-origin: bottom center;
+}
+.bm-sel-h-nw { top: -14.5px; left: -14.5px; cursor: nw-resize; }
+.bm-sel-h-n  { top: -14.5px; left: calc(50% - 4.5px); cursor: n-resize; }
+.bm-sel-h-ne { top: -14.5px; right: -14.5px; cursor: ne-resize; }
+.bm-sel-h-e  { top: calc(50% - 4.5px); right: -14.5px; cursor: e-resize; }
+.bm-sel-h-se { bottom: -14.5px; right: -14.5px; cursor: se-resize; }
+.bm-sel-h-s  { bottom: -14.5px; left: calc(50% - 4.5px); cursor: s-resize; }
+.bm-sel-h-sw { bottom: -14.5px; left: -14.5px; cursor: sw-resize; }
+.bm-sel-h-w  { top: calc(50% - 4.5px); left: -14.5px; cursor: w-resize; }
+/* Static legacy elements — always hidden; use Elements library instead */
+#elBar, #elContent, #elCode, #elUrl, #elRings, #bmGlow, #bmGridLayer { display: none !important; }
+
+.bm-rings { pointer-events: none; width: 100%; height: 100%; left: 0 !important; top: 0 !important; cursor: default; }
+.bm-ring { position: absolute; border-radius: 50%; border: 1px solid rgba(227,95,95,0.1); pointer-events: none; }
+.bm-bar-inner { width: 2px; height: 140px; border-radius: 9999px; opacity: 0.65; }
+.bm-el-label { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.24em; text-transform: uppercase; margin-bottom: 14px; opacity: 0.75; }
+.bm-el-name { font-family: 'Syne', sans-serif; font-weight: 800; line-height: 0.88; letter-spacing: -0.03em; color: #E9EBF0; margin-bottom: 24px; }
+.bm-el-tagline { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: rgba(233,235,240,0.38); letter-spacing: 0.05em; display: flex; align-items: center; gap: 10px; }
+.bm-tdot { width: 4px; height: 4px; border-radius: 50%; opacity: 0.5; flex-shrink: 0; }
+.bm-code-pre { font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 2; white-space: pre; margin: 0; }
+.bm-code-pre .cd { color: rgba(255,255,255,0.09); }
+.bm-code-pre .ca { color: rgba(227,95,95,0.4); }
+.bm-code-pre .cs { color: rgba(220,175,95,0.28); }
+.bm-code-pre .ck { color: rgba(175,130,255,0.22); }
+.bm-url-text { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; white-space: nowrap; }
+
+/* ── Context menu ── */
+.bm-ctx-menu {
+  position: absolute;
+  z-index: 200;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  padding: 4px;
+  min-width: 210px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+}
+.bm-ctx-header {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--accent); opacity: 0.7;
+  padding: 6px 10px 2px;
+}
+.bm-ctx-sep { height: 1px; background: var(--border-default); margin: 4px 0; }
+.bm-ctx-item {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; padding: 7px 10px;
+  border-radius: 6px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; color: var(--foreground);
+  transition: background 0.1s;
+}
+.bm-ctx-item:hover { background: rgba(255,255,255,0.06); }
+.bm-ctx-item span { font-size: 0.62rem; color: rgba(255,255,255,0.28); white-space: nowrap; }
+.bm-ctx-disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+.bm-ctx-danger { color: #e35f5f; }
+.bm-ctx-danger:hover { background: rgba(227,95,95,0.1); }
+
+/* ── Templates ── */
+.bm-tpl-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.bm-tpl-item {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.bm-tpl-swatch {
+  width: 100%; height: 52px;
+  border-radius: 8px;
+  border: 2px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.12s;
+}
+.bm-tpl-swatch:hover { border-color: rgba(255,255,255,0.35); transform: scale(1.04); }
+.bm-tpl-swatch.bm-tpl-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.bm-tpl-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem; letter-spacing: 0.04em;
+  color: var(--foreground-muted);
+}
+
+/* ── Pattern grid ── */
+.bm-pat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.bm-pat-item {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.bm-pat-swatch {
+  width: 100%; height: 52px;
+  border-radius: 8px;
+  border: 2px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.12s;
+  overflow: hidden;
+  position: relative;
+}
+.bm-pat-swatch:hover { border-color: rgba(255,255,255,0.35); transform: scale(1.04); }
+.bm-pat-swatch.bm-pat-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.bm-pat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem; letter-spacing: 0.04em;
+  color: var(--foreground-muted);
+}
+
+/* ── Snap ── */
+.bm-snap-input {
+  width: 38px; height: 28px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  color: var(--foreground);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  text-align: center;
+  outline: none;
+  padding: 0 4px;
+  -moz-appearance: textfield;
+}
+.bm-snap-input::-webkit-outer-spin-button,
+.bm-snap-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.bm-snap-input:focus { border-color: var(--accent); }
+.bm-tool-btn.bm-snap-active { color: var(--accent); border-color: var(--accent); background: rgba(227,95,95,0.08); }
+
+/* ── Popup solid background (overrides semi-transparent --bg-elevated) ── */
+.bm-toolbar-drop,
+.bm-shortcuts-overlay,
+.bm-layers-panel,
+.bm-ctx-menu { background: #111014 !important; }
+
+/* ── Drop tabs (Solid / Gradient) ── */
+.bm-drop-tabs {
+  display: flex; gap: 2px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border-default);
+  padding-bottom: 6px;
+}
+.bm-drop-tab {
+  flex: 1; padding: 5px;
+  background: none; border: 1px solid transparent;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--foreground-muted); cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.bm-drop-tab:hover { background: rgba(255,255,255,0.05); color: var(--foreground); }
+.bm-drop-tab-active { background: rgba(255,255,255,0.07) !important; color: var(--foreground) !important; border-color: var(--border-default) !important; }
+
+/* ── Gradient editor ── */
+.bm-grad-preview {
+  width: 100%; height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--border-default);
+}
+.bm-grad-dir-btns { display: flex; gap: 3px; }
+.bm-grad-dir {
+  width: 26px; height: 26px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-default);
+  border-radius: 5px;
+  color: var(--foreground-muted); cursor: pointer;
+  font-size: 0.75rem; display: flex; align-items: center; justify-content: center;
+  transition: background 0.12s, color 0.12s;
+}
+.bm-grad-dir:hover { background: rgba(255,255,255,0.08); color: var(--foreground); }
+.bm-grad-dir.bm-grad-dir-active { background: rgba(227,95,95,0.12); color: var(--accent); border-color: var(--accent); }
+.bm-grad-stops-list {
+  display: flex; flex-direction: column; gap: 5px;
+  margin-top: 10px;
+  max-height: 200px; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+.bm-grad-stop-row {
+  display: flex; align-items: center; gap: 5px;
+}
+.bm-grad-stop-pos {
+  width: 46px !important;
+  flex-shrink: 0;
+}
+.bm-grad-stop-hex {
+  flex: 1;
+  min-width: 0;
+}
+.bm-grad-stop-remove {
+  width: 22px !important; height: 22px !important;
+  padding: 0 !important; flex-shrink: 0;
+  font-size: 0.9rem; line-height: 1;
+}
+.bm-grad-presets {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;
+}
+.bm-grad-preset {
+  height: 34px; border-radius: 6px;
+  border: 1.5px solid transparent;
+  cursor: pointer; transition: border-color 0.15s, transform 0.12s;
+  position: relative; overflow: hidden;
+}
+.bm-grad-preset:hover { border-color: rgba(255,255,255,0.3); transform: scale(1.04); }
+.bm-grad-preset.bm-grad-preset-active { border-color: var(--accent); }
+.bm-grad-preset-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.45rem;
+  letter-spacing: 0.04em; text-align: center;
+  padding: 2px 2px 3px;
+  background: rgba(0,0,0,0.45); color: rgba(255,255,255,0.7);
+  text-transform: uppercase; opacity: 0;
+  transition: opacity 0.15s;
+}
+.bm-grad-preset:hover .bm-grad-preset-label { opacity: 1; }
+
+/* ── Toolbar dropdowns ── */
+.bm-bg-circle {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  flex-shrink: 0;
+}
+.bm-bg-btn { padding: 4px !important; }
+.bm-toolbar-drop {
+  position: absolute;
+  z-index: 60;
+  top: 44px; left: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  padding: 12px;
+  min-width: 220px;
+  max-width: 290px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+}
+.bm-drop-color-row {
+  display: flex; gap: 8px; align-items: center;
+  margin-bottom: 4px;
+}
+
+/* ── Layers panel ── */
+.bm-layers-panel {
+  position: absolute;
+  top: 44px; right: 12px;
+  width: 240px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  z-index: 50;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  max-height: 420px;
+}
+.bm-layers-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-default);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--foreground);
+  flex-shrink: 0;
+}
+.bm-layers-list {
+  overflow-y: auto; flex: 1;
+  padding: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+.bm-layer-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px; cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem; color: var(--foreground-muted);
+  transition: background 0.1s;
+  user-select: none;
+  position: relative;
+}
+.bm-layer-row:hover { background: rgba(255,255,255,0.05); color: var(--foreground); }
+.bm-layer-row.bm-layer-selected { background: rgba(227,95,95,0.12); color: var(--foreground); }
+.bm-layer-row.bm-layer-selected .bm-layer-icon { color: var(--accent); }
+.bm-layer-row.bm-layer-dragging { opacity: 0.35; }
+.bm-layer-row.bm-layer-drop-above::before {
+  content: ''; position: absolute; top: -1px; left: 6px; right: 6px;
+  height: 2px; background: var(--accent); border-radius: 2px;
+}
+.bm-layer-row.bm-layer-drop-below::after {
+  content: ''; position: absolute; bottom: -1px; left: 6px; right: 6px;
+  height: 2px; background: var(--accent); border-radius: 2px;
+}
+.bm-layer-grip { display: flex; align-items: center; flex-shrink: 0; color: rgba(255,255,255,0.15); cursor: grab; }
+.bm-layer-grip:active { cursor: grabbing; }
+.bm-layer-icon { display: flex; align-items: center; flex-shrink: 0; color: rgba(255,255,255,0.3); }
+.bm-layer-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bm-layer-z { font-size: 0.55rem; color: rgba(255,255,255,0.2); flex-shrink: 0; }
+.bm-layers-empty {
+  padding: 20px; text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem; color: rgba(255,255,255,0.2);
+}
+
+/* ── Floating format toolbar ── */
+#bmFormatToolbar {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  background: #1c1c1c;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 7px;
+  padding: 4px 5px;
+  gap: 1px;
+  align-items: center;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.6);
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+#bmFormatToolbar.bm-fmt-visible { display: flex; }
+.bm-fmt-btn {
+  background: none; border: none;
+  color: rgba(255,255,255,0.72);
+  padding: 0 7px; border-radius: 4px;
+  cursor: pointer; font-size: 12px;
+  height: 26px; min-width: 26px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.1s, color 0.1s;
+}
+.bm-fmt-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.bm-fmt-btn.bm-fmt-active { background: rgba(255,255,255,0.18); color: #fff; }
+.bm-fmt-sep { width: 1px; height: 16px; background: rgba(255,255,255,0.14); margin: 0 3px; flex-shrink: 0; }
+.bm-fmt-color {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.25); cursor: pointer;
+  padding: 0; background: none; flex-shrink: 0;
+}
+
+/* ── Slider inputs ── */
+.bm-slider-row { display: flex; align-items: center; gap: 6px; }
+.bm-slider { flex: 1; accent-color: var(--accent); cursor: pointer; height: 3px; }
+.bm-slider-num { width: 46px; flex-shrink: 0; text-align: center; padding: 4px 4px !important; }
+
+/* ── Shortcuts overlay ── */
+.bm-shortcuts-btn { width: 32px; }
+.bm-shortcuts-overlay {
+  position: absolute;
+  top: 44px; right: 12px;
+  width: 280px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  z-index: 50;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+.bm-shortcuts-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-default);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--foreground);
+}
+.bm-shortcuts-grid {
+  padding: 10px 14px 14px;
+  display: flex; flex-direction: column; gap: 3px;
+  max-height: 360px; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+.bm-sc-group {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--accent); opacity: 0.7;
+  margin-top: 10px; margin-bottom: 2px;
+}
+.bm-sc-group:first-child { margin-top: 4px; }
+.bm-sc-row {
+  display: flex; align-items: center; gap: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem; color: var(--foreground-muted);
+  padding: 2px 0;
+}
+.bm-sc-row kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; padding: 1px 5px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem; color: var(--foreground);
+  white-space: nowrap;
+}
+.bm-sc-row span { margin-left: auto; color: rgba(255,255,255,0.4); font-size: 0.65rem; }
+</style>
+
+<script>
+(function () {
+
+  // ── Element type definitions ──────────────────────────────────
+  const EL_TYPES = {
+    'text-heading': { label: 'Heading',    defaults: { text: 'Hello',               fontSize: 72,   fontWeight: 800, color: '#E9EBF0', opacity: 1,    letterSpacing: -0.03 } },
+    'text-mono':    { label: 'Mono Text',  defaults: { text: 'some text',           fontSize: 13,   fontWeight: 400, color: '#E9EBF0', opacity: 0.7,  letterSpacing: 0.05 } },
+    'text-label':   { label: 'Label',      defaults: { text: '// label',            fontSize: 10.5, fontWeight: 400, color: '#e35f5f', opacity: 0.75, letterSpacing: 0.24 } },
+    'text-url':     { label: 'URL',        defaults: { text: 'example.com',         fontSize: 10,   fontWeight: 400, color: '#e35f5f', opacity: 0.45, letterSpacing: 0.1 } },
+    'bar-v':        { label: 'V-Bar',      defaults: { width: 2,   height: 140, color: '#e35f5f', opacity: 0.65 } },
+    'bar-h':        { label: 'H-Line',     defaults: { width: 200, height: 1,   color: '#e35f5f', opacity: 0.3 } },
+    'ring':         { label: 'Ring',       defaults: { size: 200, thickness: 1, color: '#e35f5f', opacity: 0.1 } },
+    'dot':          { label: 'Dot',        defaults: { size: 6,   color: '#e35f5f', opacity: 0.6 } },
+    'rect':         { label: 'Box',        defaults: { width: 200, height: 100, radius: 8, filled: false, thickness: 1, color: '#e35f5f', opacity: 0.15 } },
+    'code-block':   { label: 'Code Block', defaults: { code: 'const obj = {\n  role:   "builder",\n  stack:  ["JS"],\n  ships:  true,\n  sleeps: false,\n};', lang: 'js', fontSize: 12, opacity: 1 } },
+    'tagline':      { label: 'Tagline',    defaults: { text: 'builder · developer', dotColor: '#e35f5f', dotOpacity: 0.5 } },
+    'divider':      { label: 'Divider',    defaults: { width: 200, color: '#e35f5f', opacity: 0.2 } },
+    'glow':         { label: 'Glow',       defaults: { size: 400, color: '#e35f5f', opacity: 0.22, syncAccent: false } },
+    'line':         { label: 'Line',       defaults: { length: 200, thickness: 2, color: '#e35f5f', opacity: 0.4 } },
+    'polygon':      { label: 'Shape',      defaults: { sides: 5, width: 100, height: 100, filled: true, color: '#e35f5f', opacity: 0.8, thickness: 2 } },
+    'image':        { label: 'Image',      defaults: { src: '', width: 200, height: 150, radius: 0, opacity: 1, objectFit: 'cover' } },
+  };
+
+  // ── State ─────────────────────────────────────────────────────
+  const S = {
+    zoom: 0.7, camX: 0, camY: 0,
+    panning: false, panStartX: 0, panStartY: 0, panStartCamX: 0, panStartCamY: 0,
+    spaceHeld: false,
+    dragging: null, draggingDyn: false,
+    dragStartMX: 0, dragStartMY: 0, dragStartPX: 0, dragStartPY: 0,
+    dragStartPositions: null,
+    selectedIds: new Set(), primaryId: null,
+    rubberReady: false, rubbering: false, rubberShift: false,
+    rubberStartX: 0, rubberStartY: 0,
+    resizing: false, rotating: false,
+    elements: [], groups: [], activeGroupId: null,
+    pos: {
+      elBar:     { x: 188, y: 130 },
+      elContent: { x: 212, y: 90  },
+      elCode:    { x: 636, y: 80  },
+      elUrl:     { x: 810, y: 442 },
+    },
+    cfg: {
+      accent: '#e35f5f', bg: '#ffffff',
+      name: 'imluri', accentSplit: 3,
+      label: '// developer & builder',
+      tagline: 'builder · modder · developer · designer',
+      url: 'imluri.github.io', nameSize: 88,
+      codeVar: 'imluri', codeRole: '"builder"',
+      codeStack: '["C#", "JS", "Python"]', codeShips: 'true', codeSleeps: 'false',
+      showContent: false, showBar: false, showCode: false, showUrl: false,
+      showRings: false, showGlow: false, showGrid: false,
+      bgPattern: 'none', bgPatternOpacity: 0.05, bgPatternSize: 40, bgPatternColor: '#808080',
+      bgType: 'solid',
+      bgGradient: { angle: 135, stops: [{ color: '#e35f5f', pos: 0 }, { color: '#0c0707', pos: 100 }] },
+      snapEnabled: true, snapGrid: 5,
+      canvasW: 960, canvasH: 480,
+    },
+    showRuler: false,
+  };
+
+  let _dynIdSeq = 0;
+  function nextId() { return 'dyn' + (++_dynIdSeq); }
+
+  // ── DOM refs ──────────────────────────────────────────────────
+  const banner    = document.getElementById('bmBanner');
+  const outer     = document.getElementById('bmBannerOuter');
+  const scroll    = document.getElementById('bmScroll');
+  const zoomLabel = document.getElementById('bmZoomLabel');
+
+  // ── Helpers ───────────────────────────────────────────────────
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  // Convert stored text (may be plain or rich HTML) to innerHTML-safe string
+  function textToDisplayHtml(t) {
+    if (!t) return '';
+    if (/<[a-zA-Z]/.test(t)) return t; // already HTML from rich edit
+    return esc(t).replace(/\n/g, '<br>'); // plain text → escaped HTML
+  }
+  // Strip HTML tags to get plain text (for sidebar inputs)
+  function stripHtml(t) {
+    if (!t) return '';
+    if (!/<[a-zA-Z]/.test(t)) return t;
+    const d = document.createElement('div'); d.innerHTML = t; return d.innerText;
+  }
+  function hexToRgb(h) {
+    return `${parseInt(h.slice(1,3),16)},${parseInt(h.slice(3,5),16)},${parseInt(h.slice(5,7),16)}`;
+  }
+  function safeHex(c) { return /^#[0-9a-fA-F]{6}$/.test(c) ? c : '#ffffff'; }
+
+  // ── Syntax highlighter ────────────────────────────────────────
+  const _HL_CFGS = {
+    js:     { kw:'await|async|break|case|catch|class|const|continue|debugger|default|delete|do|else|export|extends|false|finally|for|from|function|if|import|in|instanceof|let|new|null|of|return|static|super|switch|this|throw|true|try|typeof|undefined|var|void|while|with|yield', lc:'//', bc:['/*','*/'], str:['"',"'",'`'] },
+    ts:     { kw:'abstract|any|as|async|await|boolean|break|case|catch|class|const|constructor|continue|declare|default|delete|do|else|enum|export|extends|false|finally|for|from|function|if|implements|import|in|infer|instanceof|interface|keyof|let|namespace|never|new|null|number|object|of|override|private|protected|public|readonly|return|satisfies|static|string|super|switch|symbol|this|throw|true|try|type|typeof|undefined|unknown|var|void|while|yield', lc:'//', bc:['/*','*/'], str:['"',"'",'`'] },
+    python: { kw:'False|None|True|and|as|assert|async|await|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|try|while|with|yield', lc:'#', bc:null, str:['"""',"'''",'"',"'"] },
+    rust:   { kw:'as|async|await|break|const|continue|crate|dyn|else|enum|extern|false|fn|for|if|impl|in|let|loop|match|mod|move|mut|pub|ref|return|self|Self|static|struct|super|trait|true|type|unsafe|use|where|while|i8|i16|i32|i64|i128|u8|u16|u32|u64|u128|f32|f64|bool|char|str|String|Option|Result|Some|None|Ok|Err|Vec|Box|usize|isize', lc:'//', bc:['/*','*/'], str:['"'] },
+    go:     { kw:'break|case|chan|const|continue|default|defer|else|fallthrough|for|func|go|goto|if|import|interface|map|package|range|return|select|struct|switch|type|var|nil|true|false|make|new|len|cap|append|copy|delete|close|panic|recover|string|int|int8|int16|int32|int64|uint|float32|float64|bool|byte|rune|error', lc:'//', bc:['/*','*/'], str:['"','`'] },
+    cs:     { kw:'abstract|as|base|bool|break|byte|case|catch|char|class|const|continue|decimal|default|delegate|do|double|else|enum|event|extern|false|finally|float|for|foreach|goto|if|in|int|interface|internal|is|lock|long|namespace|new|null|object|operator|out|override|params|private|protected|public|readonly|ref|return|sealed|short|static|string|struct|switch|this|throw|true|try|typeof|uint|ulong|ushort|using|virtual|void|while|async|await|var|get|set|value|yield|partial|nameof', lc:'//', bc:['/*','*/'], str:['"'] },
+    css:    { kw:null, lc:null, bc:['/*','*/'], str:['"',"'"] },
+    bash:   { kw:'case|do|done|elif|else|esac|fi|for|function|if|in|select|then|until|while|break|continue|return|exit|export|local|readonly|declare|eval|exec|shift|source|trap|echo|printf|cd|ls|grep|sed|awk|mkdir|rm|cp|mv|cat|find|true|false', lc:'#', bc:null, str:['"',"'"] },
+    json:   { kw:'true|false|null', lc:null, bc:null, str:['"'] },
+    plain:  { kw:null, lc:null, bc:null, str:[] },
+  };
+
+  function highlightCode(rawCode, lang) {
+    if (!rawCode) return '';
+    if (lang === 'html') return _hlHtml(rawCode);
+    const cfg = _HL_CFGS[lang] || _HL_CFGS.js;
+    const kwRe = cfg.kw ? new RegExp(`^(${cfg.kw})(?=[^a-zA-Z0-9_$]|$)`) : null;
+    const strs = [...(cfg.str||[])].sort((a,b) => b.length - a.length);
+    let html = '', i = 0, code = rawCode, n = code.length;
+    while (i < n) {
+      // block comment
+      if (cfg.bc && code.startsWith(cfg.bc[0], i)) {
+        const end = code.indexOf(cfg.bc[1], i + cfg.bc[0].length);
+        const j = end === -1 ? n : end + cfg.bc[1].length;
+        html += `<span class="hl-c">${esc(code.slice(i,j))}</span>`; i = j; continue;
+      }
+      // line comment
+      if (cfg.lc && code.startsWith(cfg.lc, i)) {
+        const nl = code.indexOf('\n', i);
+        const j = nl === -1 ? n : nl;
+        html += `<span class="hl-c">${esc(code.slice(i,j))}</span>`; i = j; continue;
+      }
+      // strings
+      let strHit = false;
+      for (const q of strs) {
+        if (code.startsWith(q, i)) {
+          const multi = q.length > 1;
+          let j = i + q.length;
+          while (j < n) {
+            if (code[j] === '\\' && !multi) { j += 2; continue; }
+            if (code.startsWith(q, j)) { j += q.length; break; }
+            if (!multi && code[j] === '\n') break;
+            j++;
+          }
+          html += `<span class="hl-s">${esc(code.slice(i,j))}</span>`; i = j; strHit = true; break;
+        }
+      }
+      if (strHit) continue;
+      // number
+      if (/[0-9]/.test(code[i]) && (i===0||/[^a-zA-Z0-9_]/.test(code[i-1]))) {
+        const m = code.slice(i).match(/^0x[0-9a-fA-F]+|\d+\.?\d*([eE][+-]?\d+)?/);
+        if (m) { html += `<span class="hl-n">${esc(m[0])}</span>`; i += m[0].length; continue; }
+      }
+      // keyword
+      if (kwRe && /[a-zA-Z_$]/.test(code[i]) && (i===0||/[^a-zA-Z0-9_$]/.test(code[i-1]))) {
+        const m = code.slice(i).match(kwRe);
+        if (m) { html += `<span class="hl-k">${esc(m[1])}</span>`; i += m[1].length; continue; }
+      }
+      html += esc(code[i]); i++;
+    }
+    return html;
+  }
+
+  function _hlHtml(raw) {
+    let html = '', i = 0, n = raw.length;
+    while (i < n) {
+      if (raw.startsWith('<!--', i)) {
+        const j = raw.indexOf('-->', i+4); const end = j===-1 ? n : j+3;
+        html += `<span class="hl-c">${esc(raw.slice(i,end))}</span>`; i = end; continue;
+      }
+      if (raw[i] === '<') {
+        const closing = raw[i+1] === '/';
+        let j = i + 1 + (closing?1:0);
+        const tnS = j; while (j<n && /[a-zA-Z0-9:_-]/.test(raw[j])) j++;
+        html += `&lt;${closing?'/':''}<span class="hl-k">${esc(raw.slice(tnS,j))}</span>`; i = j;
+        while (i<n && raw[i]!=='>') {
+          if (raw[i]==='"'||raw[i]==="'") {
+            const q=raw[i]; let k=i+1; while(k<n&&raw[k]!==q)k++;
+            html += `<span class="hl-s">${esc(raw.slice(i,k+1))}</span>`; i = k+1;
+          } else if (/[a-zA-Z_:-]/.test(raw[i])) {
+            let k=i; while(k<n&&/[a-zA-Z0-9_:-]/.test(raw[k]))k++;
+            html += `<span class="hl-a">${esc(raw.slice(i,k))}</span>`; i = k;
+          } else { html += esc(raw[i]); i++; }
+        }
+        if (i<n) { html += esc(raw[i]); i++; } continue;
+      }
+      html += esc(raw[i]); i++;
+    }
+    return html;
+  }
+
+  // ── Dynamic element HTML ──────────────────────────────────────
+  function dynElHtml(data) {
+    const p = data.props;
+    switch (data.type) {
+      case 'text-heading':
+        return `<div style="font-family:'Syne',sans-serif;font-weight:${p.fontWeight};font-size:${p.fontSize}px;color:${p.color};opacity:${p.opacity};letter-spacing:${p.letterSpacing}em;line-height:1.2;${p.width ? `width:${p.width}px;word-wrap:break-word;` : 'white-space:nowrap;'}">${textToDisplayHtml(p.text)}</div>`;
+      case 'text-mono':
+        return `<div style="font-family:'JetBrains Mono',monospace;font-size:${p.fontSize}px;font-weight:${p.fontWeight||400};color:${p.color};opacity:${p.opacity};letter-spacing:${p.letterSpacing}em;${p.width ? `width:${p.width}px;word-wrap:break-word;` : 'white-space:nowrap;'}">${textToDisplayHtml(p.text)}</div>`;
+      case 'text-label':
+        return `<div style="font-family:'JetBrains Mono',monospace;font-size:${p.fontSize}px;font-weight:${p.fontWeight||400};color:${p.color};opacity:${p.opacity};letter-spacing:${p.letterSpacing}em;text-transform:uppercase;${p.width ? `width:${p.width}px;word-wrap:break-word;` : 'white-space:nowrap;'}">${textToDisplayHtml(p.text)}</div>`;
+      case 'text-url':
+        return `<div style="font-family:'JetBrains Mono',monospace;font-size:${p.fontSize}px;font-weight:${p.fontWeight||400};color:${p.color};opacity:${p.opacity};letter-spacing:${p.letterSpacing}em;${p.width ? `width:${p.width}px;word-wrap:break-word;` : 'white-space:nowrap;'}">${textToDisplayHtml(p.text)}</div>`;
+      case 'bar-v':
+        return `<div style="width:${p.width}px;height:${p.height}px;border-radius:9999px;opacity:${p.opacity};background:linear-gradient(to bottom,transparent,${p.color} 40%,${p.color} 60%,transparent);"></div>`;
+      case 'bar-h':
+        return `<div style="width:${p.width}px;height:${p.height}px;background:${p.color};opacity:${p.opacity};border-radius:9999px;"></div>`;
+      case 'ring':
+        return `<div style="width:${p.size}px;height:${p.size}px;border-radius:50%;border:${p.thickness}px solid ${p.color};opacity:${p.opacity};"></div>`;
+      case 'dot':
+        return `<div style="width:${p.size}px;height:${p.size}px;border-radius:50%;background:${p.color};opacity:${p.opacity};"></div>`;
+      case 'rect':
+        return `<div style="width:${p.width}px;height:${p.height}px;border-radius:${p.radius}px;opacity:${p.opacity};${p.filled ? `background:${p.color};` : `border:${p.thickness}px solid ${p.color};background:transparent;`}"></div>`;
+      case 'code-block': {
+        // Migrate old format
+        if (p.code === undefined && p.varName !== undefined) {
+          p.code = `const ${p.varName||'obj'} = {\n  role:   ${p.role||'""'},\n  stack:  ${p.stack||'[]'},\n  ships:  ${p.ships||'true'},\n  sleeps: ${p.sleeps||'false'},\n};`;
+          p.lang = 'js';
+        }
+        const fs = p.fontSize || 12;
+        return `<pre class="hl-pre" style="font-size:${fs}px;line-height:1.8;opacity:${p.opacity??1};">${highlightCode(p.code||'', p.lang||'js')}</pre>`;
+      }
+      case 'tagline':
+        return `<div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(233,235,240,0.38);letter-spacing:0.05em;display:flex;align-items:center;gap:10px;white-space:nowrap;"><span style="width:4px;height:4px;border-radius:50%;background:${p.dotColor};opacity:${p.dotOpacity};flex-shrink:0;display:inline-block;"></span><span>${esc(p.text)}</span></div>`;
+      case 'divider':
+        return `<div style="width:${p.width}px;height:1px;background:linear-gradient(to right,transparent,${p.color},transparent);opacity:${p.opacity};"></div>`;
+      case 'glow': {
+        const col = p.syncAccent ? S.cfg.accent : safeHex(p.color);
+        return `<div style="width:${p.size}px;height:${p.size}px;border-radius:50%;background:radial-gradient(ellipse at center,${col} 0%,transparent 70%);opacity:${p.opacity};pointer-events:none;"></div>`;
+      }
+      case 'line':
+        return `<div style="width:${p.length}px;height:${p.thickness}px;border-radius:9999px;background:${p.color};opacity:${p.opacity};"></div>`;
+      case 'polygon': {
+        const sides = p.sides || 3;
+        const w = p.width || p.size || 100, h = p.height || p.size || 100;
+        const pad = p.filled ? 0 : Math.ceil((p.thickness||2) / 2) + 1;
+        const rx = w / 2 - pad, ry = h / 2 - pad, cx = w / 2, cy = h / 2;
+        const pts = Array.from({length: sides}, (_, i) => {
+          const a = (i * 2 * Math.PI / sides) - Math.PI / 2;
+          return `${(cx + rx * Math.cos(a)).toFixed(2)},${(cy + ry * Math.sin(a)).toFixed(2)}`;
+        }).join(' ');
+        return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;overflow:visible;opacity:${p.opacity||1};"><polygon points="${pts}" fill="${p.filled ? p.color : 'none'}" stroke="${p.filled ? 'none' : p.color}" stroke-width="${p.thickness||2}" stroke-linejoin="round"/></svg>`;
+      }
+      case 'image': {
+        if (!p.src) return `<div style="width:${p.width}px;height:${p.height}px;border-radius:${p.radius||0}px;border:1.5px dashed rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-size:11px;font-family:'JetBrains Mono',monospace;box-sizing:border-box;">no image</div>`;
+        return `<img src="${p.src}" style="width:${p.width}px;height:${p.height}px;opacity:${p.opacity};object-fit:${p.objectFit||'cover'};border-radius:${p.radius||0}px;display:block;" draggable="false">`;
+      }
+      default: return '';
+    }
+  }
+
+  // ── Create / update dynamic element DOM ───────────────────────
+  function createDynElDom(data) {
+    const wrap = document.createElement('div');
+    wrap.className = 'bm-el';
+    wrap.id = 'bmel-' + data.id;
+    wrap.dataset.dynId = data.id;
+    wrap.style.left      = data.x + 'px';
+    wrap.style.top       = data.y + 'px';
+    wrap.style.zIndex    = data.z || 0;
+    wrap.style.transform = `rotate(${data.rotation || 0}deg)`;
+    wrap.innerHTML       = dynElHtml(data);
+    wrap.addEventListener('mousedown', (e) => {
+      if (S.spaceHeld) return;
+      if (textEditId === data.id) return; // let clicks pass through to contenteditable
+      e.preventDefault(); e.stopPropagation();
+      if (textEditId !== null) commitTextEdit(textEditId);
+      // Keep existing multi-selection when clicking an already-selected element;
+      // only re-select if clicking something new or shift-toggling.
+      if (!S.selectedIds.has(data.id) || e.shiftKey) selectElement(data.id, e.shiftKey);
+      S.dragging = data.id;
+      S.draggingDyn = true;
+      S.dragStartMX = e.clientX; S.dragStartMY = e.clientY;
+      S.dragStartPX = data.x;   S.dragStartPY = data.y;
+      // Store start positions of all selected elements for multi-drag
+      S.dragStartPositions = new Map();
+      S.selectedIds.forEach(sid => {
+        const sd = S.elements.find(el => el.id === sid);
+        if (sd) S.dragStartPositions.set(sid, { x: sd.x, y: sd.y });
+      });
+      wrap.classList.add('bm-dragging');
+    });
+    wrap.addEventListener('dblclick', (e) => {
+      if (TEXT_TYPES.has(data.type)) {
+        e.preventDefault(); e.stopPropagation();
+        enterTextEdit(data.id);
+      }
+    });
+    return wrap;
+  }
+
+  function refreshDynEl(id) {
+    if (textEditId === id) return; // never clobber active contenteditable
+    const data = S.elements.find(e => e.id === id);
+    const dom  = document.getElementById('bmel-' + id);
+    if (!data || !dom) return;
+    if (S.resizing) {
+      // During resize: preserve handle nodes so they track the element via CSS, only swap content
+      const handles = [...dom.querySelectorAll('.bm-sel-border, .bm-sel-handle, .bm-sel-h-rotate, .bm-sel-rot-line')];
+      dom.innerHTML = dynElHtml(data);
+      handles.forEach(h => dom.appendChild(h));
+    } else {
+      dom.innerHTML = dynElHtml(data);
+      if (S.selectedIds.size === 1 && S.primaryId === id) injectHandles(id);
+    }
+  }
+
+  function updateElPos(id) {
+    const data = S.elements.find(e => e.id === id);
+    const dom  = document.getElementById('bmel-' + id);
+    if (data && dom) {
+      dom.style.left = data.x + 'px'; dom.style.top = data.y + 'px';
+      dom.style.transform = `rotate(${data.rotation || 0}deg)`;
+    }
+  }
+
+  // ── Image history (localStorage) ─────────────────────────────
+  const IMG_HIST_KEY = 'bm-img-history';
+  function loadImgHistory() {
+    try { return JSON.parse(localStorage.getItem(IMG_HIST_KEY) || '[]'); } catch { return []; }
+  }
+  function saveImgToHistory(src) {
+    if (!src) return;
+    const isDataUrl = src.startsWith('data:');
+    if (isDataUrl && src.length > 300000) return;
+    let hist = loadImgHistory().filter(s => s !== src);
+    hist.unshift(src);
+    hist = hist.slice(0, 20);
+    try { localStorage.setItem(IMG_HIST_KEY, JSON.stringify(hist)); } catch {}
+  }
+
+  function applyImgSrc(p, data, src) {
+    p.src = src;
+    saveImgToHistory(src);
+    const img = new Image();
+    img.onload = () => {
+      if (img.naturalWidth && img.naturalHeight) {
+        const maxW = 480;
+        const ratio = img.naturalHeight / img.naturalWidth;
+        p.width  = Math.min(img.naturalWidth, maxW);
+        p.height = Math.round(p.width * ratio);
+      }
+      refreshDynEl(data.id);
+      buildPropsPanel(data);
+    };
+    img.onerror = () => { refreshDynEl(data.id); buildPropsPanel(data); };
+    img.src = src;
+  }
+
+  // ── Add element from library ──────────────────────────────────
+  function addElement(type, bx, by, overrides = {}) {
+    const id   = nextId();
+    const defs = { ...EL_TYPES[type].defaults, ...overrides };
+    const maxZ = S.elements.length ? Math.max(...S.elements.map(e => e.z || 0)) : 0;
+    const x = bx != null ? snapVal(Math.round(bx)) : 300;
+    const y = by != null ? snapVal(Math.round(by)) : 180;
+    const data = { id, type, x, y, z: maxZ + 1, rotation: 0, group: null, props: { ...defs } };
+    S.elements.push(data);
+    banner.appendChild(createDynElDom(data));
+    selectElement(id);
+    refreshLayersPanel();
+    scheduleSave();
+  }
+
+  let _libDragType = null, _libDragOverrides = {};
+
+  document.querySelectorAll('.bm-lib-item[data-add]').forEach(btn => {
+    btn.setAttribute('draggable', 'true');
+    const _getOverrides = () => btn.dataset.sides ? { sides: parseInt(btn.dataset.sides) } : {};
+    btn.addEventListener('click', () => addElement(btn.dataset.add, undefined, undefined, _getOverrides()));
+    btn.addEventListener('dragstart', e => {
+      _libDragType = btn.dataset.add;
+      _libDragOverrides = _getOverrides();
+      e.dataTransfer.effectAllowed = 'copy';
+      e.dataTransfer.setData('text/plain', btn.dataset.add);
+    });
+    btn.addEventListener('dragend', () => { _libDragType = null; _libDragOverrides = {}; });
+  });
+
+  scroll.addEventListener('dragover', e => {
+    if (!_libDragType) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  });
+
+  scroll.addEventListener('drop', e => {
+    const type = _libDragType || e.dataTransfer.getData('text/plain');
+    if (!type || !EL_TYPES[type]) return;
+    e.preventDefault();
+    const bannerRect = banner.getBoundingClientRect();
+    const bx = (e.clientX - bannerRect.left) / S.zoom;
+    const by = (e.clientY - bannerRect.top)  / S.zoom;
+    addElement(type, bx, by, _libDragOverrides);
+    _libDragType = null; _libDragOverrides = {};
+  });
+
+  // ── Selection / Properties panel ─────────────────────────────
+  function selectElement(id, additive) {
+    if (additive) {
+      if (S.selectedIds.has(id)) {
+        // Toggle off
+        document.getElementById('bmel-' + id)?.classList.remove('bm-selected');
+        S.selectedIds.delete(id);
+        S.primaryId = S.selectedIds.size ? [...S.selectedIds].at(-1) : null;
+        if (!S.primaryId) {
+          removeHandles();
+          document.getElementById('bmPropsPane').classList.add('bm-panel-hidden');
+          document.getElementById('bmSidebarMain').classList.remove('bm-panel-hidden');
+        } else if (S.selectedIds.size === 1) {
+          injectHandles(S.primaryId);
+          buildPropsPanel(S.elements.find(e => e.id === S.primaryId));
+        } else {
+          removeHandles(); buildMultiSelectPanel();
+        }
+        refreshLayersPanel();
+        return;
+      }
+    } else {
+      S.selectedIds.forEach(sid => document.getElementById('bmel-' + sid)?.classList.remove('bm-selected'));
+      S.selectedIds.clear();
+    }
+    S.selectedIds.add(id);
+    S.primaryId = id;
+    document.getElementById('bmel-' + id)?.classList.add('bm-selected');
+
+    // If element belongs to a group, expand selection to all group members
+    const clickedEl = S.elements.find(e => e.id === id);
+    if (clickedEl?.group) {
+      S.activeGroupId = clickedEl.group;
+      S.elements.filter(e => e.group === clickedEl.group).forEach(e => {
+        S.selectedIds.add(e.id);
+        document.getElementById('bmel-' + e.id)?.classList.add('bm-selected');
+      });
+      document.getElementById('bmSidebarMain').classList.add('bm-panel-hidden');
+      document.getElementById('bmPropsPane').classList.remove('bm-panel-hidden');
+      removeHandles();
+      buildGroupPropsPanel(clickedEl.group);
+    } else {
+      S.activeGroupId = null;
+      document.getElementById('bmSidebarMain').classList.add('bm-panel-hidden');
+      document.getElementById('bmPropsPane').classList.remove('bm-panel-hidden');
+      if (S.selectedIds.size > 1) { removeHandles(); buildMultiSelectPanel(); }
+      else { injectHandles(id); buildPropsPanel(S.elements.find(e => e.id === id)); }
+    }
+    refreshLayersPanel();
+    updateGroupSelBox();
+  }
+
+  function deselectAll() {
+    if (textEditId !== null) commitTextEdit(textEditId);
+    S.selectedIds.forEach(sid => document.getElementById('bmel-' + sid)?.classList.remove('bm-selected'));
+    S.selectedIds.clear();
+    S.primaryId = null;
+    S.activeGroupId = null;
+    removeHandles();
+    document.getElementById('bmPropsPane').classList.add('bm-panel-hidden');
+    document.getElementById('bmSidebarMain').classList.remove('bm-panel-hidden');
+    refreshLayersPanel();
+    updateGroupSelBox();
+  }
+  function deselectElement() { deselectAll(); }
+
+  document.getElementById('bmPropsBack').addEventListener('click', deselectAll);
+  document.getElementById('bmPropsDelete').addEventListener('click', () => deleteSelected());
+
+  // Drag ghost group selection box to move all selected elements
+  document.getElementById('bmGroupSelBox').addEventListener('mousedown', (e) => {
+    if (e.button !== 0 || S.spaceHeld) return;
+    e.preventDefault(); e.stopPropagation();
+    const anchor = S.primaryId || [...S.selectedIds][0];
+    if (!anchor) return;
+    S.dragging = anchor;
+    S.draggingDyn = true;
+    S.dragStartMX = e.clientX; S.dragStartMY = e.clientY;
+    S.dragStartPX = (S.elements.find(el => el.id === anchor) || {}).x || 0;
+    S.dragStartPY = (S.elements.find(el => el.id === anchor) || {}).y || 0;
+    S.dragStartPositions = new Map();
+    S.selectedIds.forEach(sid => {
+      const sd = S.elements.find(el => el.id === sid);
+      if (sd) S.dragStartPositions.set(sid, { x: sd.x, y: sd.y });
+    });
+  });
+
+  // Click on empty canvas = start rubber band
+  scroll.addEventListener('mousedown', (e) => {
+    if (e.button === 0 && !S.spaceHeld && !e.target.closest('.bm-el')) {
+      const sr = scroll.getBoundingClientRect();
+      S.rubberStartX = e.clientX - sr.left;
+      S.rubberStartY = e.clientY - sr.top;
+      S.rubberReady  = true;
+      S.rubbering    = false;
+      S.rubberShift  = e.shiftKey;
+    }
+  });
+
+  // ── Build properties panel ────────────────────────────────────
+  function makeField(label, inputHtml) {
+    return `<div class="bm-field"><label class="bm-flabel">${label}</label>${inputHtml}</div>`;
+  }
+  function numInput(prop, val, min='', max='', step='') {
+    return `<input class="bm-input" type="number" data-prop="${prop}" value="${val}" ${min!==''?`min="${min}"`:''}${max!==''?` max="${max}"`:''}${step!==''?` step="${step}"`:''}>`;
+  }
+  function textInput(prop, val) {
+    return `<input class="bm-input" data-prop="${prop}" value="${esc(val)}">`;
+  }
+  function colorField(label, prop, val) {
+    const hexId = `ph-${prop}`;
+    return `<div class="bm-field"><label class="bm-flabel">${label}</label><div class="bm-color-row"><input class="bm-color-swatch" type="color" data-prop="${prop}" data-hex="${hexId}" value="${safeHex(val)}"><input class="bm-input bm-input-hex" id="${hexId}" data-prop="${prop}" value="${val}"></div></div>`;
+  }
+  function checkField(label, prop, val) {
+    return `<label class="bm-check"><input type="checkbox" data-prop="${prop}" ${val?'checked':''}> ${label}</label>`;
+  }
+  function sliderNumInput(prop, val, min, max, step) {
+    return `<div class="bm-slider-row">
+      <input class="bm-slider" type="range" data-prop="${prop}" value="${val}" min="${min}" max="${max}" step="${step}">
+      <input class="bm-slider-num bm-input" type="number" data-prop="${prop}" value="${val}" min="${min}" max="${max}" step="${step}">
+    </div>`;
+  }
+
+  function buildPropsPanel(data) {
+    if (!data) return;
+    const p = data.props;
+    document.getElementById('bmPropsTitle').textContent = EL_TYPES[data.type].label;
+
+    let html = `<div class="bm-group">
+      ${makeField('X', numInput('_x', data.x))}
+      ${makeField('Y', numInput('_y', data.y))}
+      ${makeField('Rotate°', numInput('_rot', Math.round(data.rotation||0), -360, 360, 1))}
+    </div><div class="bm-group">`;
+
+    switch (data.type) {
+      case 'text-heading':
+        html += makeField('Text',  textInput('text', stripHtml(p.text)));
+        html += makeField('Width (px)', `<input class="bm-input" type="number" data-prop="width" value="${p.width || ''}" min="40" max="1920" placeholder="auto">`);
+        html += makeField('Size (px)', numInput('fontSize', p.fontSize, 6, 300));
+        html += makeField('Weight',    sliderNumInput('fontWeight', p.fontWeight, 100, 900, 100));
+        html += colorField('Color', 'color', p.color);
+        html += makeField('Opacity', sliderNumInput('opacity', p.opacity, 0, 1, 0.05));
+        html += makeField('Letter spacing (em)', numInput('letterSpacing', p.letterSpacing, -0.1, 1, 0.01));
+        break;
+      case 'text-mono':
+      case 'text-label':
+      case 'text-url':
+        html += makeField('Text',  textInput('text', stripHtml(p.text)));
+        html += makeField('Width (px)', `<input class="bm-input" type="number" data-prop="width" value="${p.width || ''}" min="40" max="1920" placeholder="auto">`);
+        html += makeField('Size (px)', numInput('fontSize', p.fontSize, 6, 200));
+        html += makeField('Weight', sliderNumInput('fontWeight', p.fontWeight||400, 100, 900, 100));
+        html += colorField('Color', 'color', p.color);
+        html += makeField('Opacity', sliderNumInput('opacity', p.opacity, 0, 1, 0.05));
+        if (data.type !== 'text-url')
+          html += makeField('Letter spacing (em)', numInput('letterSpacing', p.letterSpacing, -0.1, 1, 0.01));
+        break;
+      case 'bar-v':
+        html += makeField('Width (px)',  numInput('width',  p.width,  1, 40));
+        html += makeField('Height (px)', numInput('height', p.height, 10, 480));
+        html += colorField('Color', 'color', p.color);
+        html += makeField('Opacity', sliderNumInput('opacity', p.opacity, 0, 1, 0.05));
+        break;
+      case 'bar-h':
+        html += makeField('Width (px)',     numInput('width',  p.width, 10, 960));
+        html += makeField('Thickness (px)', numInput('height', p.height, 1, 20));
+        html += colorField('Color', 'color', p.color);
+        html += makeField('Opacity', sliderNumInput('opacity', p.opacity, 0, 1, 0.05));
+        break;
+      case 'ring':
+        html += makeField('Size (px)',      numInput('size',      p.size,      20, 800));
+        html += makeField('Thickness (px)', numInput('thickness', p.thickness, 1,  10));
+        html += colorField('Color', 'color', p.color);
+        html += makeField('Opacity', sliderNumInput('opacity', p.opacity, 0, 1, 0.05));
+        break;
+      case 'dot':
+        html += makeField('Size (px)', numInput('size', p.size, 2, 80));
+        html += colorField('Color', 'color', p.color);
+        html += makeField('Opacity', sliderNumInput('opacity', p.opacity, 0, 1, 0.05));
+        break;
+      case 'rect':
+        html += makeField('Width (px)',  numInput('width',  p.width,  10, 960));
+        html += makeField('Height (px)', numInput('height', p.height, 4,  480));
+        html += makeField('Radius (px)', numInput('radius', p.radius, 0,  240));
+        html += colorField('Color', 'color', p.color);
+        html += makeField('Opacity', sliderNumInput('opacity', p.opacity, 0, 1, 0.05));
+        html += checkField('Filled', 'filled', p.filled);
+        if (!p.filled)
+          html += makeField('Border (px)', numInput('thickness', p.thickness, 1, 20));
+        break;
+      case 'code-block': {
+        const LANGS = [['js','JavaScript'],['ts','TypeScript'],['python','Python'],['rust','Rust'],['go','Go'],['cs','C#'],['css','CSS'],['html','HTML'],['bash','Bash'],['json','JSON'],['plain','Plain text']];
+        html += makeField('Language', `<select class="bm-input" data-prop="lang">${LANGS.map(([v,l])=>`<option value="${v}"${(p.lang||'js')===v?' selected':''}>${l}</option>`).join('')}</select>`);
+        html += makeField('Size (px)', numInput('fontSize', p.fontSize||12, 6, 200));
+        html += makeField('Opacity',   sliderNumInput('opacity',  p.opacity??1,   0, 1, 0.05));
+        html += `<div class="bm-field" style="margin-top:6px;"><label class="bm-flabel">Code</label><textarea class="bm-input" data-prop="code" rows="10" style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;resize:vertical;min-height:90px;white-space:pre;">${esc(p.code||'')}</textarea></div>`;
+        break;
+      }
+      case 'tagline':
+        html += makeField('Text', textInput('text', stripHtml(p.text)));
+        html += colorField('Dot color', 'dotColor', p.dotColor);
+        html += makeField('Dot opacity', sliderNumInput('dotOpacity', p.dotOpacity, 0, 1, 0.05));
+        break;
+      case 'divider':
+        html += makeField('Width (px)', numInput('width', p.width, 10, 960));
+        html += colorField('Color', 'color', p.color);
+        html += makeField('Opacity', sliderNumInput('opacity', p.opacity, 0, 1, 0.05));
+        break;
+      case 'glow':
+        html += checkField('Sync accent color', 'syncAccent', p.syncAccent);
+        if (!p.syncAccent) html += colorField('Color', 'color', p.color);
+        html += makeField('Size (px)', numInput('size', p.size, 20, 1920));
+        html += makeField('Opacity',   sliderNumInput('opacity', p.opacity, 0, 1, 0.01));
+        break;
+      case 'line':
+        html += makeField('Length (px)',    numInput('length',    p.length,    10, 1920));
+        html += makeField('Thickness (px)', numInput('thickness', p.thickness, 1,  40));
+        html += colorField('Color', 'color', p.color);
+        html += makeField('Opacity', sliderNumInput('opacity', p.opacity, 0, 1, 0.05));
+        break;
+      case 'polygon': {
+        html += makeField('Sides',      numInput('sides',   p.sides||3, 3, 12, 1));
+        html += makeField('Width (px)', numInput('width',  p.width||100, 10, 960));
+        html += makeField('Height (px)',numInput('height', p.height||100, 4, 1080));
+        html += colorField('Color', 'color', p.color);
+        html += makeField('Opacity', sliderNumInput('opacity', p.opacity, 0, 1, 0.05));
+        html += checkField('Filled', 'filled', p.filled);
+        if (!p.filled) html += makeField('Thickness (px)', numInput('thickness', p.thickness||2, 1, 20));
+        break;
+      }
+      case 'image': {
+        const imgHist = loadImgHistory();
+        html += makeField('Image URL', `<input class="bm-input" data-prop="src" value="${esc(p.src||'')}" type="text" placeholder="https://...">`);
+        html += `<div class="bm-field"><button class="bm-btn" data-action="upload-img" style="width:100%;margin-top:2px;"><iconify-icon icon="mdi:upload" width="14" height="14"></iconify-icon> Upload from file</button></div>`;
+        if (imgHist.length) {
+          html += `<div class="bm-flabel" style="margin:8px 0 5px;">Recent</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:6px;">
+            ${imgHist.map(s => `<button data-action="hist-img" data-hist-src="${esc(s)}" title="Use this image" style="aspect-ratio:1;border-radius:6px;border:1.5px solid rgba(255,255,255,${s===p.src?'0.7':'0.12'});background:url('${s}') center/cover no-repeat #111;cursor:pointer;outline:none;padding:0;"></button>`).join('')}
+          </div>`;
+        }
+        html += makeField('Width (px)',  numInput('width',  p.width,  10, 1920));
+        html += makeField('Height (px)', numInput('height', p.height, 4,  1080));
+        html += makeField('Radius (px)', numInput('radius', p.radius||0, 0, 500));
+        html += makeField('Opacity',     sliderNumInput('opacity', p.opacity, 0, 1, 0.05));
+        html += makeField('Fit', `<select class="bm-input" data-prop="objectFit"><option value="cover"${(p.objectFit||'cover')==='cover'?' selected':''}>Cover</option><option value="contain"${p.objectFit==='contain'?' selected':''}>Contain</option><option value="fill"${p.objectFit==='fill'?' selected':''}>Fill</option><option value="none"${p.objectFit==='none'?' selected':''}>None</option></select>`);
+        break;
+      }
+    }
+
+    html += '</div>';
+    const body = document.getElementById('bmPropsBody');
+    body.innerHTML = html;
+
+    // Bind all inputs
+    body.querySelectorAll('[data-prop]').forEach(input => {
+      const prop = input.dataset.prop;
+      const hexTarget = input.dataset.hex;
+
+      input.addEventListener('input', () => {
+        let val;
+        if (input.type === 'checkbox')      val = input.checked;
+        else if (input.type === 'number' || input.type === 'range') val = parseFloat(input.value) || 0;
+        else if (input.type === 'color')    val = input.value;
+        else                                val = input.value;
+
+        // Sync slider ↔ number pairs with same data-prop
+        if (input.type === 'range' || input.type === 'number') {
+          body.querySelectorAll(`[data-prop="${prop}"]`).forEach(sibling => {
+            if (sibling !== input && (sibling.type === 'range' || sibling.type === 'number')) sibling.value = val;
+          });
+        }
+
+        // Sync color swatch ↔ hex text
+        if (input.type === 'color' && hexTarget) {
+          const hexEl = document.getElementById(hexTarget);
+          if (hexEl) hexEl.value = val;
+        }
+        if (input.type !== 'color' && /^#[0-9a-fA-F]{6}$/.test(val)) {
+          // hex text input — find matching swatch
+          body.querySelectorAll(`[data-prop="${prop}"][type="color"]`).forEach(s => s.value = val);
+        }
+
+        if (prop === '_x') { data.x = val; updateElPos(data.id); }
+        else if (prop === '_y') { data.y = val; updateElPos(data.id); }
+        else if (prop === '_rot') { data.rotation = ((val % 360) + 360) % 360; updateElPos(data.id); }
+        else { p[prop] = val; refreshDynEl(data.id); }
+
+        // Rebuild if 'filled' or 'syncAccent' changes (shows/hides conditional fields)
+        if (prop === 'filled' || prop === 'syncAccent' || prop === 'sides') buildPropsPanel(data);
+      });
+    });
+
+    // Save image URL to history when user sets it
+    if (data.type === 'image') {
+      const srcInput = body.querySelector('[data-prop="src"]');
+      if (srcInput) {
+        srcInput.addEventListener('change', () => {
+          if (srcInput.value) applyImgSrc(p, data, srcInput.value);
+        });
+      }
+    }
+
+    // Image upload button
+    const uploadBtn = body.querySelector('[data-action="upload-img"]');
+    if (uploadBtn) {
+      uploadBtn.addEventListener('click', () => {
+        const inp = document.createElement('input');
+        inp.type = 'file'; inp.accept = 'image/*';
+        inp.addEventListener('change', () => {
+          const file = inp.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (ev) => { applyImgSrc(p, data, ev.target.result); };
+          reader.readAsDataURL(file);
+        });
+        inp.click();
+      });
+    }
+
+    // History thumbnail clicks
+    body.querySelectorAll('[data-action="hist-img"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        applyImgSrc(p, data, btn.dataset.histSrc);
+      });
+    });
+  }
+
+  // ── Static element accent / render ───────────────────────────
+  function applyAccent(hex) {
+    const rgb = hexToRgb(hex);
+    const els = [
+      document.getElementById('bmElLabel'),
+      document.getElementById('bmElNameAccent'),
+    ];
+    els.forEach(el => { if (el) el.style.color = hex; });
+    document.getElementById('bmBarInner').style.background =
+      `linear-gradient(to bottom, transparent, ${hex} 40%, ${hex} 60%, transparent)`;
+    banner.querySelectorAll('.bm-ring').forEach(el => el.style.borderColor = `rgba(${rgb},0.1)`);
+    banner.querySelectorAll('.bm-tdot').forEach(el => el.style.background = hex);
+    banner.querySelectorAll('.bm-code-pre .ca').forEach(el => el.style.color = `rgba(${rgb},0.4)`);
+    document.getElementById('bmElUrl').style.color = `rgba(${rgb},0.45)`;
+    document.getElementById('bmGlow').style.background = `
+      radial-gradient(ellipse 50% 90% at 0% 55%, rgba(${rgb},0.20) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 60% at 50% 40%, rgba(${rgb},0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 30% 45% at 98% 80%, rgba(${rgb},0.07) 0%, transparent 55%)`;
+    // Live-update any glow elements synced to accent
+    S.elements.filter(e => e.type === 'glow' && e.props.syncAccent).forEach(e => refreshDynEl(e.id));
+  }
+
+  const BM_LS_KEY = 'bm_autosave_v1';
+  let _lsTimer = null;
+  function saveNow() {
+    clearTimeout(_lsTimer);
+    _lsTimer = null;
+    const statusEl = document.getElementById('bmSaveStatus');
+    try {
+      localStorage.setItem(BM_LS_KEY, JSON.stringify({ cfg: S.cfg, pos: S.pos, elements: S.elements, groups: S.groups }));
+      if (statusEl) {
+        statusEl.classList.remove('bm-save-error');
+        statusEl.classList.add('bm-save-flash');
+        clearTimeout(statusEl._flashTimer);
+        statusEl._flashTimer = setTimeout(() => statusEl.classList.remove('bm-save-flash'), 1200);
+      }
+    } catch {
+      if (statusEl) { statusEl.classList.add('bm-save-error'); statusEl.classList.remove('bm-save-flash'); }
+    }
+  }
+  function scheduleSave() {
+    clearTimeout(_lsTimer);
+    _lsTimer = setTimeout(saveNow, 800);
+    scheduleSnapshot();
+  }
+
+  // ── Undo / Redo ───────────────────────────────────────────────
+  const HIST_MAX = 60;
+  let _hist = [], _histIdx = -1, _histPending = null;
+
+  function histSnapshot() {
+    const snap = JSON.stringify({ cfg: S.cfg, elements: S.elements, groups: S.groups });
+    if (_hist[_histIdx] === snap) return;
+    _hist = _hist.slice(0, _histIdx + 1);
+    _hist.push(snap);
+    if (_hist.length > HIST_MAX) _hist.shift();
+    _histIdx = _hist.length - 1;
+  }
+
+  function scheduleSnapshot() {
+    clearTimeout(_histPending);
+    _histPending = setTimeout(histSnapshot, 150);
+  }
+
+  function applySnapshot(snap) {
+    const d = JSON.parse(snap);
+    S.cfg = d.cfg;
+    if (d.groups) S.groups = d.groups;
+    // Remove existing dynamic elements from DOM
+    S.elements.forEach(el => { const dom = document.getElementById('bmel-' + el.id); if (dom) dom.remove(); });
+    S.elements = d.elements;
+    S.elements.forEach(el => { banner.appendChild(createDynElDom(el)); });
+    S.selectedIds.clear(); S.primaryId = null; S.activeGroupId = null;
+    removeHandles();
+    document.getElementById('bmPropsPane').classList.add('bm-panel-hidden');
+    syncInputsToState();
+    renderAll();
+    refreshLayersPanel();
+  }
+
+  function undo() {
+    clearTimeout(_histPending);
+    histSnapshot();
+    if (_histIdx > 0) { _histIdx--; applySnapshot(_hist[_histIdx]); }
+  }
+  function redo() {
+    clearTimeout(_histPending);
+    if (_histIdx < _hist.length - 1) { _histIdx++; applySnapshot(_hist[_histIdx]); }
+  }
+
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); redo(); }
+  });
+
+  function renderAll() {
+    const c = S.cfg;
+    applyBg();
+    updateBgCircle();
+    scheduleSave();
+    const plain  = c.name.slice(0, Math.max(0, c.name.length - c.accentSplit));
+    const accent = c.name.slice(Math.max(0, c.name.length - c.accentSplit));
+    document.getElementById('bmElName').innerHTML =
+      esc(plain) + (accent ? `<span id="bmElNameAccent" style="color:${c.accent}">${esc(accent)}</span>` : '');
+    document.getElementById('bmElName').style.fontSize = c.nameSize + 'px';
+    document.getElementById('bmElLabel').textContent   = c.label;
+    document.getElementById('bmElTagline').textContent = c.tagline;
+    document.getElementById('bmElUrl').textContent     = c.url;
+    document.getElementById('bmCodePre').innerHTML =
+      `<span class="ck">const</span> <span class="ca">${esc(c.codeVar)}</span> <span class="cd">= {</span>\n` +
+      `  <span class="cd">role:</span>    <span class="cs">${esc(c.codeRole)}</span><span class="cd">,</span>\n` +
+      `  <span class="cd">stack:</span>   <span class="cs">${esc(c.codeStack)}</span><span class="cd">,</span>\n` +
+      `  <span class="cd">ships:</span>   <span class="ca">${esc(c.codeShips)}</span><span class="cd">,</span>\n` +
+      `  <span class="cd">sleeps:</span>  <span class="ca">${esc(c.codeSleeps)}</span><span class="cd">,</span>\n` +
+      `<span class="cd">};</span>`;
+    applyAccent(c.accent);
+    applyPositions();
+  }
+
+  function applyPositions() {
+    for (const [id, p] of Object.entries(S.pos)) {
+      const el = document.getElementById(id);
+      if (el) { el.style.left = p.x + 'px'; el.style.top = p.y + 'px'; }
+    }
+  }
+
+  // ── Camera ────────────────────────────────────────────────────
+  function applyCamera() {
+    outer.style.transform = `translate(${S.camX}px, ${S.camY}px) scale(${S.zoom})`;
+    zoomLabel.textContent = Math.round(S.zoom * 100) + '%';
+    document.documentElement.style.setProperty('--bm-inv-zoom', (1 / S.zoom).toFixed(4));
+    drawRulers();
+  }
+
+  function centerBanner() {
+    const rOff = S.showRuler ? 20 : 0;
+    S.camX = rOff + (scroll.clientWidth  - rOff - S.cfg.canvasW * S.zoom) / 2;
+    S.camY = rOff + (scroll.clientHeight - rOff - S.cfg.canvasH * S.zoom) / 2;
+    applyCamera();
+  }
+
+  function zoomToward(newZoom, clientX, clientY) {
+    const rect = scroll.getBoundingClientRect();
+    const mx = clientX - rect.left, my = clientY - rect.top;
+    const bx = (mx - S.camX) / S.zoom, by = (my - S.camY) / S.zoom;
+    S.zoom = Math.max(0.05, Math.min(5, newZoom));
+    S.camX = mx - bx * S.zoom;
+    S.camY = my - by * S.zoom;
+    applyCamera();
+  }
+
+  function zoomCenter(nz) {
+    const r = scroll.getBoundingClientRect();
+    zoomToward(nz, r.left + r.width / 2, r.top + r.height / 2);
+  }
+
+  document.getElementById('bmZoomIn') .addEventListener('click', () => zoomCenter(S.zoom * 1.15));
+  document.getElementById('bmZoomOut').addEventListener('click', () => zoomCenter(S.zoom / 1.15));
+  document.getElementById('bmZoomFit').addEventListener('click', () => {
+    S.zoom = Math.min((scroll.clientWidth - 80) / 960, (scroll.clientHeight - 80) / 480);
+    centerBanner();
+  });
+  document.getElementById('bmZoom100').addEventListener('click', () => { S.zoom = 1; centerBanner(); });
+
+  scroll.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    zoomToward(S.zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08), e.clientX, e.clientY);
+  }, { passive: false });
+
+  // ── Snap ─────────────────────────────────────────────────────
+  function snapVal(v) {
+    const g = S.cfg.snapGrid;
+    return (S.cfg.snapEnabled && g > 1) ? Math.round(v / g) * g : Math.round(v);
+  }
+
+  const snapToggleBtn = document.getElementById('bmSnapToggle');
+  const snapSizeInput = document.getElementById('bmSnapSize');
+
+  function refreshSnapBtn() {
+    snapToggleBtn.classList.toggle('bm-snap-active', S.cfg.snapEnabled);
+    snapToggleBtn.title = `Snap ${S.cfg.snapEnabled ? 'on' : 'off'} — click to toggle`;
+  }
+
+  snapToggleBtn.addEventListener('click', () => {
+    S.cfg.snapEnabled = !S.cfg.snapEnabled;
+    refreshSnapBtn();
+  });
+
+  snapSizeInput.addEventListener('input', () => {
+    const v = parseInt(snapSizeInput.value);
+    if (v >= 1) S.cfg.snapGrid = v;
+  });
+
+  // ── Pan ───────────────────────────────────────────────────────
+  window.addEventListener('keydown', (e) => { if (e.code === 'Space' && !e.target.matches('input,textarea')) { S.spaceHeld = true; scroll.style.cursor = 'grab'; e.preventDefault(); } });
+  window.addEventListener('keyup',   (e) => { if (e.code === 'Space') { S.spaceHeld = false; scroll.style.cursor = ''; } });
+
+  scroll.addEventListener('mousedown', (e) => {
+    if (e.button === 1 || (e.button === 0 && S.spaceHeld)) {
+      e.preventDefault();
+      S.panning = true;
+      S.panStartX = e.clientX; S.panStartY = e.clientY;
+      S.panStartCamX = S.camX; S.panStartCamY = S.camY;
+      scroll.classList.add('bm-panning');
+    }
+  });
+
+  // ── Drag ──────────────────────────────────────────────────────
+  ['elBar', 'elContent', 'elCode', 'elUrl'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('mousedown', (e) => {
+      if (S.spaceHeld) return;
+      e.preventDefault(); e.stopPropagation();
+      deselectElement();
+      S.dragging    = id;
+      S.draggingDyn = false;
+      S.dragStartMX = e.clientX; S.dragStartMY = e.clientY;
+      S.dragStartPX = S.pos[id].x; S.dragStartPY = S.pos[id].y;
+      el.classList.add('bm-dragging');
+    });
+  });
+
+  const rubberBand = document.getElementById('bmRubberBand');
+  let resizeState = null;
+  let rotateState = null;
+
+  function startRotate(id, e) {
+    const data = S.elements.find(el => el.id === id);
+    const dom  = document.getElementById('bmel-' + id);
+    if (!data || !dom) return;
+    const rect = dom.getBoundingClientRect();
+    const cx = rect.left + rect.width  / 2;
+    const cy = rect.top  + rect.height / 2;
+    rotateState = { id, startRotation: data.rotation || 0, startAngle: Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI };
+    S.rotating = true;
+  }
+
+  function doRotate(e) {
+    if (!rotateState) return;
+    const { id, startRotation, startAngle } = rotateState;
+    const data = S.elements.find(el => el.id === id);
+    if (!data) return;
+    const dom = document.getElementById('bmel-' + id);
+    const rect = dom.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+    const angle = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
+    let rot = ((startRotation + angle - startAngle) % 360 + 360) % 360;
+    if (e.shiftKey) rot = Math.round(rot / 45) * 45;
+    data.rotation = rot;
+    dom.style.transform = `rotate(${rot}deg)`;
+    const rotEl = document.querySelector('#bmPropsBody [data-prop="_rot"]');
+    if (rotEl) rotEl.value = Math.round(rot);
+  }
+
+  function stopRotate() {
+    S.rotating = false;
+    rotateState = null;
+    const data = getSelected();
+    if (data) buildPropsPanel(data);
+    scheduleSave();
+  }
+
+  function injectHandles(id) {
+    removeHandles();
+    const dom = document.getElementById('bmel-' + id);
+    if (!dom) return;
+    const elData = S.elements.find(e => e.id === id);
+    const border = document.createElement('div');
+    border.className = 'bm-sel-border';
+    dom.appendChild(border);
+    const handleSet = elData && elData.type === 'line' ? ['w','e'] : ['nw','n','ne','e','se','s','sw','w'];
+    handleSet.forEach(h => {
+      const div = document.createElement('div');
+      div.className = `bm-sel-handle bm-sel-h-${h}`;
+      div.dataset.handle = h;
+      div.addEventListener('mousedown', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        startResize(id, h, e.clientX, e.clientY);
+      });
+      dom.appendChild(div);
+    });
+    // Rotation connector line
+    const rotLine = document.createElement('div');
+    rotLine.className = 'bm-sel-rot-line';
+    dom.appendChild(rotLine);
+    // Rotation handle
+    const rotH = document.createElement('div');
+    rotH.className = 'bm-sel-h-rotate';
+    rotH.innerHTML = '<iconify-icon icon="mdi:rotate-right" width="9" height="9"></iconify-icon>';
+    rotH.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); startRotate(id, e); });
+    dom.appendChild(rotH);
+  }
+
+  function removeHandles() {
+    document.querySelectorAll('.bm-sel-border, .bm-sel-handle, .bm-sel-h-rotate, .bm-sel-rot-line').forEach(el => el.remove());
+  }
+
+  function startResize(id, handle, startMX, startMY) {
+    const data = S.elements.find(e => e.id === id);
+    const dom  = document.getElementById('bmel-' + id);
+    if (!data || !dom) return;
+    // Use offsetWidth/offsetHeight so rotation doesn't inflate the measurement
+    const startW = dom.offsetWidth  / S.zoom;
+    const startH = dom.offsetHeight / S.zoom;
+    resizeState = {
+      id, handle, startMX, startMY,
+      startW, startH,
+      startCx: data.x + startW / 2,
+      startCy: data.y + startH / 2,
+      startX: data.x, startY: data.y,
+      startProps: JSON.parse(JSON.stringify(data.props)),
+    };
+    S.resizing = true;
+  }
+
+  // Unified dimension-scale applier — scaleW/scaleH each default to 1 when an axis doesn't change.
+  // For uniform-scale elements (text, ring, glow…) the dominant axis scale is used.
+  function applyDimScale(data, startProps, scaleW, scaleH) {
+    const p = data.props, sp = startProps;
+    const scale = Math.abs(scaleW - 1) >= Math.abs(scaleH - 1) ? scaleW : scaleH;
+    switch (data.type) {
+      case 'text-heading': case 'text-mono': case 'text-label': case 'text-url':
+        if (Math.abs(scaleW - 1) > 0.001 && Math.abs(scaleH - 1) < 0.001) {
+          // Pure horizontal: set wrap width
+          p.width = Math.max(40, Math.round((sp.width || resizeState.startW) * scaleW));
+        } else {
+          p.fontSize = Math.max(6, parseFloat((sp.fontSize * scale).toFixed(1)));
+        }
+        break;
+      case 'code-block':
+        p.fontSize = Math.max(6, parseFloat((sp.fontSize * scale).toFixed(1))); break;
+      case 'bar-v':
+        p.width  = Math.max(1,  Math.round(sp.width  * scaleW));
+        p.height = Math.max(4,  Math.round(sp.height * scaleH)); break;
+      case 'bar-h':
+        p.width  = Math.max(10, Math.round(sp.width  * scaleW));
+        p.height = Math.max(1,  Math.round(sp.height * scaleH)); break;
+      case 'ring': p.size = Math.max(4,  Math.round(sp.size * scale)); break;
+      case 'dot':  p.size = Math.max(2,  Math.round(sp.size * scale)); break;
+      case 'rect':
+        p.width  = Math.max(10, Math.round(sp.width  * scaleW));
+        p.height = Math.max(4,  Math.round(sp.height * scaleH)); break;
+      case 'divider': p.width  = Math.max(10, Math.round(sp.width  * scaleW)); break;
+      case 'glow':    p.size   = Math.max(20, Math.round(sp.size   * scale)); break;
+      case 'line':    p.length = Math.max(10, Math.round(sp.length * scaleW)); break;
+      case 'polygon':
+        p.width  = Math.max(10, Math.round((sp.width  || sp.size || 100) * scaleW));
+        p.height = Math.max(4,  Math.round((sp.height || sp.size || 100) * scaleH)); break;
+      case 'image':
+        p.width  = Math.max(10, Math.round(sp.width  * scaleW));
+        p.height = Math.max(4,  Math.round(sp.height * scaleH)); break;
+    }
+  }
+
+  // Elements where corners resize W and H independently (no ratio-lock)
+  const FREE_RESIZE_TYPES = new Set(['polygon','rect','image','bar-v','bar-h']);
+
+  function doResize(e) {
+    if (!resizeState) return;
+    const { id, handle, startMX, startMY, startW, startH, startCx, startCy, startProps } = resizeState;
+    const data = S.elements.find(el => el.id === id);
+    if (!data) return;
+
+    const θ = ((data.rotation || 0) * Math.PI) / 180;
+    const cosθ = Math.cos(θ), sinθ = Math.sin(θ);
+
+    // Mouse delta in canvas-space pixels; rotate into element-local space
+    const dx  = (e.clientX - startMX) / S.zoom;
+    const dy  = (e.clientY - startMY) / S.zoom;
+    const ldx =  dx * cosθ + dy * sinθ;
+    const ldy = -dx * sinθ + dy * cosθ;
+
+    // Compute new local dimensions
+    let newW = startW, newH = startH;
+    switch (handle) {
+      case 'nw': newW = Math.max(10, startW - ldx); newH = Math.max(4, startH - ldy); break;
+      case 'ne': newW = Math.max(10, startW + ldx); newH = Math.max(4, startH - ldy); break;
+      case 'se': newW = Math.max(10, startW + ldx); newH = Math.max(4, startH + ldy); break;
+      case 'sw': newW = Math.max(10, startW - ldx); newH = Math.max(4, startH + ldy); break;
+      case 'e':  newW = Math.max(10, startW + ldx); break;
+      case 'w':  newW = Math.max(10, startW - ldx); break;
+      case 's':  newH = Math.max(4,  startH + ldy); break;
+      case 'n':  newH = Math.max(4,  startH - ldy); break;
+    }
+
+    // Ratio-lock corners for uniform-scale elements
+    if (['nw','ne','se','sw'].includes(handle) && !FREE_RESIZE_TYPES.has(data.type)) {
+      const s = Math.max(0.05, Math.abs(newW - startW) >= Math.abs(newH - startH)
+        ? newW / startW : newH / startH);
+      newW = startW * s; newH = startH * s;
+    }
+
+    // Anchor point (opposite of handle) in local space relative to start center
+    const ANCHORS = {
+      nw: [+startW/2, +startH/2], n:  [0, +startH/2], ne: [-startW/2, +startH/2],
+      e:  [-startW/2, 0],         se: [-startW/2, -startH/2],
+      s:  [0, -startH/2],         sw: [+startW/2, -startH/2], w: [+startW/2, 0],
+    };
+    const [alx, aly] = ANCHORS[handle];
+
+    // Anchor in canvas space (stays fixed during resize)
+    const anchorCx = startCx + alx * cosθ - aly * sinθ;
+    const anchorCy = startCy + alx * sinθ + aly * cosθ;
+
+    // Anchor's local coords relative to new center (scales proportionally with new dims)
+    const nalx = alx === 0 ? 0 : Math.sign(alx) * newW / 2;
+    const naly = aly === 0 ? 0 : Math.sign(aly) * newH / 2;
+
+    // New element center in canvas space
+    const newCx = anchorCx - nalx * cosθ + naly * sinθ;
+    const newCy = anchorCy - nalx * sinθ - naly * cosθ;
+
+    data.x = snapVal(newCx - newW / 2);
+    data.y = snapVal(newCy - newH / 2);
+
+    applyDimScale(data, startProps, newW / startW, newH / startH);
+
+    refreshDynEl(id);
+    updateElPos(id);
+    const pxEl = document.querySelector('#bmPropsBody [data-prop="_x"]');
+    const pyEl = document.querySelector('#bmPropsBody [data-prop="_y"]');
+    if (pxEl) pxEl.value = Math.round(data.x);
+    if (pyEl) pyEl.value = Math.round(data.y);
+    ['fontSize','size','width','height','length','thickness'].forEach(prop => {
+      if (data.props[prop] != null) {
+        const el = document.querySelector(`#bmPropsBody [data-prop="${prop}"]`);
+        if (el) el.value = data.props[prop];
+      }
+    });
+  }
+
+  function stopResize() {
+    S.resizing = false;
+    resizeState = null;
+    const data = getSelected();
+    if (data) {
+      // Snap fractional font sizes to integer on commit
+      const p = data.props;
+      if (typeof p.fontSize === 'number') p.fontSize = Math.round(p.fontSize);
+      buildPropsPanel(data);
+      refreshDynEl(data.id);
+    }
+    scheduleSave();
+  }
+
+  window.addEventListener('mousemove', (e) => {
+    if (S.rotating) { doRotate(e); return; }
+    if (S.resizing) { doResize(e); return; }
+    if (S.panning) {
+      S.camX = S.panStartCamX + (e.clientX - S.panStartX);
+      S.camY = S.panStartCamY + (e.clientY - S.panStartY);
+      applyCamera();
+    }
+    if (S.rubberReady) {
+      const sr = scroll.getBoundingClientRect();
+      const ex = e.clientX - sr.left, ey = e.clientY - sr.top;
+      if (Math.abs(ex - S.rubberStartX) > 4 || Math.abs(ey - S.rubberStartY) > 4) {
+        S.rubbering = true;
+        S.rubberReady = false;
+        if (!S.rubberShift) deselectAll();
+      }
+    }
+    if (S.rubbering) {
+      const sr = scroll.getBoundingClientRect();
+      const ex = e.clientX - sr.left, ey = e.clientY - sr.top;
+      const l = Math.min(S.rubberStartX, ex), t = Math.min(S.rubberStartY, ey);
+      rubberBand.style.cssText = `display:block;left:${l}px;top:${t}px;width:${Math.abs(ex-S.rubberStartX)}px;height:${Math.abs(ey-S.rubberStartY)}px;position:absolute;border:1.5px solid rgba(110,170,255,0.75);background:rgba(100,150,255,0.07);pointer-events:none;z-index:50;border-radius:2px;`;
+    }
+    if (S.dragging) {
+      const dx = (e.clientX - S.dragStartMX) / S.zoom;
+      const dy = (e.clientY - S.dragStartMY) / S.zoom;
+      if (S.draggingDyn) {
+        if (S.selectedIds.size > 1 && S.dragStartPositions) {
+          // Multi-drag: move all selected by same delta
+          S.dragStartPositions.forEach((startPos, sid) => {
+            const sd = S.elements.find(el => el.id === sid);
+            if (!sd) return;
+            sd.x = snapVal(startPos.x + dx); sd.y = snapVal(startPos.y + dy);
+            const sdom = document.getElementById('bmel-' + sid);
+            if (sdom) { sdom.style.left = sd.x + 'px'; sdom.style.top = sd.y + 'px'; }
+          });
+          updateGroupSelBox();
+          const pd = S.elements.find(el => el.id === S.primaryId);
+          if (pd) {
+            const px = document.querySelector('#bmPropsBody [data-prop="_x"]');
+            const py = document.querySelector('#bmPropsBody [data-prop="_y"]');
+            if (px) px.value = pd.x; if (py) py.value = pd.y;
+          }
+        } else {
+          const nx = snapVal(S.dragStartPX + dx), ny = snapVal(S.dragStartPY + dy);
+          const data = S.elements.find(el => el.id === S.dragging);
+          if (data) {
+            data.x = nx; data.y = ny;
+            const dom = document.getElementById('bmel-' + S.dragging);
+            if (dom) { dom.style.left = nx + 'px'; dom.style.top = ny + 'px'; }
+            const px = document.querySelector('#bmPropsBody [data-prop="_x"]');
+            const py = document.querySelector('#bmPropsBody [data-prop="_y"]');
+            if (px) px.value = nx; if (py) py.value = ny;
+          }
+        }
+      } else {
+        const nx = snapVal(S.dragStartPX + dx), ny = snapVal(S.dragStartPY + dy);
+        S.pos[S.dragging].x = nx; S.pos[S.dragging].y = ny;
+        const el = document.getElementById(S.dragging);
+        if (el) { el.style.left = nx + 'px'; el.style.top = ny + 'px'; }
+      }
+    }
+  });
+
+  window.addEventListener('mouseup', (e) => {
+    if (S.rotating) { stopRotate(); return; }
+    if (S.resizing) { stopResize(); return; }
+    if (S.panning) { S.panning = false; scroll.classList.remove('bm-panning'); }
+    if (S.rubberReady) {
+      S.rubberReady = false;
+      if (!S.rubberShift) deselectAll();
+    }
+    if (S.rubbering) {
+      S.rubbering = false;
+      rubberBand.style.display = 'none';
+      const sr = scroll.getBoundingClientRect();
+      const ex = e.clientX - sr.left, ey = e.clientY - sr.top;
+      const toB = (sx, sy) => ({ x: (sx - S.camX) / S.zoom, y: (sy - S.camY) / S.zoom });
+      const p1 = toB(Math.min(S.rubberStartX, ex), Math.min(S.rubberStartY, ey));
+      const p2 = toB(Math.max(S.rubberStartX, ex), Math.max(S.rubberStartY, ey));
+      let first = true;
+      S.elements.forEach(el => {
+        const dom = document.getElementById('bmel-' + el.id);
+        if (!dom) return;
+        const dr = dom.getBoundingClientRect();
+        const r = {
+          x1: (dr.left  - sr.left - S.camX) / S.zoom,
+          y1: (dr.top   - sr.top  - S.camY) / S.zoom,
+          x2: (dr.right - sr.left - S.camX) / S.zoom,
+          y2: (dr.bottom- sr.top  - S.camY) / S.zoom,
+        };
+        if (p1.x < r.x2 && p2.x > r.x1 && p1.y < r.y2 && p2.y > r.y1) {
+          S.selectedIds.add(el.id);
+          dom.classList.add('bm-selected');
+          if (first) { S.primaryId = el.id; first = false; }
+        }
+      });
+      if (S.selectedIds.size) {
+        document.getElementById('bmSidebarMain').classList.add('bm-panel-hidden');
+        document.getElementById('bmPropsPane').classList.remove('bm-panel-hidden');
+        if (S.selectedIds.size === 1) buildPropsPanel(S.elements.find(e => e.id === S.primaryId));
+        else buildMultiSelectPanel();
+      }
+      refreshLayersPanel();
+      updateGroupSelBox();
+    }
+    if (S.dragging) {
+      document.getElementById(S.draggingDyn ? 'bmel-' + S.dragging : S.dragging)?.classList.remove('bm-dragging');
+      S.dragging = null; S.draggingDyn = false; S.dragStartPositions = null;
+      scheduleSave();
+    }
+  });
+
+  // ── Wire content + style controls ────────────────────────────
+  function bind(id, key, transform) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      S.cfg[key] = transform ? transform(el.value) : el.value;
+      renderAll();
+    });
+  }
+  bind('ctrlName',       'name');
+  bind('ctrlAccentSplit','accentSplit', v => Math.max(0, parseInt(v) || 0));
+  bind('ctrlLabel',      'label');
+  bind('ctrlTagline',    'tagline');
+  bind('ctrlUrl',        'url');
+  bind('ctrlCodeVar',    'codeVar');
+  bind('ctrlCodeRole',   'codeRole');
+  bind('ctrlCodeStack',  'codeStack');
+  bind('ctrlCodeShips',  'codeShips');
+  bind('ctrlCodeSleeps', 'codeSleeps');
+  bind('ctrlNameSize',   'nameSize', v => parseInt(v) || 88);
+
+  function bindColor(swatchId, hexId, cfgKey, extraCb) {
+    const swatch = document.getElementById(swatchId);
+    const hexIn  = document.getElementById(hexId);
+    swatch.addEventListener('input', () => { S.cfg[cfgKey] = swatch.value; hexIn.value = swatch.value; renderAll(); if (extraCb) extraCb(); });
+    hexIn.addEventListener('input',  () => { if (/^#[0-9a-fA-F]{6}$/.test(hexIn.value)) { S.cfg[cfgKey] = hexIn.value; swatch.value = hexIn.value; renderAll(); if (extraCb) extraCb(); } });
+  }
+  bindColor('ctrlAccent', 'ctrlAccentHex', 'accent');
+  bindColor('bmBgSwatch', 'bmBgHex',       'bg', () => { applyBg(); updateBgCircle(); });
+
+
+  // Tabs
+  document.querySelectorAll('.bm-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.bm-tab').forEach(t => t.classList.remove('bm-tab-active'));
+      // Hide all tab panels (not the props body)
+      ['bm-tab-elements','bm-tab-style'].forEach(id => {
+        document.getElementById(id)?.classList.add('bm-panel-hidden');
+      });
+      tab.classList.add('bm-tab-active');
+      document.getElementById('bm-tab-' + tab.dataset.tab)?.classList.remove('bm-panel-hidden');
+    });
+  });
+
+  // ── Element library view toggle ──────────────────────────────
+  const libPanel = document.getElementById('bm-tab-elements');
+  document.getElementById('bmLibViewGrid').addEventListener('click', () => {
+    libPanel.classList.remove('bm-lib-list');
+    document.getElementById('bmLibViewGrid').classList.add('bm-lib-view-active');
+    document.getElementById('bmLibViewList').classList.remove('bm-lib-view-active');
+  });
+  document.getElementById('bmLibViewList').addEventListener('click', () => {
+    libPanel.classList.add('bm-lib-list');
+    document.getElementById('bmLibViewList').classList.add('bm-lib-view-active');
+    document.getElementById('bmLibViewGrid').classList.remove('bm-lib-view-active');
+  });
+
+  // ── Export PNG ────────────────────────────────────────────────
+  async function exportPng() {
+    const btn = document.getElementById('bmExportPngBtn');
+
+    // Hide selection highlights
+    S.selectedIds.forEach(id => document.getElementById('bmel-' + id)?.classList.remove('bm-selected'));
+
+    btn.disabled = true;
+    btn.innerHTML = '<iconify-icon icon="mdi:loading" width="14" height="14" style="animation:spin 1s linear infinite"></iconify-icon> Exporting…';
+    try {
+      if (!window.html2canvas) {
+        await new Promise((res, rej) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+          s.onload = res; s.onerror = rej;
+          document.head.appendChild(s);
+        });
+      }
+      const canvas = await html2canvas(banner, { width: 960, height: 480, scale: 1, useCORS: true, logging: false, backgroundColor: S.cfg.bg });
+      const a = document.createElement('a');
+      a.download = 'discord-banner.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    } finally {
+      S.selectedIds.forEach(id => document.getElementById('bmel-' + id)?.classList.add('bm-selected'));
+      btn.disabled = false;
+      btn.innerHTML = '<iconify-icon icon="mdi:download" width="14" height="14"></iconify-icon> Export PNG';
+    }
+  }
+  document.getElementById('bmExportPngBtn').addEventListener('click', exportPng);
+
+  // ── Export / Import JSON ──────────────────────────────────────
+  document.getElementById('bmExportJsonBtn').addEventListener('click', () => {
+    const a = document.createElement('a');
+    a.download = 'banner-config.json';
+    a.href = 'data:application/json,' + encodeURIComponent(JSON.stringify({ cfg: S.cfg, pos: S.pos, elements: S.elements }, null, 2));
+    a.click();
+  });
+
+  document.getElementById('bmImportJsonBtn').addEventListener('click', () => document.getElementById('bmJsonFileInput').click());
+
+  document.getElementById('bmJsonFileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.cfg) Object.assign(S.cfg, data.cfg);
+        if (data.pos) Object.assign(S.pos, data.pos);
+        if (data.elements) {
+          // Remove existing dynamic els
+          S.elements.forEach(el => document.getElementById('bmel-' + el.id)?.remove());
+          S.elements = data.elements;
+          S.elements.forEach(el => banner.appendChild(createDynElDom(el)));
+        }
+        syncInputsToState();
+        renderAll();
+      } catch { alert('Invalid JSON file.'); }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  function syncInputsToState() {
+    const c = S.cfg;
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+    set('ctrlName', c.name); set('ctrlAccentSplit', c.accentSplit); set('ctrlLabel', c.label);
+    set('ctrlTagline', c.tagline); set('ctrlUrl', c.url); set('ctrlCodeVar', c.codeVar);
+    set('ctrlCodeRole', c.codeRole); set('ctrlCodeStack', c.codeStack);
+    set('ctrlCodeShips', c.codeShips); set('ctrlCodeSleeps', c.codeSleeps);
+    set('ctrlAccent', c.accent); set('ctrlAccentHex', c.accent);
+    set('bmBgSwatch', c.bg); set('bmBgHex', c.bg); set('ctrlNameSize', c.nameSize);
+    set('ctrlPatColor', c.bgPatternColor || '#808080'); set('ctrlPatColorHex', c.bgPatternColor || '#808080');
+    set('ctrlPatOpacity', c.bgPatternOpacity ?? 0.05); set('ctrlPatSize', c.bgPatternSize || 40);
+    const chk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = val; };
+    // Sync background type tabs
+    const isGrad = c.bgType === 'gradient';
+    document.querySelectorAll('.bm-drop-tab').forEach(t =>
+      t.classList.toggle('bm-drop-tab-active', t.dataset.dtab === (isGrad ? 'gradient' : 'solid')));
+    const solidPanel = document.getElementById('bmBgSolidPanel');
+    const gradPanel  = document.getElementById('bmBgGradPanel');
+    if (solidPanel) solidPanel.style.display = isGrad ? 'none' : '';
+    if (gradPanel)  gradPanel.style.display  = isGrad ? '' : 'none';
+    if (isGrad) {
+      const angEl = document.getElementById('bmGradAngle');
+      if (angEl) angEl.value = c.bgGradient.angle;
+      buildGradStops();
+      buildGradPresets();
+      refreshGradPreview();
+    }
+    updateBgCircle();
+  }
+
+  // ── Layer ordering ────────────────────────────────────────────
+  function setZ(id, z) {
+    const data = S.elements.find(e => e.id === id);
+    if (!data) return;
+    data.z = z;
+    const dom = document.getElementById('bmel-' + id);
+    if (dom) dom.style.zIndex = z;
+    refreshLayersPanel();
+  }
+
+  function layerChange(id, delta) {
+    const data = S.elements.find(e => e.id === id);
+    if (data) setZ(id, (data.z || 0) + delta);
+  }
+
+  function layerFront(id) {
+    const maxZ = S.elements.length ? Math.max(...S.elements.map(e => e.z || 0)) : 0;
+    setZ(id, maxZ + 1);
+  }
+
+  function layerBack(id) {
+    const minZ = S.elements.length ? Math.min(...S.elements.map(e => e.z || 0)) : 0;
+    setZ(id, minZ - 1);
+  }
+
+  // ── Context menu ──────────────────────────────────────────────
+  const ctxMenu = document.getElementById('bmCtxMenu');
+  let cmTarget  = null;
+
+  function hideCtxMenu() {
+    ctxMenu.classList.add('bm-panel-hidden');
+    cmTarget = null;
+  }
+
+  function showCtxMenu(clientX, clientY, targetId) {
+    cmTarget = targetId;
+    const isEl   = !!targetId;
+    const hasClip = !!clipboard;
+
+    let html = '';
+    if (isEl) {
+      const data    = S.elements.find(e => e.id === targetId);
+      const typeDef = EL_TYPES[data?.type];
+      if (typeDef) html += `<div class="bm-ctx-header">${typeDef.label}</div>`;
+      html += row('select',   'Select');
+      html += sep();
+      html += row('duplicate','Duplicate', 'Ctrl+D');
+      html += row('copy',     'Copy',      'Ctrl+C');
+      html += row('paste',    'Paste',     'Ctrl+V', !hasClip);
+      html += sep();
+      html += row('forward',  'Bring Forward');
+      html += row('backward', 'Send Backward');
+      html += row('front',    'Bring to Front');
+      html += row('back',     'Send to Back');
+      html += sep();
+      html += row('delete',   'Delete', 'Del', false, true);
+    } else {
+      html += row('paste',   'Paste',      'Ctrl+V', !hasClip);
+      html += sep();
+      html += row('fit',     'Fit to View','Ctrl+0');
+      html += row('zoom100', '100% Zoom',  'Ctrl+1');
+    }
+
+    ctxMenu.innerHTML = html;
+
+    // Position relative to .bm-editor
+    const er = document.querySelector('.bm-editor').getBoundingClientRect();
+    let lx = clientX - er.left, ly = clientY - er.top;
+    ctxMenu.style.left = lx + 'px';
+    ctxMenu.style.top  = ly + 'px';
+    ctxMenu.classList.remove('bm-panel-hidden');
+
+    // Clamp after paint
+    requestAnimationFrame(() => {
+      const mr = ctxMenu.getBoundingClientRect();
+      if (mr.right  > er.right)  ctxMenu.style.left = (lx - mr.width)  + 'px';
+      if (mr.bottom > er.bottom) ctxMenu.style.top  = (ly - mr.height) + 'px';
+    });
+
+    ctxMenu.querySelectorAll('.bm-ctx-item:not(.bm-ctx-disabled)').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleCtxAction(item.dataset.action);
+        hideCtxMenu();
+      });
+    });
+  }
+
+  function row(action, label, kbd, disabled = false, danger = false) {
+    return `<div class="bm-ctx-item${disabled?' bm-ctx-disabled':''}${danger?' bm-ctx-danger':''}" data-action="${action}">${label}${kbd?`<span>${kbd}</span>`:''}</div>`;
+  }
+  function sep() { return '<div class="bm-ctx-sep"></div>'; }
+
+  function handleCtxAction(action) {
+    // Ensure element-specific actions operate on the right-clicked target
+    if (cmTarget && !S.selectedIds.has(cmTarget)) selectElement(cmTarget);
+
+    switch (action) {
+      case 'select':    /* already selected above */ break;
+      case 'copy':      copySelected(); break;
+      case 'paste':     pasteClipboard(); break;
+      case 'duplicate': duplicateSelected(); break;
+      case 'delete':    deleteSelected(); break;
+      case 'forward':   layerChange(cmTarget, 1); break;
+      case 'backward':  layerChange(cmTarget, -1); break;
+      case 'front':     layerFront(cmTarget); break;
+      case 'back':      layerBack(cmTarget); break;
+      case 'fit':
+        S.zoom = Math.min((scroll.clientWidth - 80) / 960, (scroll.clientHeight - 80) / 480);
+        centerBanner(); break;
+      case 'zoom100':   S.zoom = 1; centerBanner(); break;
+    }
+  }
+
+  // Right-click on scroll area
+  scroll.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    const dynEl = e.target.closest('[data-dyn-id]');
+    showCtxMenu(e.clientX, e.clientY, dynEl?.dataset.dynId || null);
+  });
+
+  // ── Keyboard shortcuts ───────────────────────────────────────
+  let clipboard = null;
+
+  function getSelected() {
+    return S.primaryId ? S.elements.find(e => e.id === S.primaryId) : null;
+  }
+
+  function copySelected() {
+    const data = getSelected();
+    if (data) clipboard = JSON.parse(JSON.stringify(data));
+  }
+
+  function pasteClipboard() {
+    if (!clipboard) return;
+    const clone = JSON.parse(JSON.stringify(clipboard));
+    clone.id = nextId();
+    clone.x += 20; clone.y += 20;
+    S.elements.push(clone);
+    banner.appendChild(createDynElDom(clone));
+    selectElement(clone.id);
+    clipboard.x += 20; clipboard.y += 20;
+    refreshLayersPanel();
+    scheduleSave();
+  }
+
+  function duplicateSelected() {
+    const data = getSelected();
+    if (!data) return;
+    const clone = JSON.parse(JSON.stringify(data));
+    clone.id = nextId();
+    clone.x += 20; clone.y += 20;
+    S.elements.push(clone);
+    banner.appendChild(createDynElDom(clone));
+    selectElement(clone.id);
+    refreshLayersPanel();
+    scheduleSave();
+  }
+
+  function deleteSelected() {
+    if (!S.selectedIds.size) return;
+    const ids = new Set(S.selectedIds);
+    deselectAll();
+    S.elements = S.elements.filter(e => !ids.has(e.id));
+    ids.forEach(id => document.getElementById('bmel-' + id)?.remove());
+    refreshLayersPanel();
+    scheduleSave();
+  }
+
+  function nudgeSelected(dx, dy) {
+    if (!S.selectedIds.size) return;
+    S.selectedIds.forEach(id => {
+      const data = S.elements.find(e => e.id === id);
+      if (!data) return;
+      data.x = snapVal(data.x + dx); data.y = snapVal(data.y + dy);
+      updateElPos(id);
+    });
+    const data = getSelected();
+    if (data) {
+      const px = document.querySelector('#bmPropsBody [data-prop="_x"]');
+      const py = document.querySelector('#bmPropsBody [data-prop="_y"]');
+      if (px) px.value = data.x; if (py) py.value = data.y;
+    }
+  }
+
+  // ── Group selection ghost box ─────────────────────────────────
+  function updateGroupSelBox() {
+    const box = document.getElementById('bmGroupSelBox');
+    if (!box) return;
+    const isMulti = S.selectedIds.size > 1;
+    scroll.classList.toggle('bm-multi-sel', isMulti);
+    if (!isMulti) { box.style.display = 'none'; return; }
+
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    S.selectedIds.forEach(id => {
+      const data = S.elements.find(e => e.id === id);
+      if (!data) return;
+      const dom = document.getElementById('bmel-' + id);
+      if (!dom) return;
+      const θ = ((data.rotation || 0) * Math.PI) / 180;
+      const cosθ = Math.cos(θ), sinθ = Math.sin(θ);
+      const hw = dom.offsetWidth / 2, hh = dom.offsetHeight / 2;
+      const cx = data.x + hw, cy = data.y + hh;
+      [[-hw,-hh],[hw,-hh],[hw,hh],[-hw,hh]].forEach(([lx, ly]) => {
+        const wx = cx + lx*cosθ - ly*sinθ, wy = cy + lx*sinθ + ly*cosθ;
+        if (wx < minX) minX = wx; if (wx > maxX) maxX = wx;
+        if (wy < minY) minY = wy; if (wy > maxY) maxY = wy;
+      });
+    });
+
+    const pad = 12;
+    box.style.display = 'block';
+    box.style.left   = (minX - pad) + 'px';
+    box.style.top    = (minY - pad) + 'px';
+    box.style.width  = (maxX - minX + pad * 2) + 'px';
+    box.style.height = (maxY - minY + pad * 2) + 'px';
+    const label = box.querySelector('.bm-group-sel-label');
+    if (label) {
+      const g = S.activeGroupId ? S.groups.find(g => g.id === S.activeGroupId) : null;
+      label.textContent = g ? g.label : `${S.selectedIds.size} selected`;
+    }
+  }
+
+  // ── Grouping ──────────────────────────────────────────────────
+  function groupSelected() {
+    if (S.selectedIds.size < 2) return;
+    const gid = 'grp_' + Date.now();
+    const label = 'Group ' + (S.groups.length + 1);
+    S.groups.push({ id: gid, label, expanded: true });
+    S.selectedIds.forEach(id => {
+      const data = S.elements.find(e => e.id === id);
+      if (data) data.group = gid;
+    });
+    S.activeGroupId = gid;
+    removeHandles();
+    document.getElementById('bmSidebarMain').classList.add('bm-panel-hidden');
+    document.getElementById('bmPropsPane').classList.remove('bm-panel-hidden');
+    buildGroupPropsPanel(gid);
+    refreshLayersPanel();
+    updateGroupSelBox();
+    scheduleSave();
+  }
+
+  function ungroupSelected() {
+    const gids = new Set();
+    S.selectedIds.forEach(id => {
+      const data = S.elements.find(e => e.id === id);
+      if (data && data.group) gids.add(data.group);
+    });
+    if (!gids.size) return;
+    gids.forEach(gid => {
+      S.elements.forEach(e => { if (e.group === gid) e.group = null; });
+      S.groups = S.groups.filter(g => g.id !== gid);
+    });
+    S.activeGroupId = null;
+    refreshLayersPanel();
+    updateGroupSelBox();
+    scheduleSave();
+  }
+
+  function buildGroupPropsPanel(gid) {
+    const group = S.groups.find(g => g.id === gid);
+    if (!group) { buildMultiSelectPanel(); return; }
+    const members = S.elements.filter(e => e.group === gid);
+    document.getElementById('bmPropsTitle').textContent = 'Group';
+    document.getElementById('bmPropsBody').innerHTML = `<div class="bm-group">
+      ${makeField('Label', `<input class="bm-input" id="bmGroupLabelInput" value="${esc(group.label)}">`)}
+    </div>
+    <div class="bm-group" style="color:var(--foreground-muted);font-family:'JetBrains Mono',monospace;font-size:0.65rem;padding:8px 4px;">
+      ${members.length} element${members.length !== 1 ? 's' : ''}<br>
+      <span style="opacity:0.5;font-size:0.58rem;">Ctrl+Shift+G to ungroup</span>
+    </div>`;
+    const inp = document.getElementById('bmGroupLabelInput');
+    if (inp) inp.addEventListener('input', () => {
+      group.label = inp.value;
+      updateGroupSelBox();
+      refreshLayersPanel();
+    });
+  }
+
+  const TEXT_TYPES = new Set(['text-heading','text-mono','text-label','text-url']);
+
+  let textEditId = null;
+
+  function enterTextEdit(id) {
+    if (textEditId === id) return;
+    if (textEditId !== null) commitTextEdit(textEditId);
+    const data = S.elements.find(e => e.id === id);
+    if (!data || !TEXT_TYPES.has(data.type)) return;
+
+    // Ensure the element is selected
+    if (S.primaryId !== id) selectElement(id, false);
+
+    textEditId = id;
+    removeHandles(); // hide resize handles while editing
+
+    const dom = document.getElementById('bmel-' + id);
+    if (!dom) return;
+    const inner = dom.querySelector('div');
+    if (!inner) return;
+
+    dom.style.userSelect = 'text'; // override .bm-el { user-select: none }
+    inner.contentEditable = 'true';
+    inner.spellcheck = false;
+    inner.style.outline = 'none';
+    inner.style.cursor = 'text';
+    inner.style.whiteSpace = 'pre-wrap'; // keep during editing for visual consistency
+    // Populate with existing rich HTML (or convert plain text)
+    inner.innerHTML = textToDisplayHtml(data.props.text);
+    inner.focus();
+    // Place cursor at end
+    const range = document.createRange();
+    range.selectNodeContents(inner);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    inner.addEventListener('input', () => {
+      data.props.text = inner.innerHTML;
+    });
+
+    inner.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        // Force <br> insertion (consistent across browsers)
+        e.preventDefault();
+        document.execCommand('insertLineBreak');
+      }
+      if (e.key === 'Escape') { e.preventDefault(); commitTextEdit(id); }
+      e.stopPropagation(); // block canvas shortcuts while typing
+    });
+
+    inner.addEventListener('blur', () => {
+      // Small delay so Escape can commitTextEdit first without double-committing
+      requestAnimationFrame(() => { if (textEditId === id) commitTextEdit(id); });
+    });
+
+    // Format toolbar: show above selection, update active states
+    const fmtToolbar = document.getElementById('bmFormatToolbar');
+    const onSelectionChange = () => {
+      const sel = window.getSelection();
+      if (!sel || !inner.contains(sel.anchorNode) || sel.isCollapsed) {
+        fmtToolbar.classList.remove('bm-fmt-visible');
+        return;
+      }
+      const rect = sel.getRangeAt(0).getBoundingClientRect();
+      fmtToolbar.style.left = (rect.left + rect.width / 2) + 'px';
+      fmtToolbar.style.top  = (rect.top - fmtToolbar.offsetHeight - 8) + 'px';
+      fmtToolbar.classList.add('bm-fmt-visible');
+      fmtToolbar.querySelectorAll('[data-cmd]').forEach(btn => {
+        btn.classList.toggle('bm-fmt-active', document.queryCommandState(btn.dataset.cmd));
+      });
+    };
+    document.addEventListener('selectionchange', onSelectionChange);
+    inner._fmtCleanup = () => document.removeEventListener('selectionchange', onSelectionChange);
+  }
+
+  function commitTextEdit(id) {
+    if (textEditId !== id) return;
+    const dom = document.getElementById('bmel-' + id);
+    if (dom) {
+      const inner = dom.querySelector('[contenteditable]');
+      if (inner) {
+        const data = S.elements.find(e => e.id === id);
+        if (data) data.props.text = inner.innerHTML;
+        if (inner._fmtCleanup) { inner._fmtCleanup(); inner._fmtCleanup = null; }
+      }
+    }
+    document.getElementById('bmFormatToolbar').classList.remove('bm-fmt-visible');
+    textEditId = null;
+    if (dom) dom.style.userSelect = '';
+    const data = S.elements.find(e => e.id === id);
+    if (data) {
+      refreshDynEl(id);
+      if (S.primaryId === id) injectHandles(id);
+      // Sync sidebar text input
+      const textProp = document.querySelector('#bmPropsBody [data-prop="text"]');
+      if (textProp) textProp.value = stripHtml(data.props.text);
+      scheduleSnapshot();
+    }
+  }
+
+  function toggleBold() {
+    S.selectedIds.forEach(id => {
+      const data = S.elements.find(e => e.id === id);
+      if (!data || !TEXT_TYPES.has(data.type)) return;
+      data.props.fontWeight = (data.props.fontWeight || 400) > 500 ? 400 : 700;
+      refreshDynEl(id);
+    });
+    const data = getSelected();
+    if (data) { const fw = document.querySelector('#bmPropsBody [data-prop="fontWeight"]'); if (fw) fw.value = data.props.fontWeight; }
+  }
+
+  // Format toolbar — one-time event binding
+  document.querySelectorAll('#bmFormatToolbar [data-cmd]').forEach(btn => {
+    btn.addEventListener('mousedown', (e) => {
+      e.preventDefault(); // prevent blur on contenteditable
+      document.execCommand(btn.dataset.cmd);
+    });
+  });
+  document.getElementById('bmFmtColor').addEventListener('input', (e) => {
+    document.execCommand('foreColor', false, e.target.value);
+  });
+
+  function adjustSize(delta) {
+    S.selectedIds.forEach(id => {
+      const data = S.elements.find(e => e.id === id);
+      if (!data) return;
+      const p = data.props;
+      if (TEXT_TYPES.has(data.type)) {
+        p.fontSize = Math.max(6, Math.round((p.fontSize || 16) + delta)); refreshDynEl(id);
+      } else if (data.type === 'ring' || data.type === 'dot') {
+        p.size = Math.max(4, Math.round((p.size || 40) + delta * 4)); refreshDynEl(id);
+      }
+    });
+    const data = getSelected();
+    if (data) {
+      const fs = document.querySelector('#bmPropsBody [data-prop="fontSize"]');
+      if (fs) fs.value = data.props.fontSize;
+      const sz = document.querySelector('#bmPropsBody [data-prop="size"]');
+      if (sz) sz.value = data.props.size;
+    }
+  }
+
+  window.addEventListener('keydown', (e) => {
+    const editing = document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA';
+
+    // Escape works even while editing
+    if (e.key === 'Escape') {
+      if (textEditId !== null) { commitTextEdit(textEditId); return; }
+      deselectElement();
+      document.getElementById('bmShortcutsOverlay').classList.add('bm-panel-hidden');
+      return;
+    }
+
+    if (editing || textEditId !== null) return;
+
+    // Arrow nudge
+    if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key) && S.selectedIds.size) {
+      e.preventDefault();
+      const d = e.shiftKey ? 10 : 1;
+      nudgeSelected(
+        e.key === 'ArrowLeft' ? -d : e.key === 'ArrowRight' ? d : 0,
+        e.key === 'ArrowUp'   ? -d : e.key === 'ArrowDown'  ? d : 0
+      );
+      return;
+    }
+
+    if ((e.key === 'Delete' || e.key === 'Backspace') && S.selectedIds.size) {
+      e.preventDefault();
+      deleteSelected();
+      return;
+    }
+
+    // Alt+1 = toggle layers panel
+    if (e.altKey && e.key === '1') {
+      e.preventDefault();
+      toggleLayersPanel();
+      return;
+    }
+
+    const mod = e.ctrlKey || e.metaKey;
+
+    if (mod) {
+      switch (e.key.toLowerCase()) {
+        case 'a':
+          e.preventDefault();
+          if (!S.elements.length) break;
+          S.selectedIds.forEach(sid => document.getElementById('bmel-' + sid)?.classList.remove('bm-selected'));
+          S.selectedIds.clear();
+          S.elements.forEach(el => { S.selectedIds.add(el.id); document.getElementById('bmel-' + el.id)?.classList.add('bm-selected'); });
+          S.primaryId = S.elements[S.elements.length - 1].id;
+          S.activeGroupId = null;
+          removeHandles();
+          document.getElementById('bmSidebarMain').classList.add('bm-panel-hidden');
+          document.getElementById('bmPropsPane').classList.remove('bm-panel-hidden');
+          buildMultiSelectPanel();
+          refreshLayersPanel();
+          updateGroupSelBox();
+          break;
+        case 'c': e.preventDefault(); copySelected(); break;
+        case 'v': e.preventDefault(); pasteClipboard(); break;
+        case 'd': e.preventDefault(); e.shiftKey ? null : duplicateSelected(); break;
+        case 'b': e.preventDefault(); toggleBold(); break;
+        case 'g':
+          e.preventDefault();
+          if (e.shiftKey) ungroupSelected(); else groupSelected();
+          break;
+        case ']': e.preventDefault(); adjustSize(2); break;
+        case '[': e.preventDefault(); adjustSize(-2); break;
+        case '0': e.preventDefault();
+          S.zoom = Math.min((scroll.clientWidth - 80) / 960, (scroll.clientHeight - 80) / 480);
+          centerBanner(); break;
+        case '1': e.preventDefault(); S.zoom = 1; centerBanner(); break;
+      }
+      return;
+    }
+  });
+
+  // Shortcuts overlay toggle
+  document.getElementById('bmShortcutsBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('bmShortcutsOverlay').classList.toggle('bm-panel-hidden');
+  });
+  document.getElementById('bmShortcutsClose').addEventListener('click', () => {
+    document.getElementById('bmShortcutsOverlay').classList.add('bm-panel-hidden');
+  });
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#bmShortcutsOverlay') && !e.target.closest('#bmShortcutsBtn'))
+      document.getElementById('bmShortcutsOverlay').classList.add('bm-panel-hidden');
+    if (!e.target.closest('#bmCtxMenu'))
+      hideCtxMenu();
+    if (!e.target.closest('#bmBgDrop') && !e.target.closest('#bmBgColorBtn'))
+      document.getElementById('bmBgDrop')?.classList.add('bm-panel-hidden');
+    if (!e.target.closest('#bmPatDrop') && !e.target.closest('#bmPatBtn'))
+      document.getElementById('bmPatDrop')?.classList.add('bm-panel-hidden');
+    if (!e.target.closest('#bmSizeDrop') && !e.target.closest('#bmSizeBtn'))
+      document.getElementById('bmSizeDrop')?.classList.add('bm-panel-hidden');
+  });
+
+  // ── Ruler ────────────────────────────────────────────────────
+  function niceStep(zoom) {
+    const target = 60 / zoom;
+    const mag = Math.pow(10, Math.floor(Math.log10(target)));
+    const r = target / mag;
+    if (r < 1.5) return mag;
+    if (r < 3.5) return 2 * mag;
+    if (r < 7.5) return 5 * mag;
+    return 10 * mag;
+  }
+
+  function drawRulers() {
+    const hEl = document.getElementById('bmRulerH');
+    const vEl = document.getElementById('bmRulerV');
+    if (!hEl || !vEl || !S.showRuler) return;
+    const rOff = 20;
+    const W = scroll.clientWidth  - rOff;
+    const H = scroll.clientHeight - rOff;
+    if (W <= 0 || H <= 0) return;
+    hEl.width = W; hEl.height = rOff;
+    vEl.width = rOff; vEl.height = H;
+
+    const bg = '#111014', line = 'rgba(255,255,255,0.12)', text = 'rgba(255,255,255,0.35)', tick = 'rgba(255,255,255,0.2)';
+    const step = niceStep(S.zoom);
+
+    [hEl, vEl].forEach((c, axis) => {
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, c.width, c.height);
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.fillStyle = line;
+      if (axis === 0) ctx.fillRect(0, rOff - 1, c.width, 1);
+      else ctx.fillRect(rOff - 1, 0, 1, c.height);
+
+      const camOffset = axis === 0 ? S.camX - rOff : S.camY - rOff;
+      const size = axis === 0 ? W : H;
+      const startBanner = Math.floor(-camOffset / S.zoom / step) * step;
+      const endBanner   = Math.ceil((size - camOffset) / S.zoom / step) * step;
+
+      ctx.font = '9px JetBrains Mono, monospace';
+      ctx.fillStyle = text;
+      ctx.textAlign = 'left';
+
+      for (let v = startBanner; v <= endBanner; v += step) {
+        const screen = v * S.zoom + camOffset;
+        if (screen < 0 || screen > size) continue;
+        const label = String(Math.round(v));
+        if (axis === 0) {
+          ctx.fillStyle = tick;
+          ctx.fillRect(screen, rOff - 5, 1, 5);
+          ctx.fillStyle = text;
+          ctx.fillText(label, screen + 2, 10);
+        } else {
+          ctx.fillStyle = tick;
+          ctx.fillRect(rOff - 5, screen, 5, 1);
+          ctx.fillStyle = text;
+          ctx.save();
+          ctx.translate(10, screen - 2);
+          ctx.rotate(-Math.PI / 2);
+          ctx.fillText(label, 0, 0);
+          ctx.restore();
+        }
+      }
+    });
+  }
+
+  function applyRulerVisibility() {
+    const show = S.showRuler;
+    ['bmRulerH','bmRulerV','bmRulerCorner'].forEach(id => {
+      document.getElementById(id)?.classList.toggle('bm-panel-hidden', !show);
+    });
+    document.getElementById('bmRulerToggle')?.classList.toggle('bm-snap-active', show);
+    if (show) drawRulers();
+  }
+
+  document.getElementById('bmRulerToggle').addEventListener('click', () => {
+    S.showRuler = !S.showRuler;
+    applyRulerVisibility();
+    centerBanner();
+  });
+
+  // ── Canvas size ───────────────────────────────────────────────
+  const SIZE_PRESETS = [
+    { group: 'Social',  name: 'Discord Banner',  w: 960,  h: 480  },
+    { group: 'Social',  name: 'Twitter Banner',  w: 1500, h: 500  },
+    { group: 'Social',  name: 'LinkedIn Banner', w: 1584, h: 396  },
+    { group: 'Social',  name: 'YouTube Banner',  w: 2560, h: 1440 },
+    { group: 'Social',  name: 'Facebook Cover',  w: 820,  h: 312  },
+    { group: 'Social',  name: 'Instagram Post',  w: 1080, h: 1080 },
+    { group: 'Print',   name: 'A3 Landscape',    w: 1587, h: 1123 },
+    { group: 'Print',   name: 'A3 Portrait',     w: 1123, h: 1587 },
+    { group: 'Print',   name: 'A4 Landscape',    w: 1123, h: 794  },
+    { group: 'Print',   name: 'A4 Portrait',     w: 794,  h: 1123 },
+    { group: 'Print',   name: 'A5 Landscape',    w: 794,  h: 559  },
+    { group: 'Print',   name: 'A5 Portrait',     w: 559,  h: 794  },
+    { group: 'Square',  name: '1000 × 1000',     w: 1000, h: 1000 },
+    { group: 'Square',  name: '800 × 800',       w: 800,  h: 800  },
+  ];
+
+  function applyCanvasSize(w, h) {
+    S.cfg.canvasW = w; S.cfg.canvasH = h;
+    banner.style.width  = w + 'px';
+    banner.style.height = h + 'px';
+    document.querySelector('.bm-sidebar-sub').textContent = `${w} × ${h}`;
+    document.getElementById('bmSizeLabel').textContent = `${w} × ${h}`;
+    const fit = Math.min(
+      (scroll.clientWidth  - (S.showRuler ? 20 : 0) - 60) / w,
+      (scroll.clientHeight - (S.showRuler ? 20 : 0) - 60) / h,
+      1
+    );
+    S.zoom = Math.max(0.05, Math.round(fit * 20) / 20);
+    centerBanner();
+    buildSizeDrop();
+    scheduleSave();
+  }
+
+  function buildSizeDrop() {
+    const list = document.getElementById('bmSizePresetList');
+    if (!list) return;
+    const groups = [...new Set(SIZE_PRESETS.map(p => p.group))];
+    list.innerHTML = groups.map(g => {
+      const items = SIZE_PRESETS.filter(p => p.group === g);
+      const btns = items.map(p => {
+        const active = p.w === S.cfg.canvasW && p.h === S.cfg.canvasH;
+        return `<button class="bm-size-preset-btn${active ? ' bm-size-active' : ''}" data-w="${p.w}" data-h="${p.h}">
+          <span class="bm-size-preset-name">${p.name}</span>
+          <span class="bm-size-preset-dim">${p.w} × ${p.h}</span>
+        </button>`;
+      }).join('');
+      return `<div class="bm-size-group-label">${g}</div><div class="bm-size-preset-grid">${btns}</div>`;
+    }).join('');
+    list.querySelectorAll('.bm-size-preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        applyCanvasSize(+btn.dataset.w, +btn.dataset.h);
+        document.getElementById('bmSizeDrop').classList.add('bm-panel-hidden');
+      });
+    });
+  }
+
+  document.getElementById('bmCustomSizeApply').addEventListener('click', () => {
+    const w = Math.min(5000, Math.max(100, parseInt(document.getElementById('bmCustomW').value) || 960));
+    const h = Math.min(5000, Math.max(100, parseInt(document.getElementById('bmCustomH').value) || 480));
+    applyCanvasSize(w, h);
+    document.getElementById('bmSizeDrop').classList.add('bm-panel-hidden');
+  });
+
+  document.getElementById('bmSizeBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const drop = document.getElementById('bmSizeDrop');
+    const bgDrop  = document.getElementById('bmBgDrop');
+    const patDrop = document.getElementById('bmPatDrop');
+    bgDrop.classList.add('bm-panel-hidden');
+    patDrop.classList.add('bm-panel-hidden');
+    const wasHidden = drop.classList.contains('bm-panel-hidden');
+    drop.classList.toggle('bm-panel-hidden', !wasHidden);
+    if (wasHidden) { buildSizeDrop(); positionDrop(drop, e.currentTarget); }
+  });
+
+  // ── Gradient editor ──────────────────────────────────────────
+  function refreshGradPreview() {
+    const prev = document.getElementById('bmGradPreview');
+    if (prev) prev.style.background = gradientCss();
+    // Highlight active direction button
+    document.querySelectorAll('.bm-grad-dir').forEach(btn => {
+      btn.classList.toggle('bm-grad-dir-active', parseInt(btn.dataset.angle) === S.cfg.bgGradient.angle);
+    });
+    updateBgCircle();
+  }
+
+  function buildGradStops() {
+    const list = document.getElementById('bmGradStops');
+    if (!list) return;
+    list.innerHTML = S.cfg.bgGradient.stops.map((stop, i) => `
+      <div class="bm-grad-stop-row" data-si="${i}">
+        <input class="bm-color-swatch" type="color" value="${safeHex(stop.color)}" style="width:30px;height:26px;padding:1px;flex-shrink:0;">
+        <input class="bm-input bm-grad-stop-hex" value="${stop.color}" maxlength="7">
+        <input class="bm-input bm-grad-stop-pos" type="number" value="${stop.pos}" min="0" max="100">
+        <span class="bm-tool-hint" style="flex-shrink:0;">%</span>
+        <button class="bm-icon-btn bm-icon-btn-danger bm-grad-stop-remove" title="Remove" ${S.cfg.bgGradient.stops.length <= 2 ? 'disabled style="opacity:.3;"' : ''}>×</button>
+      </div>`).join('');
+
+    list.querySelectorAll('.bm-grad-stop-row').forEach(row => {
+      const i = parseInt(row.dataset.si);
+      const swatch = row.querySelector('input[type="color"]');
+      const hex    = row.querySelector('.bm-grad-stop-hex');
+      const pos    = row.querySelector('.bm-grad-stop-pos');
+      const rm     = row.querySelector('.bm-grad-stop-remove');
+
+      swatch.addEventListener('input', () => {
+        S.cfg.bgGradient.stops[i].color = swatch.value;
+        hex.value = swatch.value;
+        applyBg(); refreshGradPreview();
+      });
+      hex.addEventListener('input', () => {
+        if (/^#[0-9a-fA-F]{6}$/.test(hex.value)) {
+          S.cfg.bgGradient.stops[i].color = hex.value;
+          swatch.value = hex.value;
+          applyBg(); refreshGradPreview();
+        }
+      });
+      pos.addEventListener('input', () => {
+        S.cfg.bgGradient.stops[i].pos = Math.min(100, Math.max(0, parseInt(pos.value) || 0));
+        applyBg(); refreshGradPreview();
+      });
+      rm?.addEventListener('click', () => {
+        if (S.cfg.bgGradient.stops.length > 2) {
+          S.cfg.bgGradient.stops.splice(i, 1);
+          buildGradStops(); applyBg(); refreshGradPreview();
+        }
+      });
+    });
+  }
+
+  // Drop tab switching
+  document.querySelectorAll('.bm-drop-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.bm-drop-tab').forEach(t => t.classList.remove('bm-drop-tab-active'));
+      tab.classList.add('bm-drop-tab-active');
+      const which = tab.dataset.dtab;
+      document.getElementById('bmBgSolidPanel').style.display = which === 'solid' ? '' : 'none';
+      document.getElementById('bmBgGradPanel').style.display  = which === 'gradient' ? '' : 'none';
+      S.cfg.bgType = which;
+      applyBg(); updateBgCircle();
+      if (which === 'gradient') { buildGradStops(); buildGradPresets(); refreshGradPreview(); }
+    });
+  });
+
+  // Angle input
+  document.getElementById('bmGradAngle').addEventListener('input', (e) => {
+    S.cfg.bgGradient.angle = ((parseInt(e.target.value) || 0) + 360) % 360;
+    applyBg(); refreshGradPreview();
+  });
+
+  // ── Gradient presets ─────────────────────────────────────────
+  const GRAD_PRESETS = [
+    { name: 'Ember',      angle: 135, stops: [{ color: '#e35f5f', pos: 0 }, { color: '#0c0707', pos: 100 }] },
+    { name: 'Void',       angle: 180, stops: [{ color: '#1a0a2e', pos: 0 }, { color: '#080408', pos: 100 }] },
+    { name: 'Aurora',     angle: 135, stops: [{ color: '#7c3aed', pos: 0 }, { color: '#0891b2', pos: 100 }] },
+    { name: 'Crimson',    angle: 135, stops: [{ color: '#c0392b', pos: 0 }, { color: '#1a0a2e', pos: 100 }] },
+    { name: 'Galaxy',     angle: 135, stops: [{ color: '#4c1d95', pos: 0 }, { color: '#1e3a5f', pos: 60 }, { color: '#0f766e', pos: 100 }] },
+    { name: 'Sunset',     angle: 135, stops: [{ color: '#f97316', pos: 0 }, { color: '#e35f5f', pos: 50 }, { color: '#0c0707', pos: 100 }] },
+    { name: 'Neon',       angle: 135, stops: [{ color: '#ec4899', pos: 0 }, { color: '#7c3aed', pos: 100 }] },
+    { name: 'Ocean',      angle: 135, stops: [{ color: '#0f766e', pos: 0 }, { color: '#1e3a5f', pos: 100 }] },
+    { name: 'Matrix',     angle: 180, stops: [{ color: '#065f46', pos: 0 }, { color: '#080808', pos: 100 }] },
+    { name: 'Dusk',       angle: 135, stops: [{ color: '#a78bfa', pos: 0 }, { color: '#1e1b4b', pos: 100 }] },
+    { name: 'Steel',      angle: 180, stops: [{ color: '#334155', pos: 0 }, { color: '#0f172a', pos: 100 }] },
+    { name: 'Blood',      angle: 135, stops: [{ color: '#7f1d1d', pos: 0 }, { color: '#0c0707', pos: 50 }, { color: '#3b0a0a', pos: 100 }] },
+    { name: 'Copper',     angle: 135, stops: [{ color: '#c2410c', pos: 0 }, { color: '#1c0704', pos: 100 }] },
+    { name: 'Ice',        angle: 135, stops: [{ color: '#7dd3fc', pos: 0 }, { color: '#0c1a2e', pos: 100 }] },
+    { name: 'Mono',       angle: 180, stops: [{ color: '#e2e8f0', pos: 0 }, { color: '#080808', pos: 100 }] },
+    { name: 'Gold',       angle: 135, stops: [{ color: '#d97706', pos: 0 }, { color: '#1c0f00', pos: 100 }] },
+  ];
+
+  function buildGradPresets() {
+    const grid = document.getElementById('bmGradPresets');
+    if (!grid) return;
+    grid.innerHTML = GRAD_PRESETS.map((p, i) => {
+      const sorted = [...p.stops].sort((a, b) => a.pos - b.pos);
+      const css = `linear-gradient(${p.angle}deg,${sorted.map(s => `${s.color} ${s.pos}%`).join(',')})`;
+      return `<button class="bm-grad-preset" data-gpi="${i}" style="background:${css};" title="${p.name}">
+        <span class="bm-grad-preset-label">${p.name}</span>
+      </button>`;
+    }).join('');
+    grid.querySelectorAll('.bm-grad-preset').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = GRAD_PRESETS[+btn.dataset.gpi];
+        S.cfg.bgGradient = { angle: p.angle, stops: p.stops.map(s => ({ ...s })) };
+        const angEl = document.getElementById('bmGradAngle');
+        if (angEl) angEl.value = p.angle;
+        buildGradStops();
+        applyBg();
+        refreshGradPreview();
+        grid.querySelectorAll('.bm-grad-preset').forEach(b => b.classList.remove('bm-grad-preset-active'));
+        btn.classList.add('bm-grad-preset-active');
+      });
+    });
+  }
+
+  // Direction preset buttons
+  document.querySelectorAll('.bm-grad-dir').forEach(btn => {
+    btn.addEventListener('click', () => {
+      S.cfg.bgGradient.angle = parseInt(btn.dataset.angle);
+      const inp = document.getElementById('bmGradAngle');
+      if (inp) inp.value = S.cfg.bgGradient.angle;
+      applyBg(); refreshGradPreview();
+    });
+  });
+
+  // Add stop
+  document.getElementById('bmGradAddStop').addEventListener('click', () => {
+    const stops = S.cfg.bgGradient.stops;
+    const sorted = [...stops].sort((a, b) => a.pos - b.pos);
+    // Insert at midpoint between last two stops (or middle)
+    const lastPos = sorted.at(-1)?.pos ?? 100;
+    const prevPos = sorted.at(-2)?.pos ?? 0;
+    const newPos  = Math.round((prevPos + lastPos) / 2);
+    stops.push({ color: '#ffffff', pos: newPos });
+    buildGradStops(); applyBg(); refreshGradPreview();
+  });
+
+  // Distribute evenly
+  document.getElementById('bmGradDistribute').addEventListener('click', () => {
+    const n = S.cfg.bgGradient.stops.length;
+    S.cfg.bgGradient.stops.forEach((s, i) => { s.pos = Math.round((i / (n - 1)) * 100); });
+    buildGradStops(); applyBg(); refreshGradPreview();
+  });
+
+  // ── Toolbar bg/pattern dropdowns ─────────────────────────────
+  function positionDrop(dropEl, triggerEl) {
+    const caRect  = document.querySelector('.bm-canvas-area').getBoundingClientRect();
+    const btnRect = triggerEl.getBoundingClientRect();
+    let left = btnRect.left - caRect.left;
+    dropEl.style.top  = (btnRect.bottom - caRect.top + 4) + 'px';
+    dropEl.style.left = left + 'px';
+    // Clamp after paint so it doesn't overflow right
+    requestAnimationFrame(() => {
+      const dr = dropEl.getBoundingClientRect();
+      if (dr.right > caRect.right - 8)
+        dropEl.style.left = (caRect.right - caRect.left - dr.width - 8) + 'px';
+    });
+  }
+
+  document.getElementById('bmBgColorBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const drop    = document.getElementById('bmBgDrop');
+    const patDrop = document.getElementById('bmPatDrop');
+    patDrop.classList.add('bm-panel-hidden');
+    const wasHidden = drop.classList.contains('bm-panel-hidden');
+    drop.classList.toggle('bm-panel-hidden', !wasHidden);
+    if (wasHidden) {
+      positionDrop(drop, e.currentTarget);
+      // Sync active tab to current state
+      const isSolid = S.cfg.bgType !== 'gradient';
+      document.querySelectorAll('.bm-drop-tab').forEach(t => {
+        t.classList.toggle('bm-drop-tab-active', t.dataset.dtab === S.cfg.bgType);
+      });
+      document.getElementById('bmBgSolidPanel').style.display = isSolid ? '' : 'none';
+      document.getElementById('bmBgGradPanel').style.display  = isSolid ? 'none' : '';
+      if (!isSolid) { buildGradStops(); buildGradPresets(); refreshGradPreview(); }
+    }
+  });
+
+  document.getElementById('bmPatBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const drop   = document.getElementById('bmPatDrop');
+    const bgDrop = document.getElementById('bmBgDrop');
+    bgDrop.classList.add('bm-panel-hidden');
+    const wasHidden = drop.classList.contains('bm-panel-hidden');
+    drop.classList.toggle('bm-panel-hidden', !wasHidden);
+    if (wasHidden) positionDrop(drop, e.currentTarget);
+  });
+
+  // ── Multi-select props ───────────────────────────────────────
+  function buildMultiSelectPanel() {
+    document.getElementById('bmPropsTitle').textContent = `${S.selectedIds.size} selected`;
+    document.getElementById('bmPropsBody').innerHTML =
+      `<div class="bm-group" style="color:var(--foreground-muted);font-family:'JetBrains Mono',monospace;font-size:0.65rem;padding:8px 4px;">${S.selectedIds.size} elements selected<br><span style="opacity:0.5;font-size:0.58rem;">Shift+click to add/remove</span></div>`;
+  }
+
+  // ── Layers panel ─────────────────────────────────────────────
+  const EL_TYPE_ICONS = {
+    'text-heading': 'mdi:format-header-1',
+    'text-mono':    'mdi:format-text',
+    'text-label':   'mdi:label-outline',
+    'text-url':     'mdi:link-variant',
+    'bar-v':        'mdi:minus',
+    'bar-h':        'mdi:minus',
+    'ring':         'mdi:circle-outline',
+    'dot':          'mdi:circle',
+    'rect':         'mdi:rectangle-outline',
+    'code-block':   'mdi:code-braces',
+    'tagline':      'mdi:dots-horizontal',
+    'divider':      'mdi:ray-start-end',
+    'glow':         'mdi:flare',
+    'image':        'mdi:image-outline',
+    'line':         'mdi:minus',
+    'polygon':      'mdi:shape-outline',
+  };
+
+  let _layerDragId = null;
+
+  function refreshLayersPanel() {
+    const panel = document.getElementById('bmLayersPanel');
+    if (!panel || panel.classList.contains('bm-panel-hidden')) return;
+    const list = document.getElementById('bmLayersList');
+    if (!S.elements.length && !S.groups.length) {
+      list.innerHTML = '<div class="bm-layers-empty">No elements yet</div>';
+      return;
+    }
+
+    // Build a flat list of display rows
+    const displayRows = [];
+
+    // Ungrouped elements
+    S.elements.filter(e => !e.group).forEach(el => {
+      displayRows.push({ kind: 'element', el, sortZ: el.z || 0 });
+    });
+
+    // Groups (use max z of children as sort key)
+    S.groups.forEach(group => {
+      const members = S.elements.filter(e => e.group === group.id);
+      if (!members.length) return;
+      const sortZ = Math.max(...members.map(e => e.z || 0));
+      displayRows.push({ kind: 'group', group, members, sortZ });
+    });
+
+    // Sort front-to-back (highest z first)
+    displayRows.sort((a, b) => b.sortZ - a.sortZ);
+
+    list.innerHTML = displayRows.map(row => {
+      if (row.kind === 'group') {
+        const { group, members } = row;
+        const sel = members.some(m => S.selectedIds.has(m.id));
+        let html = `<div class="bm-layer-group-header${sel ? ' bm-layer-selected' : ''}" data-gid="${group.id}">
+          <span class="bm-layer-grip"><iconify-icon icon="mdi:drag-vertical" width="13" height="13"></iconify-icon></span>
+          <button class="bm-layer-collapse-btn" data-gid="${group.id}">${group.expanded ? '▾' : '▸'}</button>
+          <iconify-icon icon="mdi:folder-outline" width="13" height="13"></iconify-icon>
+          <span class="bm-layer-name">${esc(group.label)}</span>
+          <span class="bm-layer-count">${members.length}</span>
+        </div>`;
+        if (group.expanded) {
+          const sorted = [...members].sort((a, b) => (b.z||0) - (a.z||0));
+          html += sorted.map(el => {
+            const icon = EL_TYPE_ICONS[el.type] || 'mdi:shape-outline';
+            const elSel = S.selectedIds.has(el.id);
+            return `<div class="bm-layer-row bm-layer-child${elSel ? ' bm-layer-selected' : ''}" data-lid="${el.id}" draggable="true">
+              <span class="bm-layer-grip"><iconify-icon icon="mdi:drag-vertical" width="13" height="13"></iconify-icon></span>
+              <span class="bm-layer-icon"><iconify-icon icon="${icon}" width="13" height="13"></iconify-icon></span>
+              <span class="bm-layer-name">${EL_TYPES[el.type]?.label || el.type}</span>
+            </div>`;
+          }).join('');
+        }
+        return html;
+      } else {
+        const { el } = row;
+        const icon = EL_TYPE_ICONS[el.type] || 'mdi:shape-outline';
+        const sel = S.selectedIds.has(el.id);
+        return `<div class="bm-layer-row${sel ? ' bm-layer-selected' : ''}" data-lid="${el.id}" draggable="true">
+          <span class="bm-layer-grip"><iconify-icon icon="mdi:drag-vertical" width="13" height="13"></iconify-icon></span>
+          <span class="bm-layer-icon"><iconify-icon icon="${icon}" width="13" height="13"></iconify-icon></span>
+          <span class="bm-layer-name">${EL_TYPES[el.type]?.label || el.type}</span>
+        </div>`;
+      }
+    }).join('');
+
+    const clearIndicators = () => list.querySelectorAll('.bm-layer-drop-above, .bm-layer-drop-below')
+      .forEach(r => r.classList.remove('bm-layer-drop-above', 'bm-layer-drop-below'));
+
+    // Group header clicks (select group or toggle collapse)
+    list.querySelectorAll('.bm-layer-group-header').forEach(header => {
+      const gid = header.dataset.gid;
+      header.addEventListener('click', (e) => {
+        if (e.target.closest('.bm-layer-collapse-btn')) {
+          const group = S.groups.find(g => g.id === gid);
+          if (group) { group.expanded = !group.expanded; refreshLayersPanel(); }
+          return;
+        }
+        const members = S.elements.filter(e => e.group === gid);
+        S.selectedIds.forEach(sid => document.getElementById('bmel-'+sid)?.classList.remove('bm-selected'));
+        S.selectedIds.clear();
+        S.activeGroupId = gid;
+        S.primaryId = members[0]?.id || null;
+        members.forEach(e => {
+          S.selectedIds.add(e.id);
+          document.getElementById('bmel-'+e.id)?.classList.add('bm-selected');
+        });
+        document.getElementById('bmSidebarMain').classList.add('bm-panel-hidden');
+        document.getElementById('bmPropsPane').classList.remove('bm-panel-hidden');
+        removeHandles();
+        buildGroupPropsPanel(gid);
+        updateGroupSelBox();
+        refreshLayersPanel();
+      });
+    });
+
+    // Element row clicks + drag
+    list.querySelectorAll('.bm-layer-row').forEach(row => {
+      row.addEventListener('click', (e) => selectElement(row.dataset.lid, e.shiftKey));
+
+      row.addEventListener('dragstart', (e) => {
+        _layerDragId = row.dataset.lid;
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(() => row.classList.add('bm-layer-dragging'), 0);
+      });
+
+      row.addEventListener('dragend', () => {
+        row.classList.remove('bm-layer-dragging');
+        clearIndicators();
+        _layerDragId = null;
+      });
+
+      row.addEventListener('dragover', (e) => {
+        if (!_layerDragId || _layerDragId === row.dataset.lid) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        clearIndicators();
+        const mid = row.getBoundingClientRect().top + row.getBoundingClientRect().height / 2;
+        row.classList.add(e.clientY < mid ? 'bm-layer-drop-above' : 'bm-layer-drop-below');
+      });
+
+      row.addEventListener('dragleave', () => {
+        row.classList.remove('bm-layer-drop-above', 'bm-layer-drop-below');
+      });
+
+      row.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (!_layerDragId || _layerDragId === row.dataset.lid) return;
+        const insertAbove = row.classList.contains('bm-layer-drop-above');
+        clearIndicators();
+
+        const order = [...S.elements].sort((a, b) => (b.z || 0) - (a.z || 0));
+        const fromIdx = order.findIndex(el => el.id === _layerDragId);
+        const [dragged] = order.splice(fromIdx, 1);
+        const targetIdx = order.findIndex(el => el.id === row.dataset.lid);
+        order.splice(insertAbove ? targetIdx : targetIdx + 1, 0, dragged);
+
+        order.forEach((el, i) => {
+          el.z = order.length - i;
+          const dom = document.getElementById('bmel-' + el.id);
+          if (dom) dom.style.zIndex = el.z;
+        });
+
+        refreshLayersPanel();
+        scheduleSave();
+      });
+    });
+  }
+
+  function toggleLayersPanel() {
+    const panel = document.getElementById('bmLayersPanel');
+    const wasHidden = panel.classList.contains('bm-panel-hidden');
+    panel.classList.toggle('bm-panel-hidden', !wasHidden);
+    if (wasHidden) refreshLayersPanel();
+  }
+
+  document.getElementById('bmLayersBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleLayersPanel();
+  });
+  document.getElementById('bmLayersClose').addEventListener('click', () => {
+    document.getElementById('bmLayersPanel').classList.add('bm-panel-hidden');
+  });
+
+  // ── Templates ─────────────────────────────────────────────────
+  // ── Patterns ──────────────────────────────────────────────────
+  const PATTERNS = [
+    { id: 'none',      name: 'None' },
+    { id: 'grid',      name: 'Grid' },
+    { id: 'dots',      name: 'Dots' },
+    { id: 'lines-h',   name: 'H-Lines' },
+    { id: 'lines-v',   name: 'V-Lines' },
+    { id: 'diagonal',  name: 'Diagonal' },
+    { id: 'cross',     name: 'Cross' },
+    { id: 'checker',   name: 'Checker' },
+    { id: 'zigzag',    name: 'Zigzag' },
+  ];
+
+  let activePatId = 'none';
+
+  function isLightBg(hex) {
+    if (!/^#[0-9a-fA-F]{6}$/.test(hex)) return false;
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return (r*299 + g*587 + b*114) / 1000 > 128;
+  }
+
+  function getPatternCss(id, color, size) {
+    const h = size / 2;
+    switch (id) {
+      case 'grid':
+        return {
+          image: `linear-gradient(${color} 1px,transparent 1px),linear-gradient(90deg,${color} 1px,transparent 1px)`,
+          size:  `${size}px ${size}px,${size}px ${size}px`,
+        };
+      case 'dots':
+        return {
+          image: `radial-gradient(circle,${color} 1.5px,transparent 1.5px)`,
+          size:  `${size}px ${size}px`,
+        };
+      case 'lines-h':
+        return {
+          image: `linear-gradient(${color} 1px,transparent 1px)`,
+          size:  `100% ${size}px`,
+        };
+      case 'lines-v':
+        return {
+          image: `linear-gradient(90deg,${color} 1px,transparent 1px)`,
+          size:  `${size}px 100%`,
+        };
+      case 'diagonal':
+        return {
+          image: `repeating-linear-gradient(45deg,${color} 0,${color} 1px,transparent 0,transparent 50%)`,
+          size:  `${size}px ${size}px`,
+        };
+      case 'cross':
+        return {
+          image: `radial-gradient(circle,${color} 1.5px,transparent 1.5px),linear-gradient(${color} 1px,transparent 1px),linear-gradient(90deg,${color} 1px,transparent 1px)`,
+          size:  `${size*3}px ${size*3}px,${size*3}px ${size*3}px,${size*3}px ${size*3}px`,
+        };
+      case 'checker':
+        return {
+          image:    `linear-gradient(45deg,${color} 25%,transparent 25%),linear-gradient(-45deg,${color} 25%,transparent 25%),linear-gradient(45deg,transparent 75%,${color} 75%),linear-gradient(-45deg,transparent 75%,${color} 75%)`,
+          size:     `${size}px ${size}px,${size}px ${size}px,${size}px ${size}px,${size}px ${size}px`,
+          position: `0 0,0 ${h}px,${h}px -${h}px,-${h}px 0`,
+        };
+      case 'zigzag':
+        return {
+          image: `linear-gradient(135deg,${color} 25%,transparent 25%),linear-gradient(225deg,${color} 25%,transparent 25%),linear-gradient(315deg,${color} 25%,transparent 25%),linear-gradient(45deg,${color} 25%,transparent 25%)`,
+          size:  `${size}px ${size}px,${size}px ${size}px,${size}px ${size}px,${size}px ${size}px`,
+          position: `${h}px 0,${h}px 0,0 0,0 0`,
+        };
+      default:
+        return { image: 'none', size: '' };
+    }
+  }
+
+  function updateBgCircle() {
+    const circle = document.getElementById('bmBgCircle');
+    if (!circle) return;
+    const c = S.cfg;
+    if (c.bgType === 'gradient' && c.bgGradient.stops.length >= 2) {
+      const sorted = [...c.bgGradient.stops].sort((a, b) => a.pos - b.pos);
+      circle.style.background = `linear-gradient(to right, ${sorted.map(s => `${s.color} ${s.pos}%`).join(', ')})`;
+    } else {
+      circle.style.background = c.bg;
+    }
+  }
+
+  function gradientCss() {
+    const g = S.cfg.bgGradient;
+    const sorted = [...g.stops].sort((a, b) => a.pos - b.pos);
+    return `linear-gradient(${g.angle}deg, ${sorted.map(s => `${s.color} ${s.pos}%`).join(', ')})`;
+  }
+
+  function applyBg() {
+    const c = S.cfg;
+    const baseColor = c.bgType === 'gradient'
+      ? (c.bgGradient.stops[0]?.color || '#000')
+      : c.bg;
+    const hex = c.bgPatternColor || '#808080';
+    const pr = parseInt(hex.slice(1,3),16), pg = parseInt(hex.slice(3,5),16), pb = parseInt(hex.slice(5,7),16);
+    const patColor = `rgba(${pr},${pg},${pb},${c.bgPatternOpacity})`;
+    const pat = getPatternCss(c.bgPattern, patColor, c.bgPatternSize);
+
+    if (c.bgType === 'gradient') {
+      const grad = gradientCss();
+      banner.style.backgroundColor = baseColor;
+      if (pat.image === 'none') {
+        banner.style.backgroundImage    = grad;
+        banner.style.backgroundSize     = '100% 100%';
+        banner.style.backgroundPosition = '0 0';
+      } else {
+        banner.style.backgroundImage    = `${pat.image}, ${grad}`;
+        banner.style.backgroundSize     = `${pat.size}, 100% 100%`;
+        banner.style.backgroundPosition = `${pat.position || '0 0'}, 0 0`;
+      }
+    } else {
+      banner.style.backgroundColor = c.bg;
+      if (pat.image === 'none') {
+        banner.style.backgroundImage = 'none';
+        banner.style.backgroundSize = '';
+        banner.style.backgroundPosition = '';
+      } else {
+        banner.style.backgroundImage    = pat.image;
+        banner.style.backgroundSize     = pat.size;
+        banner.style.backgroundPosition = pat.position || '0 0';
+      }
+    }
+    scheduleSave();
+  }
+
+  function patSwatchStyle(id, previewSize) {
+    const bgColor = '#1c1c20';
+    const patColor = 'rgba(255,255,255,0.18)';
+    if (id === 'none') return `background:${bgColor};`;
+    const pat = getPatternCss(id, patColor, previewSize);
+    const pos = pat.position ? `background-position:${pat.position};` : '';
+    return `background-color:${bgColor};background-image:${pat.image};background-size:${pat.size};${pos}`;
+  }
+
+  function buildPatGrid() {
+    const grid = document.getElementById('bmPatGrid');
+    grid.innerHTML = PATTERNS.map(pat => `
+      <div class="bm-pat-item">
+        <button class="bm-pat-swatch${pat.id === activePatId ? ' bm-pat-active' : ''}" data-pat="${pat.id}" style="${patSwatchStyle(pat.id, 14)}" title="${pat.name}"></button>
+        <div class="bm-pat-label">${pat.name}</div>
+      </div>`).join('');
+
+    grid.querySelectorAll('.bm-pat-swatch').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activePatId = btn.dataset.pat;
+        S.cfg.bgPattern = activePatId;
+        applyBg();
+        grid.querySelectorAll('.bm-pat-swatch').forEach(b =>
+          b.classList.toggle('bm-pat-active', b.dataset.pat === activePatId));
+      });
+    });
+  }
+
+  // Pattern controls
+  function bindPatternControls() {
+    const opEl    = document.getElementById('ctrlPatOpacity');
+    const sizeEl  = document.getElementById('ctrlPatSize');
+    const colorEl = document.getElementById('ctrlPatColor');
+    const hexEl   = document.getElementById('ctrlPatColorHex');
+    if (opEl)    opEl.addEventListener('input',   () => { S.cfg.bgPatternOpacity = parseFloat(opEl.value) || 0.05; applyBg(); });
+    if (sizeEl)  sizeEl.addEventListener('input', () => { S.cfg.bgPatternSize    = parseInt(sizeEl.value) || 40;   applyBg(); });
+    if (colorEl) colorEl.addEventListener('input', () => { S.cfg.bgPatternColor = colorEl.value; if (hexEl) hexEl.value = colorEl.value; applyBg(); });
+    if (hexEl)   hexEl.addEventListener('input', () => {
+      const v = hexEl.value.trim();
+      if (/^#[0-9a-fA-F]{6}$/.test(v)) { S.cfg.bgPatternColor = v; if (colorEl) colorEl.value = v; applyBg(); }
+    });
+  }
+
+  // ── Templates ─────────────────────────────────────────────────
+  const TEMPLATES = [
+    { id: 'white',    name: 'White',    bg: '#ffffff' },
+    { id: 'snow',     name: 'Snow',     bg: '#f5f4f2' },
+    { id: 'chalk',    name: 'Chalk',    bg: '#efefec' },
+    { id: 'charcoal', name: 'Charcoal', bg: '#1a1a1a' },
+    { id: 'dark',     name: 'Dark',     bg: '#0c0c0e' },
+    { id: 'ink',      name: 'Ink',      bg: '#0c0707' },
+    { id: 'midnight', name: 'Midnight', bg: '#05080f' },
+    { id: 'navy',     name: 'Navy',     bg: '#04060f' },
+    { id: 'purple',   name: 'Purple',   bg: '#0a0510' },
+    { id: 'forest',   name: 'Forest',   bg: '#060e08' },
+    { id: 'warm',     name: 'Warm',     bg: '#100900' },
+    { id: 'rose',     name: 'Rose',     bg: '#120508' },
+  ];
+
+  let activeTplId = 'white';
+
+  function buildTplGrid() {
+    const grid = document.getElementById('bmTplGrid');
+    grid.innerHTML = TEMPLATES.map(tpl => `
+      <div class="bm-tpl-item">
+        <button class="bm-tpl-swatch${tpl.id === activeTplId ? ' bm-tpl-active' : ''}" data-tpl="${tpl.id}" style="background:${tpl.bg};" title="${tpl.name}"></button>
+        <div class="bm-tpl-label">${tpl.name}</div>
+      </div>`).join('');
+
+    grid.querySelectorAll('.bm-tpl-swatch').forEach(btn => {
+      btn.addEventListener('click', () => loadTemplate(TEMPLATES.find(t => t.id === btn.dataset.tpl)));
+    });
+  }
+
+  function loadTemplate(tpl) {
+    if (!tpl) return;
+    activeTplId = tpl.id;
+    S.cfg.bg = tpl.bg;
+    S.cfg.bgType = 'solid';
+    document.getElementById('bmBgSwatch').value = tpl.bg;
+    document.getElementById('bmBgHex').value    = tpl.bg;
+    // Switch dropdown to solid tab
+    document.querySelectorAll('.bm-drop-tab').forEach(t => t.classList.toggle('bm-drop-tab-active', t.dataset.dtab === 'solid'));
+    document.getElementById('bmBgSolidPanel').style.display = '';
+    document.getElementById('bmBgGradPanel').style.display  = 'none';
+    updateBgCircle();
+    applyBg();
+    document.querySelectorAll('.bm-tpl-swatch').forEach(b =>
+      b.classList.toggle('bm-tpl-active', b.dataset.tpl === activeTplId));
+  }
+
+  // ── Init ──────────────────────────────────────────────────────
+  document.body.classList.add('bm-page');
+  window.__bmCleanup = () => {
+    saveNow();
+    document.body.classList.remove('bm-page');
+    window.__bmCleanup = null;
+  };
+
+  // Save on actual page unload (F5, tab close)
+  window.addEventListener('beforeunload', saveNow);
+
+  // Restore autosaved state
+  try {
+    const saved = localStorage.getItem(BM_LS_KEY);
+    if (saved) {
+      const data = JSON.parse(saved);
+      if (data.cfg) Object.assign(S.cfg, data.cfg);
+      if (data.pos) Object.assign(S.pos, data.pos);
+      if (data.elements) {
+        S.elements = data.elements;
+        S.elements.forEach(el => banner.appendChild(createDynElDom(el)));
+      }
+      if (data.groups) S.groups = data.groups;
+      syncInputsToState();
+      // Restore canvas size if saved
+      if (S.cfg.canvasW && S.cfg.canvasH) {
+        banner.style.width  = S.cfg.canvasW + 'px';
+        banner.style.height = S.cfg.canvasH + 'px';
+        document.querySelector('.bm-sidebar-sub').textContent = `${S.cfg.canvasW} × ${S.cfg.canvasH}`;
+        document.getElementById('bmSizeLabel').textContent = `${S.cfg.canvasW} × ${S.cfg.canvasH}`;
+      }
+    }
+  } catch {}
+
+  buildTplGrid();
+  buildPatGrid();
+  bindPatternControls();
+  renderAll();
+  updateBgCircle();
+  document.documentElement.style.setProperty('--bm-inv-zoom', (1 / S.zoom).toFixed(4));
+  requestAnimationFrame(centerBanner);
+  histSnapshot(); // seed undo history with initial state
+}());
+</script>

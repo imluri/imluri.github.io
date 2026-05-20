@@ -14,6 +14,7 @@ const ROUTES = {
   '/projects': '/pages/projects.html',
   '/project':  '/pages/project.html',
   '/iyai':     '/pages/iyai.html',
+  '/designer': '/pages/designer.html',
 };
 
 // Cache fetched fragments so we don't re-fetch on back/forward
@@ -74,6 +75,7 @@ function initPage() {
 async function swapContent(html) {
   if (typeof stopShowcaseAnimations === 'function') stopShowcaseAnimations();
   if (typeof window.__ibCleanup === 'function') window.__ibCleanup();
+  if (typeof window.__bmCleanup === 'function') window.__bmCleanup();
   document.body.classList.remove('ib-page');
   app.classList.add('page-exit');
   await new Promise(r => setTimeout(r, 180));
@@ -214,6 +216,7 @@ async function navigate(pathname, pushState = true) {
     '/':         'imluri',
     '/projects': 'Projects | imluri',
     '/iyai':     'IYAI Bridge | imluri',
+    '/designer': 'Designer | imluri',
   };
   if (pathname.startsWith('/project/')) {
     const slug = pathname.replace('/project/', '');

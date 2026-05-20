@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Discord Banner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      min-height: 100vh;
+      font-family: monospace;
+    }
+
+    .hint { font-size: 10px; color: rgba(255,255,255,0.25); letter-spacing: 0.08em; }
+
+    /* ── 960×480 banner ── */
+    .banner {
+      width: 960px;
+      height: 480px;
+      background: #0c0707;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* Glows */
+    .banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 50% 90% at 0% 55%, rgba(227,95,95,0.2) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 60% at 50% 40%, rgba(227,95,95,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 45% at 98% 80%, rgba(227,95,95,0.07) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    /* Grid */
+    .grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    /* Noise */
+    .noise {
+      position: absolute;
+      inset: 0;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* Decorative rings — far left, avatar will overlap these, looks intentional */
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(227,95,95,0.1);
+      pointer-events: none;
+    }
+
+    /* Vertical accent line — placed right of avatar zone */
+    .accent-bar {
+      position: absolute;
+      left: 188px;
+      top: 42%;
+      transform: translateY(-50%);
+      width: 2px;
+      height: 140px;
+      background: linear-gradient(to bottom, transparent, #e35f5f 40%, #e35f5f 60%, transparent);
+      border-radius: 9999px;
+      opacity: 0.65;
+    }
+
+    /* Content — starts at 212px, safe from avatar */
+    .content {
+      position: absolute;
+      left: 212px;
+      top: 42%;
+      transform: translateY(-50%);
+    }
+
+    .label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: #e35f5f;
+      margin-bottom: 14px;
+      opacity: 0.75;
+    }
+
+    .name {
+      font-family: 'Syne', sans-serif;
+      font-size: 88px;
+      font-weight: 800;
+      line-height: 0.88;
+      letter-spacing: -0.03em;
+      color: #E9EBF0;
+      margin-bottom: 24px;
+    }
+
+    .name span { color: #e35f5f; }
+
+    .tagline {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: rgba(233,235,240,0.38);
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dot {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: #e35f5f;
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+
+    /* Code block — right side */
+    .code-block {
+      position: absolute;
+      right: 56px;
+      top: 50%;
+      transform: translateY(-60%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 2;
+      user-select: none;
+      white-space: pre;
+    }
+
+    .c-dim     { color: rgba(255,255,255,0.09); }
+    .c-accent  { color: rgba(227,95,95,0.38); }
+    .c-string  { color: rgba(220,175,95,0.26); }
+    .c-keyword { color: rgba(175,130,255,0.20); }
+
+    /* Bottom-right url */
+    .url {
+      position: absolute;
+      bottom: 28px;
+      right: 56px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: rgba(227,95,95,0.45);
+    }
+
+    /* Avatar zone guide — DELETE before screenshotting */
+    .avatar-guide {
+      position: absolute;
+      left: 0; bottom: 0;
+      width: 188px;
+      height: 188px;
+      border-right: 1px dashed rgba(255,220,0,0.2);
+      border-top: 1px dashed rgba(255,220,0,0.2);
+      pointer-events: none;
+    }
+    .avatar-guide::after {
+      content: 'avatar';
+      position: absolute;
+      bottom: 8px; left: 8px;
+      font-size: 9px;
+      font-family: monospace;
+      color: rgba(255,220,0,0.25);
+      letter-spacing: 0.08em;
+    }
+  </style>
+</head>
+<body>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <p class="hint">960 × 480</p>
+    <button id="exportBtn" onclick="exportBanner()" style="
+      font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.1em;
+      text-transform:uppercase;padding:8px 20px;border-radius:9999px;cursor:pointer;
+      background:#e35f5f;border:none;color:#fff;transition:opacity 0.15s;
+    " onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+      Export PNG
+    </button>
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+      <input type="checkbox" id="showGuide" checked onchange="document.querySelector('.avatar-guide').style.display=this.checked?'block':'none'" style="accent-color:#e35f5f;">
+      <span class="hint">avatar guide</span>
+    </label>
+  </div>
+
+  <div class="banner">
+    <div class="grid"></div>
+    <div class="noise"></div>
+
+    <!-- Rings on left — avatar overlaps these, looks fine -->
+    <div class="ring" style="width:340px;height:340px;left:-120px;top:-80px;"></div>
+    <div class="ring" style="width:200px;height:200px;left:-40px;bottom:-70px;border-color:rgba(227,95,95,0.07);"></div>
+    <div class="ring" style="width:90px;height:90px;left:110px;top:70px;border-color:rgba(227,95,95,0.08);"></div>
+
+    <!-- Avatar guide (remove before screenshot) -->
+    <div class="avatar-guide"></div>
+
+    <!-- Accent bar -->
+    <div class="accent-bar"></div>
+
+    <!-- Main content -->
+    <div class="content">
+      <div class="label">// developer &amp; builder</div>
+      <div class="name">iml<span>uri</span></div>
+      <div class="tagline">
+        <span class="dot"></span>
+        builder · modder · developer · designer
+      </div>
+    </div>
+
+    <!-- Code block -->
+    <div class="code-block"><span class="c-keyword">const</span> <span class="c-accent">imluri</span> <span class="c-dim">= {</span>
+  <span class="c-dim">role:</span>    <span class="c-string">"builder"</span><span class="c-dim">,</span>
+  <span class="c-dim">stack:</span>   <span class="c-string">["C#", "JS", "Python"]</span><span class="c-dim">,</span>
+  <span class="c-dim">ships:</span>   <span class="c-accent">true</span><span class="c-dim">,</span>
+  <span class="c-dim">sleeps:</span>  <span class="c-accent">false</span><span class="c-dim">,</span>
+<span class="c-dim">};</span></div>
+
+    <!-- URL bottom right -->
+    <div class="url">imluri.github.io</div>
+  </div>
+
+  <p class="hint">exported PNG is 960 × 480</p>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script>
+    async function exportBanner() {
+      const btn = document.getElementById('exportBtn');
+      const guide = document.querySelector('.avatar-guide');
+      const wasVisible = guide.style.display !== 'none';
+
+      btn.textContent = 'Exporting…';
+      btn.disabled = true;
+      guide.style.display = 'none';
+
+      try {
+        const canvas = await html2canvas(document.querySelector('.banner'), {
+          width: 960,
+          height: 480,
+          scale: 1,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#0c0707',
+        });
+
+        const link = document.createElement('a');
+        link.download = 'imluri-banner.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } finally {
+        if (wasVisible) guide.style.display = 'block';
+        btn.textContent = 'Export PNG';
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

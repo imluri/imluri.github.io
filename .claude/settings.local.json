@@ -38,7 +38,9 @@
       "PowerShell($response = Invoke-WebRequest -Uri \"https://gfxcomet.com/\" -UseBasicParsing; $response.Content | Select-String -Pattern '<nav|<header|<div class=\"nav|<div class=\"header' -Context 2 | Select-Object -First 100)",
       "Bash(ls \"C:\\\\Users\\\\luri\\\\Downloads\\\\Vanilla 3 for Roblox Studio v544\\\\Colourful\\\\Dark\\\\RobloxCustom\\\\instance\\\\16x\\\\200\" | head -60)",
       "Read(//c/Users/luri/Downloads/Vanilla 3 for Roblox Studio v544/Colourful/Dark/RobloxCustom/instance/16x/200/**)",
-      "Bash(Sort-Object FullName)"
+      "Bash(Sort-Object FullName)",
+      "Bash(py \"C:\\\\Users\\\\luri\\\\.claude\\\\plugins\\\\cache\\\\ui-ux-pro-max-skill\\\\ui-ux-pro-max\\\\2.5.0\\\\src\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"creative tool banner dark gradient\" --domain color -n 5)",
+      "Bash(del \"c:\\\\Users\\\\luri\\\\Documents\\\\Programming\\\\imluri.github.io\\\\pages\\\\banner.html\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\luri\\Downloads\\lurimous.github.io-main\\assets"
