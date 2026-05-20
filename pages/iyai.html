@@ -1,4 +1,4 @@
-<section class="iyai-bridge-page">
+﻿<section class="iyai-bridge-page">
 
   <!-- Top bar -->
   <div class="ib-topbar">
@@ -39,14 +39,17 @@
         <iconify-icon icon="mdi:puzzle-outline" width="14" height="14"></iconify-icon>
       </button>
       <div class="ib-toggle-sep"></div>
-      <button class="ib-toggle-btn ib-preset-btn" id="ibPresetWide"   onclick="ibApplyPreset('wide')"    title="Wide layout">
-        <iconify-icon icon="mdi:view-split-vertical" width="14" height="14"></iconify-icon>
+      <button class="ib-toggle-btn ib-preset-btn" id="ibPresetWide"   onclick="ibApplyPreset('wide')"    title="Studio — Explorer · Chat · Properties + Output &amp; History below">
+        <iconify-icon icon="mdi:view-split-vertical" width="13" height="13"></iconify-icon>
+        <span class="ib-preset-label">Studio</span>
       </button>
-      <button class="ib-toggle-btn ib-preset-btn" id="ibPresetMedium" onclick="ibApplyPreset('medium')"  title="Medium layout">
-        <iconify-icon icon="mdi:view-agenda-outline" width="14" height="14"></iconify-icon>
+      <button class="ib-toggle-btn ib-preset-btn" id="ibPresetMedium" onclick="ibApplyPreset('medium')"  title="Developer — Explorer · Code &amp; Output · Chat &amp; Properties">
+        <iconify-icon icon="mdi:code-braces" width="13" height="13"></iconify-icon>
+        <span class="ib-preset-label">Developer</span>
       </button>
-      <button class="ib-toggle-btn ib-preset-btn" id="ibPresetCompact" onclick="ibApplyPreset('compact')" title="Compact layout">
-        <iconify-icon icon="mdi:dock-window" width="14" height="14"></iconify-icon>
+      <button class="ib-toggle-btn ib-preset-btn" id="ibPresetCompact" onclick="ibApplyPreset('compact')" title="Chat — History &amp; Skills sidebar + full-width Chat">
+        <iconify-icon icon="mdi:message-outline" width="13" height="13"></iconify-icon>
+        <span class="ib-preset-label">Chat</span>
       </button>
     </div>
   </div>
@@ -132,10 +135,12 @@
         <iconify-icon icon="mdi:history" width="12" height="12"></iconify-icon>
         <span>History</span>
       </div>
-      <div class="ib-win-body" id="ibHistoryList" style="overflow-y:auto">
-        <div class="ib-empty-state">
-          <iconify-icon icon="mdi:history" width="22" height="22"></iconify-icon>
-          <span>No conversations yet</span>
+      <div class="ib-win-body">
+        <div id="ibHistoryList" style="flex:1;overflow-y:auto;display:flex;flex-direction:column">
+          <div class="ib-empty-state">
+            <iconify-icon icon="mdi:history" width="22" height="22"></iconify-icon>
+            <span>No conversations yet</span>
+          </div>
         </div>
       </div>
     </div>
@@ -146,10 +151,12 @@
         <iconify-icon icon="mdi:tools" width="12" height="12"></iconify-icon>
         <span>Tools</span>
       </div>
-      <div class="ib-win-body" id="ibToolsList" style="overflow-y:auto">
-        <div class="ib-empty-state">
-          <iconify-icon icon="mdi:connection" width="22" height="22"></iconify-icon>
-          <span>Connect to load tools</span>
+      <div class="ib-win-body">
+        <div id="ibToolsList" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;padding:6px">
+          <div class="ib-empty-state">
+            <iconify-icon icon="mdi:connection" width="22" height="22"></iconify-icon>
+            <span>Connect to load tools</span>
+          </div>
         </div>
       </div>
     </div>
@@ -164,9 +171,11 @@
         </button>
       </div>
       <div class="ib-win-body ib-code-body" id="ibCodeBody">
-        <div class="ib-empty-state" id="ibCodeEmpty">
-          <iconify-icon icon="mdi:code-braces" width="22" height="22"></iconify-icon>
-          <span>Connect to load code</span>
+        <div id="ibCodeEmpty" style="flex:1;display:flex;flex-direction:column">
+          <div class="ib-empty-state">
+            <iconify-icon icon="mdi:code-braces" width="22" height="22"></iconify-icon>
+            <span>Connect to load code</span>
+          </div>
         </div>
         <div class="ib-code-editor-wrap" id="ibCodeEditorWrap" style="display:none;flex:1;flex-direction:column;min-height:0">
           <div class="ib-code-tabs" id="ibCodeTabs"></div>
@@ -182,10 +191,12 @@
         <iconify-icon icon="mdi:puzzle-outline" width="12" height="12"></iconify-icon>
         <span>Skills</span>
       </div>
-      <div class="ib-win-body" id="ibSkillsList" style="overflow-y:auto">
-        <div class="ib-empty-state">
-          <iconify-icon icon="mdi:connection" width="22" height="22"></iconify-icon>
-          <span>Connect to load skills</span>
+      <div class="ib-win-body">
+        <div id="ibSkillsList" style="flex:1;overflow-y:auto;display:flex;flex-direction:column">
+          <div class="ib-empty-state">
+            <iconify-icon icon="mdi:connection" width="22" height="22"></iconify-icon>
+            <span>Connect to load skills</span>
+          </div>
         </div>
       </div>
     </div>
@@ -345,13 +356,22 @@ let ibConnected   = false;
 let ibConnecting  = false;
 let ibEventSource = null;
 let ibBaseUrl     = 'http://localhost:7402';
-let ibTopZ        = 10;
 let ibCurrentHistory = [];
 let ibSettings = { host: 'OpenRouter', model: '', apiKey: '' };
 const IB_HOSTS = ['OpenRouter', 'Groq', 'Mistral', 'Pollinations', 'HuggingFace', 'Google AI Studio', 'Ollama'];
 
-const SNAP_GRID = 8;
-const SNAP_EDGE = 14;
+// Per-window position/visibility state
+const ibWinState = new Map([
+  ['ibWinExplorer', { visible:false, x:0, y:0, w:280, h:400, z:1 }],
+  ['ibWinChat',     { visible:false, x:0, y:0, w:480, h:520, z:2 }],
+  ['ibWinProps',    { visible:false, x:0, y:0, w:280, h:400, z:3 }],
+  ['ibWinOutput',   { visible:false, x:0, y:0, w:420, h:200, z:4 }],
+  ['ibWinHistory',  { visible:false, x:0, y:0, w:280, h:320, z:5 }],
+  ['ibWinTools',    { visible:false, x:0, y:0, w:280, h:320, z:6 }],
+  ['ibWinCode',     { visible:false, x:0, y:0, w:420, h:420, z:7 }],
+  ['ibWinSkills',   { visible:false, x:0, y:0, w:280, h:320, z:8 }],
+]);
+let ibWinTopZ = 10;
 
 
 // ── Log ───────────────────────────────────────────────────────
@@ -807,65 +827,32 @@ function ibShowProps(cls, data) {
   el.innerHTML = header + `<table class="ib-props-table">${rows}</table>`;
 }
 
-// ══════════════════════════════════════════════════════════════
-//  GoldenLayout-style Dock Engine
-//  Layout tree: { type:'leaf', panelId } | { type:'split', dir:'h'|'v', sizes:[], children:[] }
-//  Panels are DOM nodes moved between .ib-leaf-slot containers.
-//  During drag the panel floats fixed; on drop it is re-docked.
-// ══════════════════════════════════════════════════════════════
+// ══ WINDOW MANAGEMENT ═════════════════════════════════════════
 
-// ── Layout presets (all 4 panels always visible) ───────────────
-const IB_PRESETS = {
-  // Studio ≥1200px — Explorer | Chat | Properties top, Output bottom
-  wide: {
-    type: 'split', dir: 'v', sizes: [0.72, 0.28],
-    children: [
-      {
-        type: 'split', dir: 'h', sizes: [0.18, 0.64, 0.18],
-        children: [
-          { type: 'leaf', panelId: 'ibWinExplorer' },
-          { type: 'leaf', panelId: 'ibWinChat'     },
-          { type: 'leaf', panelId: 'ibWinProps'    },
-        ],
-      },
-      { type: 'leaf', panelId: 'ibWinOutput' },
-    ],
-  },
-  // Medium 768–1199px — left col: Explorer over Properties | right col: Chat over Output
-  medium: {
-    type: 'split', dir: 'h', sizes: [0.22, 0.78],
-    children: [
-      {
-        type: 'split', dir: 'v', sizes: [0.55, 0.45],
-        children: [
-          { type: 'leaf', panelId: 'ibWinExplorer' },
-          { type: 'leaf', panelId: 'ibWinProps'    },
-        ],
-      },
-      {
-        type: 'split', dir: 'v', sizes: [0.72, 0.28],
-        children: [
-          { type: 'leaf', panelId: 'ibWinChat'   },
-          { type: 'leaf', panelId: 'ibWinOutput' },
-        ],
-      },
-    ],
-  },
-  // Compact <768px — Chat top, Explorer | Properties | Output across the bottom
-  compact: {
-    type: 'split', dir: 'v', sizes: [0.62, 0.38],
-    children: [
-      { type: 'leaf', panelId: 'ibWinChat' },
-      {
-        type: 'split', dir: 'h', sizes: [0.3, 0.4, 0.3],
-        children: [
-          { type: 'leaf', panelId: 'ibWinExplorer' },
-          { type: 'leaf', panelId: 'ibWinOutput'   },
-          { type: 'leaf', panelId: 'ibWinProps'    },
-        ],
-      },
-    ],
-  },
+// Preset layout definitions — fractional positions within the workspace
+const IB_PRESET_DEFS = {
+  // Studio — mirrors Roblox Studio
+  wide: [
+    { id: 'ibWinExplorer', x:0,    y:0,    w:0.20, h:0.68 },
+    { id: 'ibWinChat',     x:0.20, y:0,    w:0.54, h:0.68 },
+    { id: 'ibWinProps',    x:0.74, y:0,    w:0.26, h:0.68 },
+    { id: 'ibWinOutput',   x:0,    y:0.68, w:0.62, h:0.32 },
+    { id: 'ibWinHistory',  x:0.62, y:0.68, w:0.38, h:0.32 },
+  ],
+  // Developer — code-first
+  medium: [
+    { id: 'ibWinExplorer', x:0,    y:0,    w:0.18, h:1.00 },
+    { id: 'ibWinCode',     x:0.18, y:0,    w:0.44, h:0.62 },
+    { id: 'ibWinOutput',   x:0.18, y:0.62, w:0.44, h:0.38 },
+    { id: 'ibWinChat',     x:0.62, y:0,    w:0.38, h:0.68 },
+    { id: 'ibWinProps',    x:0.62, y:0.68, w:0.38, h:0.32 },
+  ],
+  // Chat — conversation-first
+  compact: [
+    { id: 'ibWinHistory',  x:0,    y:0,    w:0.22, h:0.52 },
+    { id: 'ibWinSkills',   x:0,    y:0.52, w:0.22, h:0.48 },
+    { id: 'ibWinChat',     x:0.22, y:0,    w:0.78, h:1.00 },
+  ],
 };
 
 function ibPickPreset() {
@@ -875,556 +862,210 @@ function ibPickPreset() {
   return 'compact';
 }
 
-// Deep-clone a preset so mutations don't corrupt the originals
-function ibCloneLayout(node) {
-  if (node.type === 'leaf') return { type: 'leaf', panelId: node.panelId };
-  return {
-    type: node.type, dir: node.dir,
-    sizes: [...node.sizes],
-    children: node.children.map(ibCloneLayout),
-  };
-}
+// ── Apply window state to DOM ──────────────────────────────────
 
-// ── Layout tree (auto-selected from preset on load) ────────────
-let ibLayout = ibCloneLayout(IB_PRESETS[ibPickPreset()]);
-
-// ── Drag state ────────────────────────────────────────────────
-let ibDragPanelId    = null;   // id of panel being dragged
-let ibDragOffX       = 0, ibDragOffY = 0;
-let ibDragActive     = false;
-let ibCurrentSlot    = null;   // .ib-leaf-slot the cursor is over
-let ibHoveredZone    = null;   // 'n'|'s'|'e'|'w'|'c' within slot compass
-let ibHoveredEdge    = null;   // 'n'|'s'|'e'|'w' workspace-edge zone
-let ibNearResizer    = null;   // resizer DOM element when cursor is close to one
-const EDGE_T         = 50;     // px from workspace edge to trigger edge zone
-const RESIZER_T      = 20;     // px from a resizer to trigger insert-between
-
-// ══ TREE HELPERS ══════════════════════════════════════════════
-
-function ibFindLeaf(node, panelId, parent, idx) {
-  if (node.type === 'leaf') return node.panelId === panelId ? { node, parent, idx } : null;
-  for (let i = 0; i < node.children.length; i++) {
-    const r = ibFindLeaf(node.children[i], panelId, node, i);
-    if (r) return r;
-  }
-  return null;
-}
-
-// Remove panel from tree; collapse single-child splits in-place
-function ibRemoveFromTree(panelId) {
-  const f = ibFindLeaf(ibLayout, panelId, null, -1);
-  if (!f || !f.parent) return;
-  const { parent, idx } = f;
-  parent.children.splice(idx, 1);
-  parent.sizes.splice(idx, 1);
-  // Renormalize sizes
-  const tot = parent.sizes.reduce((a, b) => a + b, 0) || 1;
-  parent.sizes = parent.sizes.map(s => s / tot);
-  // Collapse if only one child remains
-  if (parent.children.length === 1) {
-    const only = parent.children[0];
-    Object.keys(parent).forEach(k => delete parent[k]);
-    Object.assign(parent, only);
-  }
-}
-
-// Insert dragged panel adjacent to target at compass zone
-function ibInsertPanel(draggedId, targetId, zone) {
-  if (draggedId === targetId) return;
-  const newLeaf = { type: 'leaf', panelId: draggedId };
-  const f = ibFindLeaf(ibLayout, targetId, null, -1);
-  if (!f) return;
-  const { node: target, parent, idx } = f;
-
-  const dir   = (zone === 'n' || zone === 's') ? 'v' : 'h';
-  const first = (zone === 'n' || zone === 'w');
-  const split = {
-    type: 'split', dir, sizes: [0.5, 0.5],
-    children: first ? [newLeaf, { type: 'leaf', panelId: targetId }]
-                    : [{ type: 'leaf', panelId: targetId }, newLeaf],
-  };
-  if (!parent) { ibLayout = split; }
-  else         { parent.children[idx] = split; }
-}
-
-// Insert panel at workspace edge (wraps entire current layout)
-function ibInsertAtEdge(draggedId, edge) {
-  const newLeaf = { type: 'leaf', panelId: draggedId };
-  const dir     = (edge === 'n' || edge === 's') ? 'v' : 'h';
-  const first   = (edge === 'n' || edge === 'w');
-  const oldRoot = ibLayout;
-  ibLayout = {
-    type: 'split', dir, sizes: first ? [0.28, 0.72] : [0.72, 0.28],
-    children: first ? [newLeaf, oldRoot] : [oldRoot, newLeaf],
-  };
-}
-
-// ══ RENDER ════════════════════════════════════════════════════
-
-function ibRenderNode(node) {
-  if (node.type === 'leaf') {
-    const slot = document.createElement('div');
-    slot.className = 'ib-leaf-slot';
-    slot.dataset.panelId = node.panelId;
-    const panel = document.getElementById(node.panelId);
-    // Don't touch the panel currently floating in a drag
-    if (panel && panel.id !== ibDragPanelId) {
-      panel.style.cssText = '';
-      slot.appendChild(panel);
-    }
-    return slot;
-  }
-  const el = document.createElement('div');
-  el.className = `ib-split ib-split-${node.dir}`;
-  el._ibNode = node;
-  node.children.forEach((child, i) => {
-    if (i > 0) {
-      const r = document.createElement('div');
-      r.className = `ib-resizer ib-resizer-${node.dir}`;
-      r.dataset.splitIdx = String(i); // index of the child AFTER this resizer
-      el.appendChild(r);
-    }
-    const childEl = ibRenderNode(child);
-    childEl.style.flex      = String(node.sizes ? node.sizes[i] : 1);
-    childEl.style.minWidth  = '0';
-    childEl.style.minHeight = '0';
-    el.appendChild(childEl);
-  });
-  return el;
-}
-
-function ibRenderLayout() {
+function ibApplyWinState() {
   const main = document.getElementById('ibMain');
   if (!main) return;
-  // Move all known panels to body temporarily (preserves DOM state)
-  const ALL_PANEL_IDS = ['ibWinExplorer', 'ibWinChat', 'ibWinProps', 'ibWinOutput', 'ibWinHistory', 'ibWinTools', 'ibWinCode', 'ibWinSkills'];
-  ALL_PANEL_IDS.forEach(id => {
-    const w = document.getElementById(id);
-    if (w && w.id !== ibDragPanelId) {
-      w.style.display = '';
-      document.body.appendChild(w);
-    }
+  ibWinState.forEach((st, id) => {
+    const panel = document.getElementById(id);
+    if (!panel) return;
+    if (!st.visible) { panel.style.display = 'none'; return; }
+    if (panel.parentElement !== main) main.appendChild(panel);
+    Object.assign(panel.style, {
+      display:  'flex',
+      position: 'absolute',
+      left:     st.x + 'px',
+      top:      st.y + 'px',
+      width:    st.w + 'px',
+      height:   st.h + 'px',
+      zIndex:   String(st.z),
+    });
+    ibBindDrag(panel);
+    ibAddResizeHandles(panel);
+    ibBindFrontOnClick(panel);
+    requestAnimationFrame(() => {
+      panel.querySelectorAll('iconify-icon').forEach(el => {
+        const icon = el.getAttribute('icon');
+        if (icon) { el.removeAttribute('icon'); el.setAttribute('icon', icon); }
+      });
+    });
   });
-  main.innerHTML = '';
-  const root = ibRenderNode(ibLayout);
-  root.style.flex      = '1';
-  root.style.minHeight = '0';
-  root.style.minWidth  = '0';
-  main.appendChild(root);
-  ibBindResizers(main);
-  // Re-attach header listeners on newly rendered panels
-  main.querySelectorAll('.ib-leaf-slot > .ib-window').forEach(ibBindHeader);
-  // Hide panels not placed in the layout tree (orphaned in body)
-  ALL_PANEL_IDS.forEach(id => {
-    const w = document.getElementById(id);
-    if (w && w.parentElement === document.body && w.id !== ibDragPanelId) {
-      w.style.display = 'none';
-    }
-  });
-
   ibUpdateToggleStates();
 }
 
 function ibUpdateToggleStates() {
   document.querySelectorAll('.ib-toggle-btn[data-panel]').forEach(btn => {
-    const inTree = !!ibFindLeaf(ibLayout, btn.dataset.panel, null, -1);
-    btn.classList.toggle('ib-toggle-active', inTree);
+    const st = ibWinState.get(btn.dataset.panel);
+    btn.classList.toggle('ib-toggle-active', !!(st?.visible));
   });
 }
 
-// ══ DOCK TARGET COMPASS ═══════════════════════════════════════
+// ── Drag (move by title bar) ───────────────────────────────────
 
-function ibShowDockTargets(slot) {
-  if (slot === ibCurrentSlot) return;
-  ibHideDockTargets();
-  ibCurrentSlot = slot;
-
-  const overlay = document.createElement('div');
-  overlay.id = 'ibDockOverlay';
-  overlay.className = 'ib-dock-overlay';
-
-  const compass = document.createElement('div');
-  compass.className = 'ib-dock-compass';
-
-  ['n', 'w', 'c', 'e', 's'].forEach(z => {
-    const btn = document.createElement('div');
-    btn.className = `ib-dock-zone ib-dock-${z}`;
-    btn.dataset.zone = z;
-    // Show drop-ghost preview on hover of each compass arrow
-    btn.addEventListener('mouseenter', () => {
-      ibHoveredZone = z;
-      ibShowDropGhost(slot, z);
-    });
-    btn.addEventListener('mouseleave', () => {
-      ibHoveredZone = null;
-      document.getElementById('ibDropGhost')?.remove();
-    });
-    compass.appendChild(btn);
-  });
-
-  overlay.appendChild(compass);
-  slot.appendChild(overlay);
-}
-
-function ibHideDockTargets() {
-  document.getElementById('ibDockOverlay')?.remove();
-  document.getElementById('ibDropGhost')?.remove();
-  ibCurrentSlot = null;
-  ibHoveredZone = null;
-}
-
-// Semi-transparent preview of exactly where the panel will land
-function ibShowDropGhost(slot, zone) {
-  document.getElementById('ibDropGhost')?.remove();
-  const g = document.createElement('div');
-  g.id = 'ibDropGhost';
-  g.className = `ib-drop-ghost ib-drop-${zone}`;
-  slot.appendChild(g);
-}
-
-// Workspace-edge zone preview (wraps full layout)
-function ibShowEdgeGhost(edge) {
-  document.getElementById('ibEdgeGhost')?.remove();
-  const g = document.createElement('div');
-  g.id = 'ibEdgeGhost';
-  g.className = `ib-edge-ghost ib-edge-ghost-${edge}`;
-  document.getElementById('ibMain').appendChild(g);
-}
-
-// Find the nearest resizer within RESIZER_T px of the cursor
-function ibGetNearResizer(cx, cy) {
-  const main = document.getElementById('ibMain');
-  if (!main) return null;
-  const mr = main.getBoundingClientRect();
-  let best = null, bestDist = RESIZER_T;
-  main.querySelectorAll('.ib-resizer').forEach(r => {
-    const rr = r.getBoundingClientRect();
-    const rx = rr.left - mr.left, ry = rr.top - mr.top;
-    let dist;
-    if (r.classList.contains('ib-resizer-h')) {
-      // horizontal split → vertical bar → close if X is near
-      const midX = rx + rr.width / 2;
-      const inY  = cy >= ry && cy <= ry + rr.height;
-      dist = inY ? Math.abs(cx - midX) : Infinity;
-    } else {
-      // vertical split → horizontal bar → close if Y is near
-      const midY = ry + rr.height / 2;
-      const inX  = cx >= rx && cx <= rx + rr.width;
-      dist = inX ? Math.abs(cy - midY) : Infinity;
-    }
-    if (dist < bestDist) { bestDist = dist; best = r; }
-  });
-  return best;
-}
-
-function ibShowInsertGhost(resizerEl) {
-  document.getElementById('ibInsertGhost')?.remove();
-  const main = document.getElementById('ibMain');
-  if (!main) return;
-  const mr = main.getBoundingClientRect();
-  const rr = resizerEl.getBoundingClientRect();
-  const g  = document.createElement('div');
-  g.id = 'ibInsertGhost';
-  g.className = 'ib-insert-ghost';
-  if (resizerEl.classList.contains('ib-resizer-h')) {
-    // vertical bar — show as a vertical strip at same X
-    const midX = rr.left - mr.left + rr.width / 2;
-    g.style.cssText = `position:absolute;top:${rr.top - mr.top}px;left:${midX - 2}px;width:4px;height:${rr.height}px;`;
-  } else {
-    // horizontal bar — show as a horizontal strip at same Y
-    const midY = rr.top - mr.top + rr.height / 2;
-    g.style.cssText = `position:absolute;left:${rr.left - mr.left}px;top:${midY - 2}px;width:${rr.width}px;height:4px;`;
-  }
-  main.appendChild(g);
-}
-
-function ibHideInsertGhost() {
-  document.getElementById('ibInsertGhost')?.remove();
-}
-
-// Splice dragged panel as a sibling in the parent split at the resizer boundary
-function ibInsertBetween(draggedId, resizerEl) {
-  const parentEl = resizerEl.parentElement;
-  const node     = parentEl?._ibNode;
-  if (!node || node.type !== 'split') return;
-
-  const afterIdx = parseInt(resizerEl.dataset.splitIdx, 10); // child index after resizer
-  const newLeaf  = { type: 'leaf', panelId: draggedId };
-
-  // Insert before the child at afterIdx
-  node.children.splice(afterIdx, 0, newLeaf);
-  // Give equal weight to the new slot taken from both neighbors proportionally
-  const share = (node.sizes[afterIdx - 1] + node.sizes[afterIdx]) / 3;
-  node.sizes[afterIdx - 1] -= share / 2;
-  node.sizes[afterIdx]     -= share / 2;
-  node.sizes.splice(afterIdx, 0, share);
-  // Renormalize
-  const tot = node.sizes.reduce((a, b) => a + b, 0) || 1;
-  node.sizes = node.sizes.map(s => s / tot);
-}
-
-// ══ SHARED MOUSE HANDLERS ═════════════════════════════════════
-
-function ibOnMouseMove(e) {
-  if (!ibDragActive) return;
-
-  // Float the panel with the cursor
-  const panel = document.getElementById(ibDragPanelId);
-  if (panel) {
-    panel.style.left = (e.clientX - ibDragOffX) + 'px';
-    panel.style.top  = (e.clientY - ibDragOffY) + 'px';
-  }
-
-  const main = document.getElementById('ibMain');
-  if (!main) return;
-  const mr = main.getBoundingClientRect();
-  const cx = e.clientX - mr.left, cy = e.clientY - mr.top;
-  const mw = mr.width,  mh = mr.height;
-
-  // Detect workspace edge zones
-  let edge = null;
-  if      (cx < EDGE_T)      edge = 'w';
-  else if (cx > mw - EDGE_T) edge = 'e';
-  else if (cy < EDGE_T)      edge = 'n';
-  else if (cy > mh - EDGE_T) edge = 's';
-
-  if (edge !== ibHoveredEdge) {
-    ibHoveredEdge = edge;
-    document.getElementById('ibEdgeGhost')?.remove();
-    ibHideDockTargets();
-    ibHideInsertGhost();
-    ibNearResizer = null;
-    if (edge) ibShowEdgeGhost(edge);
-  }
-  if (edge) return; // workspace-edge takes priority
-
-  // Check for resizer proximity (insert-between, second priority)
-  const nearR = ibGetNearResizer(cx, cy);
-  if (nearR !== ibNearResizer) {
-    ibNearResizer = nearR;
-    ibHideInsertGhost();
-    ibHideDockTargets();
-    if (nearR) {
-      ibShowInsertGhost(nearR);
-      return; // resizer takes priority over slot compass
-    }
-  }
-  if (ibNearResizer) return;
-
-  // Find leaf slot under cursor (panel has pointer-events:none so we see through it)
-  const under = document.elementFromPoint(e.clientX, e.clientY);
-  const slot  = under?.closest('.ib-leaf-slot');
-  if (slot !== ibCurrentSlot) {
-    ibHideDockTargets();
-    if (slot) ibShowDockTargets(slot);
-  }
-}
-
-function ibOnMouseUp() {
-  if (!ibDragActive) return;
-  ibDragActive = false;
-  document.body.style.userSelect = '';
-  document.body.style.cursor = '';
-
-  const panelId    = ibDragPanelId;
-  ibDragPanelId    = null;
-  const targetSlot = ibCurrentSlot;
-  const zone       = ibHoveredZone;
-  const edge       = ibHoveredEdge;
-
-  ibHideDockTargets();
-  ibHideInsertGhost();
-  document.getElementById('ibEdgeGhost')?.remove();
-  ibHoveredEdge = null;
-  const nearR   = ibNearResizer;
-  ibNearResizer = null;
-
-  // Re-enable flex transitions now that drag ended
-  document.getElementById('ibMain')?.classList.remove('ib-dragging');
-
-  // Capture floating rect BEFORE clearing styles — this is where the panel is right now
-  const panel    = document.getElementById(panelId);
-  const fromRect = panel?.getBoundingClientRect();
-
-  // Clear floating styles and re-insert into tree
-  if (panel) { panel.style.cssText = ''; panel.classList.remove('ib-win-floating'); }
-
-  if (edge) {
-    ibInsertAtEdge(panelId, edge);
-  } else if (nearR) {
-    ibInsertBetween(panelId, nearR);
-  } else if (targetSlot && zone) {
-    ibInsertPanel(panelId, targetSlot.dataset.panelId, zone);
-  } else {
-    ibLayout = {
-      type: 'split', dir: 'h', sizes: [0.72, 0.28],
-      children: [ibLayout, { type: 'leaf', panelId }],
-    };
-  }
-
-  ibRenderLayout();
-  ibMarkActivePreset(null); // user moved a panel — no preset is active
-
-  // FLIP flight: ghost flies from floating position to the docked slot
-  if (panel && fromRect && fromRect.width > 0) {
-    const toRect = panel.getBoundingClientRect();
-    const dx = toRect.left - fromRect.left;
-    const dy = toRect.top  - fromRect.top;
-    const sx = toRect.width  / fromRect.width;
-    const sy = toRect.height / fromRect.height;
-
-    // Ghost sits at the floating position, then transforms to docked rect
-    const ghost = document.createElement('div');
-    ghost.style.cssText = `
-      position:fixed;left:${fromRect.left}px;top:${fromRect.top}px;
-      width:${fromRect.width}px;height:${fromRect.height}px;
-      transform-origin:top left;
-      background:rgba(10,11,16,0.92);
-      border:1px solid rgba(255,255,255,0.15);
-      border-radius:8px;
-      box-shadow:0 16px 48px rgba(0,0,0,0.6);
-      pointer-events:none;z-index:9999;
-    `;
-    document.body.appendChild(ghost);
-
-    // Hide real panel while ghost is in flight
-    panel.style.opacity = '0';
-
-    void ghost.offsetWidth; // force reflow so starting position is painted
-
-    ghost.style.transition = 'transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.12s ease 0.22s';
-    ghost.style.transform  = `translate(${dx}px,${dy}px) scale(${sx},${sy})`;
-    ghost.style.opacity    = '0';
-
-    const onDone = (e) => {
-      if (e.propertyName !== 'opacity') return;
-      ghost.removeEventListener('transitionend', onDone);
-      ghost.remove();
-      panel.style.opacity = '';
-    };
-    ghost.addEventListener('transitionend', onDone);
-  }
-}
-
-document.addEventListener('mousemove', ibOnMouseMove);
-document.addEventListener('mouseup',   ibOnMouseUp);
-
-// ══ HEADER BIND ═══════════════════════════════════════════════
-
-function ibBindHeader(panel) {
+function ibBindDrag(panel) {
   const header = panel.querySelector('.ib-win-header');
-  if (!header || header._ibBound) return;
-  header._ibBound = true;
+  if (!header || header._ibDragBound) return;
+  header._ibDragBound = true;
   header.style.cursor = 'grab';
 
   header.addEventListener('mousedown', (e) => {
-    if (e.target.closest('button')) return;
+    if (e.button !== 0 || e.target.closest('button')) return;
     e.preventDefault();
+    const st = ibWinState.get(panel.id);
+    if (!st) return;
 
-    const panelId = panel.id;
-    const rect    = panel.getBoundingClientRect();
+    ibWinTopZ++; st.z = ibWinTopZ;
+    panel.style.zIndex = String(ibWinTopZ);
 
-    // Lift panel out of layout tree (the gap closes on re-render)
-    ibRemoveFromTree(panelId);
-    ibDragPanelId = panelId;
+    const offX = e.clientX - st.x;
+    const offY = e.clientY - st.y;
+    const main = document.getElementById('ibMain');
+    const mr   = main?.getBoundingClientRect();
 
-    // Float the panel under the cursor
-    panel.classList.add('ib-win-floating');
-    Object.assign(panel.style, {
-      position:      'fixed',
-      left:          rect.left + 'px',
-      top:           rect.top  + 'px',
-      width:         rect.width + 'px',
-      height:        rect.height + 'px',
-      zIndex:        '9999',
-      opacity:       '0.88',
-      pointerEvents: 'none',
-      boxShadow:     '0 24px 72px rgba(0,0,0,0.65)',
-      borderRadius:  '8px',
-      border:        '1px solid rgba(255,255,255,0.13)',
-    });
-    document.body.appendChild(panel);
-
-    // Disable flex transitions during drag so sibling slots snap instantly
-    document.getElementById('ibMain')?.classList.add('ib-dragging');
-
-    // Re-render layout without this panel (closes the empty slot)
-    ibRenderLayout();
-
-    ibDragOffX   = e.clientX - rect.left;
-    ibDragOffY   = e.clientY - rect.top;
-    ibDragActive = true;
-    document.body.style.userSelect = 'none';
-    document.body.style.cursor     = 'grabbing';
     header.style.cursor = 'grabbing';
+    document.body.style.userSelect = 'none';
+
+    const SNAP_T = 10;
+    const onMove = (ev) => {
+      let nx = ev.clientX - offX;
+      let ny = ev.clientY - offY;
+      const mw = mr?.width ?? 0, mh = mr?.height ?? 0;
+      if (mr) {
+        nx = Math.max(-(st.w - 80), Math.min(mw - 80, nx));
+        ny = Math.max(0,            Math.min(mh - 30, ny));
+      }
+
+      // Snap dragged window edges to other visible windows' edges and workspace edges
+      let bdx = SNAP_T, bdy = SNAP_T, snapX = null, snapY = null;
+      const xTargets = [0, mw];
+      const yTargets = [0, mh];
+      ibWinState.forEach((ost, oid) => {
+        if (oid === panel.id || !ost.visible) return;
+        xTargets.push(ost.x, ost.x + ost.w);
+        yTargets.push(ost.y, ost.y + ost.h);
+      });
+      for (const tx of xTargets) {
+        const dL = Math.abs(nx - tx), dR = Math.abs(nx + st.w - tx);
+        if (dL < bdx) { bdx = dL; snapX = tx; }
+        if (dR < bdx) { bdx = dR; snapX = tx - st.w; }
+      }
+      for (const ty of yTargets) {
+        const dT = Math.abs(ny - ty), dB = Math.abs(ny + st.h - ty);
+        if (dT < bdy) { bdy = dT; snapY = ty; }
+        if (dB < bdy) { bdy = dB; snapY = ty - st.h; }
+      }
+      if (snapX !== null) nx = snapX;
+      if (snapY !== null) ny = snapY;
+
+      st.x = nx; st.y = ny;
+      panel.style.left = nx + 'px';
+      panel.style.top  = ny + 'px';
+    };
+    const onUp = () => {
+      header.style.cursor = 'grab';
+      document.body.style.userSelect = '';
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup',   onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup',   onUp);
   });
 }
 
-// ══ RESIZE HANDLES ════════════════════════════════════════════
+// ── Click to bring to front ────────────────────────────────────
 
-function ibBindResizers(container) {
-  container.querySelectorAll('.ib-resizer').forEach(resizer => {
-    if (resizer._ibBound) return;
-    resizer._ibBound = true;
+function ibBindFrontOnClick(panel) {
+  if (panel._ibFrontBound) return;
+  panel._ibFrontBound = true;
+  panel.addEventListener('mousedown', () => {
+    const st = ibWinState.get(panel.id);
+    if (!st) return;
+    ibWinTopZ++; st.z = ibWinTopZ;
+    panel.style.zIndex = String(ibWinTopZ);
+  });
+}
 
-    resizer.addEventListener('mousedown', (e) => {
-      e.preventDefault();
+// ── Resize (8-direction handles) ──────────────────────────────
+
+function ibAddResizeHandles(panel) {
+  if (panel.querySelector('.ib-rz')) return;
+  ['n','s','e','w','ne','nw','se','sw'].forEach(dir => {
+    const h = document.createElement('div');
+    h.className = `ib-rz ib-rz-${dir}`;
+    h.addEventListener('mousedown', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      const st = ibWinState.get(panel.id);
+      if (!st) return;
+      ibWinTopZ++; st.z = ibWinTopZ;
+      panel.style.zIndex = String(ibWinTopZ);
+
+      const sx = st.x, sy = st.y, sw = st.w, sh = st.h;
+      const ox = e.clientX, oy = e.clientY;
+      const MIN_W = 220, MIN_H = 140;
+
       document.body.style.userSelect = 'none';
-      document.getElementById('ibMain')?.classList.add('ib-dragging');
-
-      const isH     = resizer.classList.contains('ib-resizer-h');
-      const prev    = resizer.previousElementSibling;
-      const next    = resizer.nextElementSibling;
-      const parent  = resizer.parentElement;
-      const startX  = e.clientX, startY = e.clientY;
-      const pf      = parseFloat(prev.style.flex) || 1;
-      const nf      = parseFloat(next.style.flex) || 1;
-      // totalPx = full parent size; flex values are normalized to sum=1.0
-      // so delta (px/totalPx) directly maps to flex units — no extra multiplier
-      const totalPx = isH ? parent.offsetWidth : parent.offsetHeight;
-      const total   = pf + nf;
-
-      const onMove = ev => {
-        const delta = (isH ? ev.clientX - startX : ev.clientY - startY) / totalPx;
-        const np    = Math.max(0.08, Math.min(total - 0.08, pf + delta));
-        prev.style.flex = String(np);
-        next.style.flex = String(total - np);
+      const onMove = (ev) => {
+        const dx = ev.clientX - ox, dy = ev.clientY - oy;
+        let { x, y, w, h } = { x: sx, y: sy, w: sw, h: sh };
+        if (dir.includes('e')) w = Math.max(MIN_W, sw + dx);
+        if (dir.includes('s')) h = Math.max(MIN_H, sh + dy);
+        if (dir.includes('w')) { w = Math.max(MIN_W, sw - dx); x = sx + sw - w; }
+        if (dir.includes('n')) { h = Math.max(MIN_H, sh - dy); y = sy + sh - h; }
+        Object.assign(st, { x, y, w, h });
+        Object.assign(panel.style, { left:x+'px', top:y+'px', width:w+'px', height:h+'px' });
       };
       const onUp = () => {
         document.body.style.userSelect = '';
-        document.getElementById('ibMain')?.classList.remove('ib-dragging');
         document.removeEventListener('mousemove', onMove);
         document.removeEventListener('mouseup',   onUp);
-        ibMarkActivePreset(null); // user resized — no preset is active
       };
       document.addEventListener('mousemove', onMove);
       document.addEventListener('mouseup',   onUp);
     });
+    panel.appendChild(h);
   });
 }
 
-// ══ TOGGLE ════════════════════════════════════════════════════
+// ══ TOGGLE / PRESET / INIT ════════════════════════════════════
 
 function ibToggleWindow(id) {
-  const inTree = !!ibFindLeaf(ibLayout, id, null, -1);
-  if (inTree) {
-    ibRemoveFromTree(id);
-  } else {
-    ibLayout = {
-      type: 'split', dir: 'h', sizes: [0.75, 0.25],
-      children: [ibLayout, { type: 'leaf', panelId: id }],
-    };
+  const st = ibWinState.get(id);
+  if (!st) return;
+  st.visible = !st.visible;
+  if (st.visible) {
+    const main = document.getElementById('ibMain');
+    // First time shown with no position — center in workspace
+    if (main && st.x === 0 && st.y === 0) {
+      st.x = Math.max(20, Math.round((main.offsetWidth  - st.w) / 2));
+      st.y = Math.max(20, Math.round((main.offsetHeight - st.h) / 2));
+    }
+    ibWinTopZ++; st.z = ibWinTopZ;
   }
-  ibRenderLayout();
-  ibMarkActivePreset(null); // user toggled a panel — no preset is active
+  ibApplyWinState();
+  ibMarkActivePreset(null);
 }
 
-// ══ PRESET SWITCHER ═══════════════════════════════════════════
-
 function ibApplyPreset(name) {
-  if (!IB_PRESETS[name]) return;
-  ibLayout = ibCloneLayout(IB_PRESETS[name]);
-  ibRenderLayout();
+  const defs = IB_PRESET_DEFS[name];
+  if (!defs) return;
+  const main = document.getElementById('ibMain');
+  if (!main) return;
+  const mw = main.offsetWidth  || window.innerWidth;
+  const mh = main.offsetHeight || (window.innerHeight - 48);
+  ibWinState.forEach(st => { st.visible = false; });
+  defs.forEach((def, i) => {
+    const st = ibWinState.get(def.id);
+    if (!st) return;
+    st.visible = true;
+    st.x = Math.round(def.x * mw);
+    st.y = Math.round(def.y * mh);
+    st.w = Math.round(def.w * mw);
+    st.h = Math.round(def.h * mh);
+    st.z = i + 1;
+  });
+  ibWinTopZ = defs.length + 1;
+  ibApplyWinState();
   ibMarkActivePreset(name);
 }
 
@@ -1435,11 +1076,8 @@ function ibMarkActivePreset(name) {
   document.getElementById(ids[name])?.classList.add('ib-preset-active');
 }
 
-// ══ INIT ══════════════════════════════════════════════════════
-
 function ibInitWindows() {
-  ibRenderLayout();
-  ibMarkActivePreset(ibPickPreset());
+  ibApplyPreset(ibPickPreset());
 }
 
 // ══ HELP MODAL ════════════════════════════════════════════════
@@ -1460,12 +1098,11 @@ function ibToggleHelp() {
 // Cleanup on navigation away
 window.__ibCleanup = function() {
   if (ibEventSource) { ibEventSource.close(); ibEventSource = null; }
-  ibConnected  = false;
-  ibDragActive = false;
-  document.removeEventListener('mousemove', ibOnMouseMove);
-  document.removeEventListener('mouseup',   ibOnMouseUp);
-  // Remove any panels stranded in body from a mid-drag navigation
-  document.querySelectorAll('body > .ib-window').forEach(w => w.remove());
+  ibConnected = false;
+  ibWinState.forEach((st, id) => {
+    const w = document.getElementById(id);
+    if (w) w.style.cssText = '';
+  });
   delete window.__ibCleanup;
   delete window.ibConnect;
   delete window.ibSend;

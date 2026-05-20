@@ -1,4 +1,4 @@
-*, *::before, *::after {
+﻿*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -2195,60 +2195,34 @@ body.bm-page #app {
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  position: relative; /* anchor for edge-ghost + dock-overlay absolute children */
+  position: relative;
   background: var(--bg-deep);
 }
 
-/* ── Layout tree nodes ───────────────────────────────────────── */
-.ib-split { display: flex; flex: 1; min-width: 0; min-height: 0; }
-.ib-split-h { flex-direction: row; }
-.ib-split-v { flex-direction: column; }
-
-.ib-leaf-slot {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 0;
-  position: relative;
-  overflow: hidden;
-  transition: flex 0.22s cubic-bezier(0.4,0,0.2,1);
-}
-/* During drag/resize, disable transitions so layout responds instantly */
-.ib-dragging .ib-leaf-slot,
-.ib-dragging .ib-split { transition: none !important; }
-
-.ib-resizer-h {
-  width: 4px; flex-shrink: 0;
-  background: rgba(255,255,255,0.04);
-  cursor: col-resize; z-index: 10;
-  transition: background 0.15s;
-}
-.ib-resizer-h:hover, .ib-resizer-h:active { background: rgba(255,112,112,0.45); }
-
-.ib-resizer-v {
-  height: 4px; flex-shrink: 0;
-  background: rgba(255,255,255,0.04);
-  cursor: row-resize; z-index: 10;
-  transition: background 0.15s;
-}
-.ib-resizer-v:hover, .ib-resizer-v:active { background: rgba(255,112,112,0.45); }
-
-/* ── Panel (docked) ──────────────────────────────────────────── */
+/* ── Windows (absolutely positioned) ────────────────────────── */
 .ib-window {
-  display: flex;
+  display: none;
   flex-direction: column;
-  flex: 1;
-  min-width: 0;
-  min-height: 0;
+  position: absolute;
   background: var(--bg-elevated);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  box-shadow: 0 16px 56px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
   overflow: hidden;
+  min-width: 220px;
+  min-height: 140px;
 }
 
-.ib-win-floating {
-  border: 1px solid rgba(255,255,255,0.12) !important;
-  border-radius: 8px !important;
-  box-shadow: 0 24px 72px rgba(0,0,0,0.65) !important;
-}
+/* ── 8-direction resize handles ─────────────────────────────── */
+.ib-rz { position: absolute; z-index: 10; }
+.ib-rz-n  { top:-4px;    left:8px;   right:8px;  height:8px;  cursor:n-resize;  }
+.ib-rz-s  { bottom:-4px; left:8px;   right:8px;  height:8px;  cursor:s-resize;  }
+.ib-rz-e  { right:-4px;  top:8px;    bottom:8px; width:8px;   cursor:e-resize;  }
+.ib-rz-w  { left:-4px;   top:8px;    bottom:8px; width:8px;   cursor:w-resize;  }
+.ib-rz-ne { top:-4px;    right:-4px; width:14px; height:14px; cursor:ne-resize; }
+.ib-rz-nw { top:-4px;    left:-4px;  width:14px; height:14px; cursor:nw-resize; }
+.ib-rz-se { bottom:-4px; right:-4px; width:14px; height:14px; cursor:se-resize; }
+.ib-rz-sw { bottom:-4px; left:-4px;  width:14px; height:14px; cursor:sw-resize; }
 
 .ib-win-header {
   display: flex;
@@ -2294,96 +2268,6 @@ body.bm-page #app {
 }
 .ib-messages-body { overflow: hidden; }
 
-/* ── Dock compass overlay ────────────────────────────────────── */
-.ib-dock-overlay {
-  position: absolute; inset: 0; z-index: 500;
-  pointer-events: none;
-  background: rgba(227,95,95,0.05);
-  border: 1px solid rgba(255,112,112,0.18);
-  animation: ibOverlayIn 0.15s ease both;
-}
-@keyframes ibOverlayIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-.ib-dock-compass {
-  position: absolute; top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 112px; height: 112px;
-  display: grid;
-  grid-template: ".  n  ." "w  c  e" ".  s  .";
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
-  gap: 5px; pointer-events: auto;
-  animation: ibCompassIn 0.18s cubic-bezier(0.34,1.56,0.64,1) both;
-}
-@keyframes ibCompassIn {
-  from { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
-  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-}
-.ib-dock-zone {
-  background: rgba(8,9,14,0.92);
-  border: 1px solid rgba(255,112,112,0.35);
-  border-radius: 4px; cursor: pointer;
-  transition: background 0.1s, border-color 0.1s, transform 0.1s;
-}
-.ib-dock-zone:hover {
-  background: rgba(227,95,95,0.45);
-  border-color: rgba(255,112,112,0.9);
-  transform: scale(1.12);
-}
-.ib-dock-n { grid-area: n; } .ib-dock-s { grid-area: s; }
-.ib-dock-w { grid-area: w; } .ib-dock-e { grid-area: e; }
-.ib-dock-c { grid-area: c; }
-
-/* ── Drop ghost — slides in from its zone direction ─────────── */
-.ib-drop-ghost {
-  position: absolute;
-  background: rgba(227,95,95,0.18);
-  border: 2px solid rgba(255,112,112,0.7);
-  border-radius: 3px; pointer-events: none; z-index: 499;
-}
-.ib-drop-n { top:0;    left:0; right:0;  height:50%; animation: ibGhostFromTop    0.15s cubic-bezier(0.34,1.3,0.64,1) both; }
-.ib-drop-s { bottom:0; left:0; right:0;  height:50%; animation: ibGhostFromBottom 0.15s cubic-bezier(0.34,1.3,0.64,1) both; }
-.ib-drop-w { top:0;  left:0;  bottom:0; width:50%;  animation: ibGhostFromLeft   0.15s cubic-bezier(0.34,1.3,0.64,1) both; }
-.ib-drop-e { top:0;  right:0; bottom:0; width:50%;  animation: ibGhostFromRight  0.15s cubic-bezier(0.34,1.3,0.64,1) both; }
-.ib-drop-c { inset:0; animation: ibGhostFade 0.12s ease both; }
-@keyframes ibGhostFromTop    { from { opacity:0; clip-path: inset(0 0 100% 0); } to { opacity:1; clip-path: inset(0 0 0 0); } }
-@keyframes ibGhostFromBottom { from { opacity:0; clip-path: inset(100% 0 0 0); } to { opacity:1; clip-path: inset(0 0 0 0); } }
-@keyframes ibGhostFromLeft   { from { opacity:0; clip-path: inset(0 100% 0 0); } to { opacity:1; clip-path: inset(0 0 0 0); } }
-@keyframes ibGhostFromRight  { from { opacity:0; clip-path: inset(0 0 0 100%); } to { opacity:1; clip-path: inset(0 0 0 0); } }
-@keyframes ibGhostFade       { from { opacity:0; } to { opacity:1; } }
-
-/* ── Workspace-edge ghost — grows in from its edge ──────────── */
-.ib-edge-ghost {
-  position: absolute;
-  background: rgba(227,95,95,0.13);
-  border: 2px solid rgba(255,112,112,0.55);
-  pointer-events: none; z-index: 1000;
-}
-.ib-edge-ghost-n { top:0;    left:0; right:0;  height:28%; animation: ibEdgeFromTop    0.16s cubic-bezier(0.34,1.2,0.64,1) both; }
-.ib-edge-ghost-s { bottom:0; left:0; right:0;  height:28%; animation: ibEdgeFromBottom 0.16s cubic-bezier(0.34,1.2,0.64,1) both; }
-.ib-edge-ghost-w { top:0;  left:0;  bottom:0; width:28%;  animation: ibEdgeFromLeft   0.16s cubic-bezier(0.34,1.2,0.64,1) both; }
-.ib-edge-ghost-e { top:0;  right:0; bottom:0; width:28%;  animation: ibEdgeFromRight  0.16s cubic-bezier(0.34,1.2,0.64,1) both; }
-@keyframes ibEdgeFromTop    { from { opacity:0; transform: translateY(-12px); } to { opacity:1; transform: translateY(0); } }
-@keyframes ibEdgeFromBottom { from { opacity:0; transform: translateY(12px);  } to { opacity:1; transform: translateY(0); } }
-@keyframes ibEdgeFromLeft   { from { opacity:0; transform: translateX(-12px); } to { opacity:1; transform: translateX(0); } }
-@keyframes ibEdgeFromRight  { from { opacity:0; transform: translateX(12px);  } to { opacity:1; transform: translateX(0); } }
-
-/* ── Insert-between ghost ────────────────────────────────────── */
-.ib-insert-ghost {
-  position: absolute;
-  background: rgba(255,112,112,0.85);
-  border-radius: 3px;
-  box-shadow: 0 0 0 2px rgba(255,112,112,0.3), 0 0 16px 4px rgba(255,112,112,0.5);
-  pointer-events: none;
-  z-index: 300;
-  animation: ibInsertPulse 0.9s ease-in-out infinite alternate;
-}
-@keyframes ibInsertPulse {
-  from { opacity: 0.75; box-shadow: 0 0 0 2px rgba(255,112,112,0.25), 0 0 12px 3px rgba(255,112,112,0.4); }
-  to   { opacity: 1;    box-shadow: 0 0 0 3px rgba(255,112,112,0.5), 0 0 22px 6px rgba(255,112,112,0.65); }
-}
 
 /* ── Misc ────────────────────────────────────────────────────── */
 .ib-win-toggles { display: flex; gap: 4px; flex-shrink: 0; }
@@ -2410,6 +2294,18 @@ body.bm-page #app {
   background: rgba(255,112,112,0.15) !important;
   border-color: rgba(255,112,112,0.5) !important;
   color: rgba(255,112,112,1) !important;
+}
+.ib-preset-btn {
+  gap: 5px;
+  padding: 4px 9px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0;
+}
+.ib-preset-label {
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 .ib-toggle-sep {
   width: 1px;
@@ -2549,7 +2445,7 @@ body.bm-page #app {
   justify-content: center;
   gap: 8px;
   flex: 1;
-  height: 100%;
+  min-height: 80px;
   color: var(--foreground-muted);
   font-size: 0.7rem;
   text-align: center;
@@ -2564,6 +2460,8 @@ body.bm-page #app {
   flex: 1;
   min-height: 0;
   padding: 4px 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .ib-explorer-empty {
@@ -2934,7 +2832,7 @@ body.bm-page #app {
 .ib-send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
 /* Properties */
-.ib-props { flex: 1; overflow-y: auto; }
+.ib-props { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
 .ib-props-cls {
   display: flex;
   align-items: center;
