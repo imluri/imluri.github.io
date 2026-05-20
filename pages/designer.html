@@ -109,6 +109,10 @@
         <button class="bm-btn bm-btn-secondary" id="bmImportJsonBtn"><iconify-icon icon="mdi:upload" width="14" height="14"></iconify-icon> Import JSON</button>
         <input type="file" id="bmJsonFileInput" accept=".json" style="display:none">
       </div>
+      <button class="bm-btn bm-btn-secondary" id="bmLoadTestSceneBtn" style="width:100%;margin-top:4px;opacity:0.6;">
+        <iconify-icon icon="mdi:bug-outline" width="14" height="14"></iconify-icon>
+        Load Test Scene
+      </button>
     </div>
   </aside>
 
@@ -276,6 +280,7 @@
 
           <div class="bm-glow" id="bmGlow"></div>
           <div class="bm-grid-layer" id="bmGridLayer"></div>
+          <div id="bmBgPattern" style="position:absolute;inset:0;pointer-events:none;z-index:0;"></div>
           <div class="bm-noise-layer"></div>
 
           <div class="bm-el bm-rings" id="elRings">
@@ -310,6 +315,12 @@
 
   <!-- Context menu -->
   <div class="bm-ctx-menu bm-panel-hidden" id="bmCtxMenu"></div>
+
+  <!-- Export progress overlay -->
+  <div id="bmExportOverlay">
+    <iconify-icon icon="mdi:loading" width="32" height="32" style="animation:spin 1s linear infinite;color:var(--accent);"></iconify-icon>
+    <span>Exporting…</span>
+  </div>
 
   <!-- Floating text format toolbar -->
   <div id="bmFormatToolbar">
@@ -1080,6 +1091,19 @@
 }
 
 /* ── Floating format toolbar ── */
+#bmExportOverlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 99999;
+  background: rgba(0,0,0,0.72);
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem; letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.7);
+  backdrop-filter: blur(4px);
+}
+#bmExportOverlay.bm-exporting { display: flex; }
+
 #bmFormatToolbar {
   display: none;
   position: fixed;
@@ -2507,11 +2531,14 @@
   async function exportPng() {
     const btn = document.getElementById('bmExportPngBtn');
 
-    // Hide selection highlights
     S.selectedIds.forEach(id => document.getElementById('bmel-' + id)?.classList.remove('bm-selected'));
+    removeHandles();
 
     btn.disabled = true;
     btn.innerHTML = '<iconify-icon icon="mdi:loading" width="14" height="14" style="animation:spin 1s linear infinite"></iconify-icon> Exporting…';
+    document.getElementById('bmExportOverlay').classList.add('bm-exporting');
+
+    let clone = null;
     try {
       if (!window.html2canvas) {
         await new Promise((res, rej) => {
@@ -2521,13 +2548,190 @@
           document.head.appendChild(s);
         });
       }
-      const canvas = await html2canvas(banner, { width: 960, height: 480, scale: 1, useCORS: true, logging: false, backgroundColor: S.cfg.bg });
+
+      await document.fonts.ready;
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+      const W = S.cfg.canvasW, H = S.cfg.canvasH;
+
+      // Clone the banner directly into <body> so html2canvas sees it with
+      // no ancestor transforms — zoom level on #bmBannerOuter won't affect it.
+      // Use individual style assignments to preserve banner's inline styles
+      // (background-color, background-image, width, height set by applyBg/applyCanvasSize).
+      clone = banner.cloneNode(true);
+      Object.assign(clone.style, {
+        position: 'absolute',
+        left:     `-${W + 400}px`,
+        top:      '0',
+        transform:    'none',
+        overflow:     'hidden',
+        borderRadius: '0',
+        boxShadow:    'none',
+      });
+      document.body.appendChild(clone);
+
+      // Strip UI chrome from the clone
+      ['bmGroupSelBox','bmCtxMenu','bmFormatToolbar','bmRulerH','bmRulerV','bmRubberBand']
+        .forEach(id => clone.querySelector('#' + id)?.remove());
+      clone.querySelectorAll('.bm-handles,.bm-handle').forEach(n => n.remove());
+
+      // html2canvas doesn't tile gradient backgrounds (background-repeat is ignored),
+      // so the pattern shows as only one tile. Rasterize it to a full W×H canvas
+      // image instead, same technique as code blocks.
+      const clonePatEl = clone.querySelector('#bmBgPattern');
+      if (clonePatEl && S.cfg.bgPattern && S.cfg.bgPattern !== 'none') {
+        const hex   = S.cfg.bgPatternColor || '#808080';
+        const pr = parseInt(hex.slice(1,3),16), pg = parseInt(hex.slice(3,5),16), pb = parseInt(hex.slice(5,7),16);
+        const pCol  = `rgba(${pr},${pg},${pb},${S.cfg.bgPatternOpacity ?? 0.05})`;
+        const pSize = S.cfg.bgPatternSize || 32;
+        const ph    = pSize / 2;
+
+        const pc = document.createElement('canvas');
+        pc.width = W; pc.height = H;
+        const px = pc.getContext('2d');
+        px.fillStyle   = pCol;
+        px.strokeStyle = pCol;
+        px.lineWidth   = 1;
+
+        switch (S.cfg.bgPattern) {
+          case 'dots':
+            for (let x = ph; x < W + ph; x += pSize)
+              for (let y = ph; y < H + ph; y += pSize) {
+                px.beginPath(); px.arc(x, y, 1.5, 0, Math.PI*2); px.fill();
+              }
+            break;
+          case 'grid':
+            for (let x = 0; x <= W; x += pSize) { px.beginPath(); px.moveTo(x,0); px.lineTo(x,H); px.stroke(); }
+            for (let y = 0; y <= H; y += pSize) { px.beginPath(); px.moveTo(0,y); px.lineTo(W,y); px.stroke(); }
+            break;
+          case 'lines-h':
+            for (let y = 0; y <= H; y += pSize) { px.beginPath(); px.moveTo(0,y); px.lineTo(W,y); px.stroke(); }
+            break;
+          case 'lines-v':
+            for (let x = 0; x <= W; x += pSize) { px.beginPath(); px.moveTo(x,0); px.lineTo(x,H); px.stroke(); }
+            break;
+          case 'diagonal':
+            for (let i = -H; i < W + H; i += pSize) { px.beginPath(); px.moveTo(i,0); px.lineTo(i+H,H); px.stroke(); }
+            break;
+          case 'checker':
+            for (let x = 0; x < W; x += pSize)
+              for (let y = 0; y < H; y += pSize)
+                if ((Math.floor(x/pSize) + Math.floor(y/pSize)) % 2 === 0) px.fillRect(x, y, pSize, pSize);
+            break;
+          case 'zigzag': {
+            const cols = Math.ceil(W / pSize) + 1;
+            for (let row = 0; row * ph < H + pSize; row++) {
+              px.beginPath();
+              for (let col = 0; col < cols; col++) {
+                const cx = col * pSize, cy = row * ph + (col % 2 === 0 ? 0 : ph);
+                col === 0 ? px.moveTo(cx, cy) : px.lineTo(cx, cy);
+              }
+              px.stroke();
+            }
+            break;
+          }
+          case 'cross':
+            for (let x = 0; x <= W; x += pSize) { px.beginPath(); px.moveTo(x,0); px.lineTo(x,H); px.stroke(); }
+            for (let y = 0; y <= H; y += pSize) { px.beginPath(); px.moveTo(0,y); px.lineTo(W,y); px.stroke(); }
+            for (let x = ph; x < W; x += pSize)
+              for (let y = ph; y < H; y += pSize) {
+                px.beginPath(); px.arc(x, y, 1.5, 0, Math.PI*2); px.fill();
+              }
+            break;
+        }
+
+        const patImg = document.createElement('img');
+        patImg.src = pc.toDataURL();
+        Object.assign(patImg.style, { position:'absolute', top:'0', left:'0', width: W+'px', height: H+'px', pointerEvents:'none', zIndex:'0' });
+        clonePatEl.replaceWith(patImg);
+      } else if (clonePatEl) {
+        clonePatEl.style.display = 'none';
+      }
+
+      // Hide .bm-noise-layer: SVG feTurbulence data URL not supported by html2canvas.
+      clone.querySelectorAll('.bm-noise-layer').forEach(n => n.style.display = 'none');
+
+      // html2canvas can't render <span> inside white-space:pre without inserting
+      // spurious newlines. Fix: rasterize each code block to a canvas image first,
+      // then replace the <pre> with an <img> so html2canvas just blits pixels.
+      const HL_COLORS = {
+        'hl-k': 'rgba(175,130,255,0.75)',
+        'hl-s': 'rgba(220,175,95,0.75)',
+        'hl-c': 'rgba(255,255,255,0.28)',
+        'hl-n': 'rgba(227,95,95,0.75)',
+        'hl-a': 'rgba(130,210,255,0.75)',
+      };
+      clone.querySelectorAll('.hl-pre').forEach(pre => {
+        const fs      = parseFloat(pre.style.fontSize) || 12;
+        const lineH   = fs * 1.8;
+        const opacity = parseFloat(pre.style.opacity) ?? 1;
+
+        // Parse child nodes into lines of {text, color} segments
+        const lines = [[]];
+        for (const node of pre.childNodes) {
+          const color = node.nodeType !== 3 ? (HL_COLORS[node.className] || null) : null;
+          node.textContent.split('\n').forEach((txt, i) => {
+            if (i) lines.push([]);
+            lines[lines.length - 1].push({ text: txt, color });
+          });
+        }
+
+        // Measure text widths using a temp canvas
+        const mc = document.createElement('canvas').getContext('2d');
+        mc.font = `400 ${fs}px 'JetBrains Mono', monospace`;
+        const cw = Math.ceil(Math.max(1, ...lines.map(l =>
+          l.reduce((s, seg) => s + mc.measureText(seg.text).width, 0)
+        ))) + 4;
+        const ch = Math.ceil(lineH * lines.length);
+
+        // Draw each line with per-segment colours
+        const c = document.createElement('canvas');
+        c.width = cw; c.height = ch;
+        const ctx = c.getContext('2d');
+        ctx.font          = `400 ${fs}px 'JetBrains Mono', monospace`;
+        ctx.textBaseline  = 'top';
+        ctx.globalAlpha   = opacity;
+        lines.forEach((segs, li) => {
+          let x = 0;
+          segs.forEach(seg => {
+            ctx.fillStyle = seg.color || 'rgba(255,255,255,0.45)';
+            ctx.fillText(seg.text, x, li * lineH + (lineH - fs) * 0.4);
+            x += ctx.measureText(seg.text).width;
+          });
+        });
+
+        // Swap <pre> for <img> — html2canvas handles images fine
+        const img = document.createElement('img');
+        img.src = c.toDataURL();
+        img.style.cssText = `display:block;width:${cw}px;height:${ch}px;`;
+        pre.replaceWith(img);
+      });
+
+      // Capture at scale:1. html2canvas may output at device pixels (css*DPR),
+      // so we draw the result into a fixed-size output canvas to guarantee
+      // the PNG is exactly W×H regardless of DPR or browser zoom.
+      const raw = await html2canvas(clone, {
+        scale:           1,
+        backgroundColor: S.cfg.bg,
+        logging:         false,
+        useCORS:         true,
+        allowTaint:      true,
+      });
+
+      const out = document.createElement('canvas');
+      out.width  = W;
+      out.height = H;
+      out.getContext('2d').drawImage(raw, 0, 0, W, H);
+
       const a = document.createElement('a');
       a.download = 'discord-banner.png';
-      a.href = canvas.toDataURL('image/png');
+      a.href = out.toDataURL('image/png');
       a.click();
     } finally {
+      clone?.remove();
+      document.getElementById('bmExportOverlay').classList.remove('bm-exporting');
       S.selectedIds.forEach(id => document.getElementById('bmel-' + id)?.classList.add('bm-selected'));
+      if (S.primaryId) injectHandles(S.primaryId);
       btn.disabled = false;
       btn.innerHTML = '<iconify-icon icon="mdi:download" width="14" height="14"></iconify-icon> Export PNG';
     }
@@ -2565,6 +2769,58 @@
     };
     reader.readAsText(file);
     e.target.value = '';
+  });
+
+  // ── Load Test Scene ───────────────────────────────────────────
+  document.getElementById('bmLoadTestSceneBtn').addEventListener('click', () => {
+    if (!confirm('Replace current banner with test scene?')) return;
+
+    // Clear existing elements
+    S.elements.forEach(el => document.getElementById('bmel-' + el.id)?.remove());
+    S.elements = [];
+    S.selectedIds.clear();
+    S.primaryId = null;
+    removeHandles();
+
+    // Set up a gradient background
+    S.cfg.bgType = 'gradient';
+    S.cfg.bgGradient = {
+      angle: 135,
+      stops: [{ color: '#1a0a2e', pos: 0 }, { color: '#0d1b4a', pos: 50 }, { color: '#0a2a1a', pos: 100 }],
+    };
+    S.cfg.bgPattern = 'dots';
+    S.cfg.bgPatternColor = '#8080ff';
+    S.cfg.bgPatternOpacity = 0.07;
+    S.cfg.bgPatternSize = 32;
+    S.cfg.accent = '#7c5cbf';
+
+    const nextId = () => 'el' + Date.now() + Math.random().toString(36).slice(2, 6);
+
+    const testEls = [
+      { type: 'glow',         x: 80,  y: 60,  z: 1,  props: { size: 220, color: '#7c5cbf', opacity: 0.45, syncAccent: false } },
+      { type: 'text-heading', x: 60,  y: 80,  z: 2,  props: { text: 'Export Test', fontSize: 36, fontWeight: 700, color: '#ffffff', opacity: 1, letterSpacing: -0.02 } },
+      { type: 'text-label',   x: 60,  y: 130, z: 2,  props: { text: 'dpr · zoom · gradient · pattern · code', fontSize: 11, fontWeight: 500, color: '#a89fd0', opacity: 0.8, letterSpacing: 0.06 } },
+      { type: 'dot',          x: 420, y: 90,  z: 2,  props: { size: 80, color: '#c0506a', opacity: 0.9 } },
+      { type: 'ring',         x: 400, y: 70,  z: 1,  props: { size: 120, thickness: 2, color: '#7c5cbf', opacity: 0.5 } },
+      { type: 'bar-h',        x: 60,  y: 170, z: 2,  props: { width: 200, height: 2, color: '#7c5cbf', opacity: 0.6 } },
+      { type: 'code-block',   x: 560, y: 40,  z: 2,  props: {
+          code: 'const banner = {\n  dpr:    window.devicePixelRatio,\n  zoom:   S.zoom,\n  export: "works",\n};',
+          lang: 'js', fontSize: 13, opacity: 1,
+        }
+      },
+      { type: 'tagline',      x: 60,  y: 200, z: 2,  props: { text: 'imluri.github.io · designer', dotColor: '#7c5cbf', dotOpacity: 1 } },
+    ];
+
+    testEls.forEach(spec => {
+      const data = { id: nextId(), type: spec.type, x: spec.x, y: spec.y, z: spec.z, rotation: 0, props: spec.props };
+      S.elements.push(data);
+      banner.appendChild(createDynElDom(data));
+    });
+
+    applyBg();
+    renderAll();
+    refreshLayersPanel();
+    histSnapshot();
   });
 
   function syncInputsToState() {
@@ -3754,37 +4010,36 @@
 
   function applyBg() {
     const c = S.cfg;
-    const baseColor = c.bgType === 'gradient'
-      ? (c.bgGradient.stops[0]?.color || '#000')
-      : c.bg;
     const hex = c.bgPatternColor || '#808080';
     const pr = parseInt(hex.slice(1,3),16), pg = parseInt(hex.slice(3,5),16), pb = parseInt(hex.slice(5,7),16);
     const patColor = `rgba(${pr},${pg},${pb},${c.bgPatternOpacity})`;
     const pat = getPatternCss(c.bgPattern, patColor, c.bgPatternSize);
 
+    // Pattern lives on its own element so html2canvas can render it as a child
+    // node rather than a CSS background-image layer (which html2canvas drops).
+    const patEl = document.getElementById('bmBgPattern');
+    if (patEl) {
+      if (pat.image === 'none') {
+        patEl.style.backgroundImage = 'none';
+      } else {
+        patEl.style.backgroundImage    = pat.image;
+        patEl.style.backgroundSize     = pat.size;
+        patEl.style.backgroundPosition = pat.position || '0 0';
+      }
+    }
+
+    // Banner carries only the solid color or gradient (single-layer, reliable).
     if (c.bgType === 'gradient') {
       const grad = gradientCss();
-      banner.style.backgroundColor = baseColor;
-      if (pat.image === 'none') {
-        banner.style.backgroundImage    = grad;
-        banner.style.backgroundSize     = '100% 100%';
-        banner.style.backgroundPosition = '0 0';
-      } else {
-        banner.style.backgroundImage    = `${pat.image}, ${grad}`;
-        banner.style.backgroundSize     = `${pat.size}, 100% 100%`;
-        banner.style.backgroundPosition = `${pat.position || '0 0'}, 0 0`;
-      }
+      banner.style.backgroundColor    = c.bgGradient.stops[0]?.color || '#000';
+      banner.style.backgroundImage    = grad;
+      banner.style.backgroundSize     = '100% 100%';
+      banner.style.backgroundPosition = '0 0';
     } else {
       banner.style.backgroundColor = c.bg;
-      if (pat.image === 'none') {
-        banner.style.backgroundImage = 'none';
-        banner.style.backgroundSize = '';
-        banner.style.backgroundPosition = '';
-      } else {
-        banner.style.backgroundImage    = pat.image;
-        banner.style.backgroundSize     = pat.size;
-        banner.style.backgroundPosition = pat.position || '0 0';
-      }
+      banner.style.backgroundImage = 'none';
+      banner.style.backgroundSize  = '';
+      banner.style.backgroundPosition = '';
     }
     scheduleSave();
   }
