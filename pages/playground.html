@@ -1,0 +1,389 @@
+<!-- Playground -->
+<style>
+  .pg-hero {
+    padding: 120px 0 60px;
+  }
+
+  .pg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 0;
+  }
+
+  .pg-card {
+    background: var(--surface);
+    border: 1px solid var(--border-default);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pg-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+  }
+
+  .pg-card.pg-card-link {
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+  }
+
+  .pg-card.pg-card-link:hover {
+    border-color: var(--border-accent);
+    box-shadow: 0 16px 40px rgba(227,95,95,0.07);
+  }
+
+  .pg-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .pg-card-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    background: var(--accent-glow);
+    border: 1px solid var(--border-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--accent);
+  }
+
+  .pg-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+
+  .pg-status-live {
+    background: rgba(74, 222, 128, 0.1);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.2);
+  }
+
+  .pg-status-wip {
+    background: rgba(251, 191, 36, 0.1);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+  }
+
+  .pg-status-concept {
+    background: rgba(148, 163, 184, 0.08);
+    color: var(--foreground-muted);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+  }
+
+  .pg-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--foreground);
+    line-height: 1.3;
+  }
+
+  .pg-card p {
+    font-size: 0.83rem;
+    color: var(--foreground-muted);
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  .pg-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 4px;
+  }
+
+  .pg-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--foreground-subtle);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-default);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
+  .pg-card-arrow {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    color: var(--accent);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+
+  .pg-card-link:hover .pg-card-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Featured card — wider */
+  .pg-card-featured {
+    grid-column: span 2;
+  }
+
+  @media (max-width: 700px) {
+    .pg-card-featured { grid-column: span 1; }
+    .pg-hero { padding: 100px 0 48px; }
+  }
+
+  .pg-featured-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: center;
+  }
+
+  @media (max-width: 700px) {
+    .pg-featured-inner { grid-template-columns: 1fr; }
+  }
+
+  .pg-preview {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-default);
+    background: var(--bg-deep);
+    aspect-ratio: 16/9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Mini window manager preview animation */
+  .pg-win {
+    position: absolute;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 5px;
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(4px);
+  }
+
+  .pg-win-header {
+    height: 14px;
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 6px;
+  }
+
+  .pg-win-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+  }
+
+  @keyframes pgWinFloat {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-4px); }
+  }
+
+  .pg-win:nth-child(1) { width: 95px; height: 65px; top: 12%; left: 5%;  animation: pgWinFloat 4s ease-in-out infinite; }
+  .pg-win:nth-child(2) { width: 80px; height: 55px; top: 10%; left: 52%; animation: pgWinFloat 4s ease-in-out infinite 1.2s; }
+  .pg-win:nth-child(3) { width: 70px; height: 50px; top: 52%; left: 28%; animation: pgWinFloat 4s ease-in-out infinite 2.4s; }
+
+  .pg-preview-label {
+    position: absolute;
+    bottom: 8px;
+    right: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--foreground-subtle);
+  }
+
+  /* Divider */
+  .pg-divider {
+    border: none;
+    border-top: 1px solid var(--border-default);
+    margin: 48px 0 40px;
+  }
+
+  .pg-section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--foreground-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+</style>
+
+<section class="pg-hero">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-label">// PLAYGROUND</p>
+      <h2 class="gradient-text">Experiments & Demos</h2>
+      <p class="section-description">Live prototypes, work-in-progress tools, and technical concepts I'm building or exploring.</p>
+    </div>
+
+    <p class="pg-section-label">// featured</p>
+    <div class="pg-grid">
+
+      <!-- Featured: IYAI Bridge -->
+      <a class="pg-card pg-card-link pg-card-featured section-enter" href="/iyai" data-route>
+        <div class="pg-featured-inner">
+          <div>
+            <div class="pg-card-top" style="margin-bottom:14px">
+              <div class="pg-card-icon">
+                <iconify-icon icon="mdi:window-restore" width="18" height="18"></iconify-icon>
+              </div>
+              <span class="pg-status pg-status-live">Live</span>
+            </div>
+            <h3>IYAI Bridge</h3>
+            <p style="margin-top:8px">A Windows-style floating window manager built from scratch in the browser. Drag, snap, resize with coupled edges, ghost previews, and frosted-glass panels.</p>
+            <div class="pg-tags" style="margin-top:16px">
+              <span class="pg-tag">window-manager</span>
+              <span class="pg-tag">vanilla JS</span>
+              <span class="pg-tag">CSS snap</span>
+              <span class="pg-tag">coupled resize</span>
+            </div>
+          </div>
+          <div class="pg-preview">
+            <div class="pg-win">
+              <div class="pg-win-header">
+                <div class="pg-win-dot" style="background:#ff5f57"></div>
+                <div class="pg-win-dot" style="background:#febc2e"></div>
+                <div class="pg-win-dot" style="background:#28c840"></div>
+              </div>
+            </div>
+            <div class="pg-win">
+              <div class="pg-win-header">
+                <div class="pg-win-dot" style="background:#ff5f57"></div>
+                <div class="pg-win-dot" style="background:#febc2e"></div>
+                <div class="pg-win-dot" style="background:#28c840"></div>
+              </div>
+            </div>
+            <div class="pg-win">
+              <div class="pg-win-header">
+                <div class="pg-win-dot" style="background:#ff5f57"></div>
+                <div class="pg-win-dot" style="background:#febc2e"></div>
+                <div class="pg-win-dot" style="background:#28c840"></div>
+              </div>
+            </div>
+            <span class="pg-preview-label">live preview →</span>
+          </div>
+        </div>
+        <iconify-icon class="pg-card-arrow" icon="mdi:arrow-right" width="16" height="16"></iconify-icon>
+      </a>
+
+    </div>
+
+    <hr class="pg-divider">
+    <p class="pg-section-label">// all experiments</p>
+
+    <div class="pg-grid">
+
+      <!-- Designer -->
+      <a class="pg-card pg-card-link section-enter" href="/designer" data-route style="animation-delay:0.05s">
+        <div class="pg-card-top">
+          <div class="pg-card-icon">
+            <iconify-icon icon="mdi:vector-square" width="18" height="18"></iconify-icon>
+          </div>
+          <span class="pg-status pg-status-live">Live</span>
+        </div>
+        <h3>Designer</h3>
+        <p>A canvas-based design editor. Add shapes, text, code blocks, and decorative elements. Export as PNG or SVG.</p>
+        <div class="pg-tags">
+          <span class="pg-tag">canvas</span>
+          <span class="pg-tag">drag-and-drop</span>
+          <span class="pg-tag">SVG export</span>
+        </div>
+        <iconify-icon class="pg-card-arrow" icon="mdi:arrow-right" width="16" height="16"></iconify-icon>
+      </a>
+
+      <!-- GoldIQ Field Kit -->
+      <a class="pg-card pg-card-link section-enter" href="/goldiq.html" style="animation-delay:0.1s">
+        <div class="pg-card-top">
+          <div class="pg-card-icon">
+            <iconify-icon icon="mdi:cube-scan" width="18" height="18"></iconify-icon>
+          </div>
+          <span class="pg-status pg-status-live">Live</span>
+        </div>
+        <h3>GoldIQ Field Kit</h3>
+        <p>Interactive 3D explorer of the GoldIQ hardware prototype — ESP32, pH & EC probes, GPS, 4G module, and a rugged tablet with animated electric flow lines.</p>
+        <div class="pg-tags">
+          <span class="pg-tag">Three.js</span>
+          <span class="pg-tag">WebGL</span>
+          <span class="pg-tag">IoT hardware</span>
+          <span class="pg-tag">3D</span>
+        </div>
+        <iconify-icon class="pg-card-arrow" icon="mdi:arrow-right" width="16" height="16"></iconify-icon>
+      </a>
+
+      <!-- Particle field (concept) -->
+      <div class="pg-card section-enter" style="animation-delay:0.15s">
+        <div class="pg-card-top">
+          <div class="pg-card-icon">
+            <iconify-icon icon="mdi:atom-variant" width="18" height="18"></iconify-icon>
+          </div>
+          <span class="pg-status pg-status-concept">Concept</span>
+        </div>
+        <h3>Particle Field</h3>
+        <p>WebGL canvas experiment — mouse-reactive particles forming and dissolving into constellations based on cursor proximity and velocity.</p>
+        <div class="pg-tags">
+          <span class="pg-tag">WebGL</span>
+          <span class="pg-tag">canvas</span>
+          <span class="pg-tag">generative</span>
+        </div>
+      </div>
+
+      <!-- Logic gates (concept) -->
+      <div class="pg-card section-enter" style="animation-delay:0.2s">
+        <div class="pg-card-top">
+          <div class="pg-card-icon">
+            <iconify-icon icon="mdi:gate-and" width="18" height="18"></iconify-icon>
+          </div>
+          <span class="pg-status pg-status-concept">Concept</span>
+        </div>
+        <h3>Logic Gate Sim</h3>
+        <p>Interactive digital logic circuit builder. Wire up AND, OR, NOT, XOR gates and watch signals propagate in real time.</p>
+        <div class="pg-tags">
+          <span class="pg-tag">logic gates</span>
+          <span class="pg-tag">circuits</span>
+          <span class="pg-tag">interactive</span>
+        </div>
+      </div>
+
+      <!-- Noise explorer (concept) -->
+      <div class="pg-card section-enter" style="animation-delay:0.25s">
+        <div class="pg-card-top">
+          <div class="pg-card-icon">
+            <iconify-icon icon="mdi:terrain" width="18" height="18"></iconify-icon>
+          </div>
+          <span class="pg-status pg-status-concept">Concept</span>
+        </div>
+        <h3>Noise Explorer</h3>
+        <p>Visual playground for Perlin and simplex noise — tweak octaves, scale, and seed to generate terrain heightmaps or texture patterns.</p>
+        <div class="pg-tags">
+          <span class="pg-tag">procedural</span>
+          <span class="pg-tag">Perlin noise</span>
+          <span class="pg-tag">canvas</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>

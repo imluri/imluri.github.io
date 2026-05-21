@@ -1,0 +1,881 @@
+<!-- 3D Model Mapper -->
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  body.mm-page footer { display: none; }
+
+  .mm-wrap {
+    --bg:      #080608;
+    --surface: #0f0d12;
+    --surface2:#161420;
+    --accent:  #e35f5f;
+    --accent-br:#ff7070;
+    --gold:    #f0c040;
+    --white:   #e9ebf0;
+    --muted:   #9aa0b2;
+    --subtle:  rgba(255,255,255,0.05);
+    --border:  rgba(255,255,255,0.07);
+    --mono:    'IBM Plex Mono', monospace;
+    --sidebar: 280px;
+
+    position: fixed;
+    top: 58px;
+    left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 14px;
+    color: var(--white);
+    background: var(--bg);
+  }
+
+  /* ── Toolbar ── */
+  .mm-toolbar {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    background: rgba(8,6,8,0.95);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    gap: 12px;
+  }
+  .mm-title { font-size: 0.82rem; font-weight: 600; letter-spacing: 0.5px; }
+  .mm-modes { display: flex; gap: 4px; }
+
+  .mm-wrap .mode-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 6px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--muted);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 0.78rem; font-weight: 500; cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .mm-wrap .mode-btn:hover { background: var(--subtle); color: var(--white); }
+  .mm-wrap .mode-btn.active {
+    background: rgba(227,95,95,0.14);
+    border-color: rgba(227,95,95,0.35);
+    color: var(--accent-br);
+  }
+  .mm-wrap .mode-btn .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor; flex-shrink: 0;
+  }
+  .mm-wrap .mode-btn.active .dot { box-shadow: 0 0 6px currentColor; }
+
+  /* ── Layout ── */
+  .mm-wrap .main {
+    flex: 1; display: flex; overflow: hidden; min-height: 0;
+  }
+
+  /* ── Sidebar ── */
+  .mm-wrap .sidebar {
+    width: var(--sidebar); flex-shrink: 0;
+    display: flex; flex-direction: column;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto; overflow-x: hidden;
+  }
+  .mm-wrap .sidebar::-webkit-scrollbar { width: 4px; }
+  .mm-wrap .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .mm-wrap .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+
+  .mm-wrap .sb-section { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+
+  .mm-wrap .sb-label {
+    font-family: var(--mono); font-size: 0.62rem;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .mm-wrap .sb-label-count {
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1px 7px; font-size: 0.6rem; color: var(--muted);
+  }
+
+  /* Upload */
+  .mm-wrap .upload-area {
+    border: 1.5px dashed rgba(255,255,255,0.12); border-radius: 8px;
+    padding: 18px 12px; text-align: center; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s; position: relative;
+  }
+  .mm-wrap .upload-area:hover,
+  .mm-wrap .upload-area.drag-over {
+    border-color: rgba(227,95,95,0.4); background: rgba(227,95,95,0.04);
+  }
+  .mm-wrap .upload-area input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .mm-wrap .upload-icon { font-size: 1.5rem; margin-bottom: 6px; }
+  .mm-wrap .upload-text { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+  .mm-wrap .upload-text strong { color: var(--white); }
+  .mm-wrap .upload-text small { font-family: var(--mono); font-size: 0.65rem; }
+  .mm-wrap .file-name {
+    margin-top: 8px; font-family: var(--mono); font-size: 0.68rem;
+    color: var(--accent-br); word-break: break-all; display: none;
+  }
+
+  /* Instructions */
+  .mm-wrap .instructions { font-size: 0.75rem; color: var(--muted); line-height: 1.7; }
+  .mm-wrap .instructions ol { padding-left: 16px; }
+  .mm-wrap .instructions li { margin-bottom: 4px; }
+  .mm-wrap .instructions code {
+    font-family: var(--mono); font-size: 0.68rem;
+    background: rgba(255,255,255,0.06); padding: 1px 4px; border-radius: 3px; color: var(--white);
+  }
+
+  /* Pending pin form */
+  .mm-wrap #pending-form { display: none; flex-direction: column; gap: 8px; }
+  .mm-wrap #pending-form.visible { display: flex; }
+  .mm-wrap .form-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 3px; }
+  .mm-wrap .form-input {
+    width: 100%; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 7px 10px; color: var(--white);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 0.8rem; outline: none; transition: border-color 0.15s;
+  }
+  .mm-wrap .form-input:focus { border-color: rgba(227,95,95,0.4); }
+  .mm-wrap .form-input::placeholder { color: var(--muted); }
+  .mm-wrap .form-row { display: flex; gap: 6px; }
+  .mm-wrap .mm-btn {
+    flex: 1; padding: 7px 12px; border-radius: 6px;
+    border: 1px solid var(--border);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s;
+  }
+  .mm-wrap .mm-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .mm-wrap .mm-btn-primary:hover { background: var(--accent-br); }
+  .mm-wrap .mm-btn-ghost { background: transparent; color: var(--muted); }
+  .mm-wrap .mm-btn-ghost:hover { background: var(--subtle); color: var(--white); }
+
+  .mm-wrap .coords {
+    font-family: var(--mono); font-size: 0.65rem; color: var(--muted);
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 5px; padding: 6px 8px;
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; text-align: center;
+  }
+  .mm-wrap .coords span { color: var(--white); }
+
+  /* Pin list */
+  .mm-wrap #pin-list { display: flex; flex-direction: column; gap: 6px; }
+  .mm-wrap .pin-empty {
+    text-align: center; font-size: 0.75rem; color: var(--muted); padding: 16px 0; line-height: 1.6;
+  }
+  .mm-wrap .pin-item {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 7px; padding: 9px 10px; cursor: pointer;
+    transition: border-color 0.15s; position: relative;
+  }
+  .mm-wrap .pin-item:hover { border-color: rgba(255,255,255,0.14); }
+  .mm-wrap .pin-item.selected { border-color: rgba(227,95,95,0.4); }
+  .mm-wrap .pin-item-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;
+  }
+  .mm-wrap .pin-item-label {
+    font-size: 0.8rem; font-weight: 600; color: var(--white);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .mm-wrap .pin-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 6px rgba(227,95,95,0.6); flex-shrink: 0;
+  }
+  .mm-wrap .pin-delete {
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font-size: 0.8rem; padding: 2px 4px; border-radius: 4px; transition: color 0.15s, background 0.15s;
+  }
+  .mm-wrap .pin-delete:hover { color: var(--accent); background: rgba(227,95,95,0.1); }
+  .mm-wrap .pin-coords { font-family: var(--mono); font-size: 0.62rem; color: var(--muted); }
+  .mm-wrap .pin-desc { font-size: 0.72rem; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+  /* Export */
+  .mm-wrap .export-btn {
+    width: 100%; padding: 9px;
+    background: rgba(240,192,64,0.08); border: 1px solid rgba(240,192,64,0.2);
+    border-radius: 7px; color: var(--gold);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 0.8rem; font-weight: 600; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .mm-wrap .export-btn:hover { background: rgba(240,192,64,0.14); border-color: rgba(240,192,64,0.35); }
+  .mm-wrap .export-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .mm-wrap .export-hint { font-size: 0.68rem; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+
+  /* Canvas area */
+  .mm-wrap .canvas-wrap { flex: 1; position: relative; overflow: hidden; }
+  .mm-wrap #three-canvas { width: 100%; height: 100%; display: block; }
+  .mm-wrap .canvas-hint {
+    position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+    font-family: var(--mono); font-size: 0.65rem;
+    color: rgba(255,255,255,0.3); letter-spacing: 1px;
+    pointer-events: none; text-align: center; white-space: nowrap;
+  }
+  .mm-wrap #mode-badge {
+    position: absolute; top: 12px; right: 12px;
+    font-family: var(--mono); font-size: 0.65rem;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 20px; pointer-events: none;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .mm-wrap #mode-badge.orbit {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--muted);
+  }
+  .mm-wrap #mode-badge.pin {
+    background: rgba(227,95,95,0.12); border: 1px solid rgba(227,95,95,0.3);
+    color: var(--accent-br); animation: mmBadgePulse 1.8s ease-in-out infinite;
+  }
+  @keyframes mmBadgePulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(227,95,95,0.25); }
+    50%      { box-shadow: 0 0 0 5px rgba(227,95,95,0); }
+  }
+  .mm-wrap #no-model {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 10px;
+    pointer-events: none; transition: opacity 0.4s;
+  }
+  .mm-wrap #no-model.hidden { opacity: 0; }
+  .mm-wrap .no-model-icon { font-size: 2.5rem; opacity: 0.3; }
+  .mm-wrap .no-model-text { font-size: 0.82rem; color: var(--muted); }
+  .mm-wrap .canvas-wrap.pin-mode #three-canvas { cursor: crosshair; }
+  .mm-wrap .canvas-wrap.orbit-mode #three-canvas { cursor: grab; }
+  .mm-wrap .canvas-wrap.orbit-mode #three-canvas:active { cursor: grabbing; }
+
+  /* Hierarchy tree */
+  .mm-wrap #hierarchy-tree { max-height: 220px; overflow-y: auto; margin-top: 2px; }
+  .mm-wrap #hierarchy-tree::-webkit-scrollbar { width: 4px; }
+  .mm-wrap #hierarchy-tree::-webkit-scrollbar-track { background: transparent; }
+  .mm-wrap #hierarchy-tree::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+  .mm-wrap .h-node {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 8px 4px 0; border-radius: 5px; cursor: pointer;
+    font-size: 0.75rem; transition: background 0.15s, color 0.15s;
+    color: var(--muted); user-select: none;
+  }
+  .mm-wrap .h-node:hover { background: var(--subtle); color: var(--white); }
+  .mm-wrap .h-node.selected { background: rgba(227,95,95,0.12); color: var(--accent-br); }
+  .mm-wrap .h-node-mesh { color: var(--white); }
+  .mm-wrap .h-node-icon { font-size: 0.6rem; flex-shrink: 0; color: var(--muted); }
+  .mm-wrap .h-node-mesh > .h-node-icon { color: #f0c040; }
+  .mm-wrap .h-node.selected > .h-node-icon { color: var(--accent); }
+  .mm-wrap .h-node-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px; }
+  .mm-wrap .h-empty { font-size: 0.72rem; color: var(--muted); padding: 4px 0; }
+
+  /* Mobile */
+  @media (max-width: 600px) {
+    .mm-wrap { --sidebar: 100%; }
+    .mm-wrap .main { flex-direction: column; }
+    .mm-wrap .sidebar { width: 100%; height: 50vh; border-right: none; border-bottom: 1px solid var(--border); }
+    .mm-wrap .canvas-wrap { height: 50vh; }
+  }
+</style>
+
+<div class="mm-wrap">
+  <!-- Toolbar -->
+  <div class="mm-toolbar">
+    <span class="mm-title">3D Model Mapper</span>
+    <div class="mm-modes">
+      <button class="mode-btn active" id="btnOrbit"><span class="dot"></span> Orbit</button>
+      <button class="mode-btn" id="btnPin"><span class="dot"></span> Place Pin</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+      <div class="sb-section">
+        <div class="sb-label">Model File</div>
+        <div class="upload-area" id="uploadArea">
+          <input type="file" id="fileInput" accept=".glb,.gltf,.bin,.png,.jpg,.jpeg,.webp" multiple />
+          <div class="upload-icon">📦</div>
+          <div class="upload-text">
+            <strong>Click or drag to load</strong><br>
+            <small>.GLB (single file) or<br>.GLTF + .BIN + textures together</small>
+          </div>
+        </div>
+        <div class="file-name" id="fileName"></div>
+      </div>
+
+      <div class="sb-section">
+        <div class="sb-label">How to Use</div>
+        <div class="instructions">
+          <ol>
+            <li>Load a <code>.glb</code> or <code>.gltf</code> file above</li>
+            <li>Switch to <code>Orbit</code> — drag to rotate, scroll to zoom</li>
+            <li>Switch to <code>Place Pin</code> and click any surface, <em>or</em> pick a part from <strong>Model Parts</strong> below</li>
+            <li>Give the pin a label and optional description</li>
+            <li>Repeat for all annotation points</li>
+            <li>Click <strong>Export JSON</strong> to download pin data</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="sb-section" id="hierarchy-section" style="display:none">
+        <div class="sb-label">
+          Model Parts
+          <span style="font-size:0.6rem;font-weight:400;color:var(--muted);margin-left:4px">click to pin</span>
+        </div>
+        <div id="hierarchy-tree"></div>
+      </div>
+
+      <div class="sb-section" id="pending-section" style="display:none">
+        <div class="sb-label" style="color:var(--accent-br)">📍 New Pin</div>
+        <div id="pending-form" class="visible">
+          <div>
+            <div class="form-label">Label <span style="color:var(--accent)">*</span></div>
+            <input class="form-input" id="pinLabel" placeholder="e.g. GPIO 4, VCC Rail, GND…" maxlength="40" />
+          </div>
+          <div>
+            <div class="form-label">Description (optional)</div>
+            <input class="form-input" id="pinDesc" placeholder="e.g. PWM output to pH probe" maxlength="80" />
+          </div>
+          <div id="pendingCoords" class="coords">
+            <div><div style="font-size:0.55rem;color:var(--muted);margin-bottom:2px">X</div><span id="cx">—</span></div>
+            <div><div style="font-size:0.55rem;color:var(--muted);margin-bottom:2px">Y</div><span id="cy">—</span></div>
+            <div><div style="font-size:0.55rem;color:var(--muted);margin-bottom:2px">Z</div><span id="cz">—</span></div>
+          </div>
+          <div class="form-row">
+            <button class="mm-btn mm-btn-primary" id="btnSavePin">Add Pin</button>
+            <button class="mm-btn mm-btn-ghost"   id="btnCancelPin">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sb-section" style="flex:1">
+        <div class="sb-label">
+          Pins
+          <span class="sb-label-count" id="pinCount">0</span>
+        </div>
+        <div id="pin-list">
+          <div class="pin-empty">No pins placed yet.<br>Switch to <strong>Place Pin</strong> mode<br>and click the model.</div>
+        </div>
+      </div>
+
+      <div class="sb-section">
+        <button class="export-btn" id="btnExport" disabled>⬇ Export JSON</button>
+        <div class="export-hint">Downloads a <code style="font-family:var(--mono);font-size:0.65rem">pin-map.json</code> file with all pin positions and labels.</div>
+      </div>
+
+    </aside>
+
+    <!-- Canvas -->
+    <div class="canvas-wrap orbit-mode" id="canvasWrap">
+      <canvas id="three-canvas"></canvas>
+      <div id="mode-badge" class="orbit">ORBIT</div>
+      <div class="canvas-hint" id="canvasHint">Drag to orbit · Scroll to zoom</div>
+      <div id="no-model">
+        <div class="no-model-icon">🗂</div>
+        <div class="no-model-text">Load a model to get started</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader }    from 'three/addons/loaders/GLTFLoader.js';
+
+document.body.classList.add('mm-page');
+let rafId;
+
+// ── Renderer ──────────────────────────────────────────────────────────────────
+const canvasEl = document.getElementById('three-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+renderer.toneMapping       = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+
+function getCanvasSize() {
+  const wrap = document.getElementById('canvasWrap');
+  return { w: wrap.clientWidth, h: wrap.clientHeight };
+}
+function resizeRenderer() {
+  const { w, h } = getCanvasSize();
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+
+// ── Scene ──────────────────────────────────────────────────────────────────────
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x080608);
+
+const gridHelper = new THREE.GridHelper(4, 20, 0x1a1a22, 0x111116);
+gridHelper.visible = false;
+scene.add(gridHelper);
+
+// ── Camera ────────────────────────────────────────────────────────────────────
+const { w: iw, h: ih } = getCanvasSize();
+const camera = new THREE.PerspectiveCamera(45, iw / ih, 0.001, 1000);
+camera.position.set(0, 0.5, 2);
+
+// ── Lighting ──────────────────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+const keyLight = new THREE.DirectionalLight(0xfff5e0, 1.6);
+keyLight.position.set(3, 6, 4); keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048); scene.add(keyLight);
+const fillLight = new THREE.DirectionalLight(0xc0d8ff, 0.5);
+fillLight.position.set(-4, 2, -3); scene.add(fillLight);
+const rimLight = new THREE.DirectionalLight(0xffd580, 0.3);
+rimLight.position.set(0, -2, -5); scene.add(rimLight);
+
+// ── Controls ──────────────────────────────────────────────────────────────────
+const controls = new OrbitControls(camera, canvasEl);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.screenSpacePanning = false;
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let mode           = 'orbit';
+let modelRoot      = null;
+let modelMeshes    = [];
+let pinScale       = 0.02;
+let pendingPinData = null;
+const pins         = [];
+let nextPinId      = 1;
+let selectedPinId  = null;
+
+// ── GLTF Loader ───────────────────────────────────────────────────────────────
+const fileIn  = document.getElementById('fileInput');
+const fileNm  = document.getElementById('fileName');
+const noModel = document.getElementById('no-model');
+
+function loadFiles(files) {
+  if (!files || files.length === 0) return;
+  const fileMap = new Map();
+  for (const f of files) fileMap.set(f.name, URL.createObjectURL(f));
+  const entry = [...files].find(f => /\.(glb|gltf)$/i.test(f.name));
+  if (!entry) { alert('No .glb or .gltf file found in the selection.'); return; }
+  const entryUrl = fileMap.get(entry.name);
+  const manager = new THREE.LoadingManager();
+  manager.setURLModifier(url => {
+    const filename = decodeURIComponent(url.split('/').pop().split('?')[0]);
+    return fileMap.get(filename) ?? url;
+  });
+  const loader = new GLTFLoader(manager);
+  loadModel(loader, entryUrl, entry.name, () => fileMap.forEach(u => URL.revokeObjectURL(u)));
+}
+
+fileIn.addEventListener('change', e => loadFiles(e.target.files));
+
+const uploadArea = document.getElementById('uploadArea');
+uploadArea.addEventListener('dragover',  e => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+uploadArea.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadArea.classList.remove('drag-over');
+  loadFiles(e.dataTransfer.files);
+});
+
+function loadModel(loader, url, filename, onDone) {
+  if (modelRoot) { scene.remove(modelRoot); modelRoot = null; modelMeshes = []; }
+  hierarchySection.style.display = 'none';
+  hierarchyTree.innerHTML = '';
+  clearHierarchyHighlight();
+
+  fileNm.textContent = filename;
+  fileNm.style.display = 'block';
+
+  loader.load(url, gltf => {
+    if (onDone) onDone();
+    modelRoot = gltf.scene;
+
+    const box    = new THREE.Box3().setFromObject(modelRoot);
+    const center = box.getCenter(new THREE.Vector3());
+    const size   = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const normalizeScale = 1.0 / maxDim;
+    modelRoot.scale.setScalar(normalizeScale);
+    modelRoot.position.sub(center.multiplyScalar(normalizeScale));
+
+    const box2 = new THREE.Box3().setFromObject(modelRoot);
+    modelRoot.position.y -= box2.min.y;
+
+    pinScale = maxDim * normalizeScale * 0.025;
+
+    scene.add(modelRoot);
+
+    modelMeshes = [];
+    modelRoot.traverse(obj => {
+      if (obj.isMesh) {
+        obj.castShadow = true; obj.receiveShadow = true;
+        modelMeshes.push(obj);
+      }
+    });
+
+    const gridSize = Math.ceil(maxDim * normalizeScale * 3);
+    gridHelper.scale.setScalar(gridSize / 4);
+    gridHelper.visible = true;
+
+    const box3 = new THREE.Box3().setFromObject(modelRoot);
+    const sz   = box3.getSize(new THREE.Vector3());
+    const ctr  = box3.getCenter(new THREE.Vector3());
+    const dist = Math.max(sz.x, sz.y, sz.z) * 2.2;
+    camera.position.set(ctr.x, ctr.y + sz.y * 0.5, ctr.z + dist);
+    controls.target.copy(ctr);
+    controls.minDistance = dist * 0.1;
+    controls.maxDistance = dist * 5;
+    controls.update();
+
+    noModel.classList.add('hidden');
+    buildHierarchy(modelRoot);
+  }, undefined, err => {
+    if (onDone) onDone();
+    console.error('GLTF load error:', err);
+    alert('Failed to load model. Make sure all companion files (.bin, textures) are selected together with the .gltf.');
+  });
+}
+
+// ── Mode toggle ───────────────────────────────────────────────────────────────
+const btnOrbit   = document.getElementById('btnOrbit');
+const btnPin     = document.getElementById('btnPin');
+const modeBadge  = document.getElementById('mode-badge');
+const canvasHint = document.getElementById('canvasHint');
+const canvasWrap = document.getElementById('canvasWrap');
+
+function setMode(m) {
+  mode = m;
+  controls.enabled = (m === 'orbit');
+  btnOrbit.classList.toggle('active', m === 'orbit');
+  btnPin.classList.toggle('active',   m === 'pin');
+  modeBadge.textContent = m === 'orbit' ? 'ORBIT' : 'PIN MODE';
+  modeBadge.className   = m;
+  canvasHint.textContent = m === 'orbit'
+    ? 'Drag to orbit · Scroll to zoom'
+    : 'Click any surface on the model to place a pin';
+  canvasWrap.className = `canvas-wrap ${m}-mode`;
+}
+
+btnOrbit.addEventListener('click', () => setMode('orbit'));
+btnPin.addEventListener('click',   () => { if (!modelRoot) { alert('Load a model first.'); return; } setMode('pin'); });
+
+// ── Pin placement (raycasting) ────────────────────────────────────────────────
+const raycaster = new THREE.Raycaster();
+const pointer   = new THREE.Vector2();
+let mouseDown   = null;
+
+canvasEl.addEventListener('mousedown', e => { mouseDown = { x: e.clientX, y: e.clientY }; });
+canvasEl.addEventListener('mouseup', e => {
+  if (!mouseDown || mode !== 'pin') return;
+  const dx = Math.abs(e.clientX - mouseDown.x);
+  const dy = Math.abs(e.clientY - mouseDown.y);
+  mouseDown = null;
+  if (dx > 5 || dy > 5) return;
+  if (!modelRoot || modelMeshes.length === 0) return;
+
+  const rect = canvasEl.getBoundingClientRect();
+  pointer.x  =  ((e.clientX - rect.left)  / rect.width)  * 2 - 1;
+  pointer.y  = -((e.clientY - rect.top)   / rect.height)  * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(modelMeshes, true);
+  if (hits.length > 0) placePendingPin(hits[0].point.clone());
+});
+
+// ── Pending pin ───────────────────────────────────────────────────────────────
+const pendingSection = document.getElementById('pending-section');
+const pinLabelInput  = document.getElementById('pinLabel');
+const pinDescInput   = document.getElementById('pinDesc');
+const cx = document.getElementById('cx');
+const cy = document.getElementById('cy');
+const cz = document.getElementById('cz');
+
+function placePendingPin(point) {
+  cancelPendingPin(false);
+
+  const group = new THREE.Group();
+  group.position.copy(point);
+
+  const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(pinScale * 1.4, 14, 14),
+    new THREE.MeshBasicMaterial({ color: 0xe35f5f, transparent: true, opacity: 0.7 })
+  );
+  group.add(sphere);
+
+  const stemH = pinScale * 5;
+  const stem  = new THREE.Mesh(
+    new THREE.CylinderGeometry(pinScale * 0.12, pinScale * 0.12, stemH, 5),
+    new THREE.MeshBasicMaterial({ color: 0xe35f5f, transparent: true, opacity: 0.6 })
+  );
+  stem.position.y = stemH / 2;
+  group.add(stem);
+
+  const head = new THREE.Mesh(
+    new THREE.SphereGeometry(pinScale * 0.7, 10, 10),
+    new THREE.MeshBasicMaterial({ color: 0xff7070 })
+  );
+  head.position.y = stemH;
+  group.add(head);
+
+  scene.add(group);
+  pendingPinData = { point, group };
+
+  cx.textContent = point.x.toFixed(4);
+  cy.textContent = point.y.toFixed(4);
+  cz.textContent = point.z.toFixed(4);
+
+  pendingSection.style.display = '';
+  pinLabelInput.value = '';
+  pinDescInput.value  = '';
+  pinLabelInput.focus();
+  setMode('orbit');
+}
+
+function cancelPendingPin(switchToPin = true) {
+  if (pendingPinData) { scene.remove(pendingPinData.group); pendingPinData = null; }
+  pendingSection.style.display = 'none';
+  clearHierarchyHighlight();
+  if (switchToPin) setMode('pin');
+}
+
+function confirmPin() {
+  const label = pinLabelInput.value.trim();
+  if (!label) { pinLabelInput.focus(); pinLabelInput.style.borderColor = 'rgba(227,95,95,0.6)'; return; }
+  pinLabelInput.style.borderColor = '';
+
+  const desc  = pinDescInput.value.trim();
+  const point = pendingPinData.point.clone();
+
+  scene.remove(pendingPinData.group);
+  pendingPinData = null;
+
+  const group = buildPinMarker(label, point);
+  scene.add(group);
+
+  const id = nextPinId++;
+  pins.push({ id, label, desc, position: point, group });
+
+  pendingSection.style.display = 'none';
+  clearHierarchyHighlight();
+  renderPinList();
+  setMode('pin');
+}
+
+// ── Pin marker ────────────────────────────────────────────────────────────────
+function buildPinMarker(label, point) {
+  const group = new THREE.Group();
+  group.position.copy(point);
+
+  group.add(new THREE.Mesh(
+    new THREE.SphereGeometry(pinScale, 12, 12),
+    new THREE.MeshStandardMaterial({ color: 0xe35f5f, emissive: 0xe35f5f, emissiveIntensity: 0.8, roughness: 0.3 })
+  ));
+
+  const stemH = pinScale * 5;
+  const stem  = new THREE.Mesh(
+    new THREE.CylinderGeometry(pinScale * 0.1, pinScale * 0.1, stemH, 5),
+    new THREE.MeshBasicMaterial({ color: 0xff6060, transparent: true, opacity: 0.8 })
+  );
+  stem.position.y = stemH / 2;
+  group.add(stem);
+
+  const head = new THREE.Mesh(
+    new THREE.SphereGeometry(pinScale * 0.6, 8, 8),
+    new THREE.MeshStandardMaterial({ color: 0xff4444, emissive: 0xff4444, emissiveIntensity: 0.5 })
+  );
+  head.position.y = stemH;
+  group.add(head);
+
+  const sprite = makeLabelSprite(label);
+  sprite.position.y = stemH + pinScale * 3;
+  sprite.scale.set(pinScale * 14, pinScale * 4, 1);
+  group.add(sprite);
+
+  return group;
+}
+
+function makeLabelSprite(text) {
+  const c = document.createElement('canvas');
+  c.width = 320; c.height = 80;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = 'rgba(14,12,20,0.92)';
+  ctx.beginPath(); ctx.roundRect(4, 4, 312, 72, 10); ctx.fill();
+  ctx.strokeStyle = 'rgba(227,95,95,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = '#e9ebf0';
+  ctx.font = '600 28px "IBM Plex Sans"';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(text.length > 18 ? text.slice(0, 17) + '…' : text, 160, 40);
+  const tex = new THREE.CanvasTexture(c);
+  return new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+}
+
+// ── Pin list UI ───────────────────────────────────────────────────────────────
+const pinList   = document.getElementById('pin-list');
+const pinCount  = document.getElementById('pinCount');
+const btnExport = document.getElementById('btnExport');
+
+function renderPinList() {
+  pinCount.textContent = pins.length;
+  btnExport.disabled   = pins.length === 0;
+  if (pins.length === 0) {
+    pinList.innerHTML = '<div class="pin-empty">No pins placed yet.<br>Switch to <strong>Place Pin</strong> mode<br>and click the model.</div>';
+    return;
+  }
+  pinList.innerHTML = pins.map(p => `
+    <div class="pin-item${p.id === selectedPinId ? ' selected' : ''}" data-id="${p.id}">
+      <div class="pin-item-header">
+        <div class="pin-item-label"><span class="pin-dot"></span>${p.label}</div>
+        <button class="pin-delete" data-del="${p.id}" title="Delete">✕</button>
+      </div>
+      <div class="pin-coords">x ${p.position.x.toFixed(4)} &nbsp; y ${p.position.y.toFixed(4)} &nbsp; z ${p.position.z.toFixed(4)}</div>
+      ${p.desc ? `<div class="pin-desc">${p.desc}</div>` : ''}
+    </div>
+  `).join('');
+  pinList.querySelectorAll('.pin-item').forEach(el => {
+    el.addEventListener('click', e => { if (e.target.dataset.del) return; selectPin(+el.dataset.id); });
+  });
+  pinList.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', () => deletePin(+btn.dataset.del));
+  });
+}
+
+function selectPin(id) {
+  selectedPinId = id;
+  const pin = pins.find(p => p.id === id);
+  if (pin) controls.target.copy(pin.position);
+  renderPinList();
+}
+
+function deletePin(id) {
+  const idx = pins.findIndex(p => p.id === id);
+  if (idx === -1) return;
+  scene.remove(pins[idx].group);
+  pins.splice(idx, 1);
+  if (selectedPinId === id) selectedPinId = null;
+  renderPinList();
+}
+
+// ── Hierarchy ─────────────────────────────────────────────────────────────────
+const hierarchySection = document.getElementById('hierarchy-section');
+const hierarchyTree    = document.getElementById('hierarchy-tree');
+let   hierarchyHighlight = null;
+let   hierarchyNodes     = [];
+let   selectedHierNode   = -1;
+
+function buildHierarchy(root) {
+  hierarchyNodes = [];
+  function hasMesh(o) { return o.isMesh || o.children.some(hasMesh); }
+  function walk(obj, depth) {
+    if (!hasMesh(obj)) return;
+    hierarchyNodes.push({ obj, depth });
+    obj.children.forEach(c => walk(c, depth + 1));
+  }
+  root.children.forEach(c => walk(c, 0));
+
+  if (hierarchyNodes.length === 0) {
+    hierarchyTree.innerHTML = '<div class="h-empty">No parts found.</div>';
+    hierarchySection.style.display = '';
+    return;
+  }
+
+  hierarchyTree.innerHTML = hierarchyNodes.map((n, i) => {
+    const name    = n.obj.name || (n.obj.isMesh ? '(mesh)' : '(group)');
+    const icon    = n.obj.isMesh ? '●' : '▸';
+    const meshCls = n.obj.isMesh ? ' h-node-mesh' : '';
+    const indent  = 8 + n.depth * 12;
+    return `<div class="h-node${meshCls}" data-hidx="${i}" style="padding-left:${indent}px" title="${name}">
+      <span class="h-node-icon">${icon}</span>
+      <span class="h-node-name">${name}</span>
+    </div>`;
+  }).join('');
+
+  hierarchyTree.querySelectorAll('.h-node').forEach(el => {
+    el.addEventListener('click', () => {
+      const i = +el.dataset.hidx;
+      if (selectedHierNode === i) {
+        clearHierarchyHighlight();
+        hierarchyTree.querySelectorAll('.h-node').forEach(n => n.classList.remove('selected'));
+        return;
+      }
+      hierarchyTree.querySelectorAll('.h-node').forEach(n => n.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedHierNode = i;
+      selectHierarchyPart(hierarchyNodes[i].obj);
+    });
+  });
+
+  hierarchySection.style.display = '';
+}
+
+function selectHierarchyPart(obj) {
+  if (hierarchyHighlight) scene.remove(hierarchyHighlight);
+  hierarchyHighlight = new THREE.BoxHelper(obj, 0xe35f5f);
+  scene.add(hierarchyHighlight);
+  const box    = new THREE.Box3().setFromObject(obj);
+  const center = box.getCenter(new THREE.Vector3());
+  controls.target.lerp(center, 0.5);
+  placePendingPin(center);
+}
+
+function clearHierarchyHighlight() {
+  if (hierarchyHighlight) { scene.remove(hierarchyHighlight); hierarchyHighlight = null; }
+  selectedHierNode = -1;
+  hierarchyTree.querySelectorAll('.h-node').forEach(n => n.classList.remove('selected'));
+}
+
+// ── Form buttons ──────────────────────────────────────────────────────────────
+document.getElementById('btnSavePin').addEventListener('click', confirmPin);
+document.getElementById('btnCancelPin').addEventListener('click', () => cancelPendingPin(true));
+pinLabelInput.addEventListener('keydown', e => { if (e.key === 'Enter') confirmPin(); });
+pinDescInput.addEventListener('keydown',  e => { if (e.key === 'Enter') confirmPin(); });
+
+// ── Export ────────────────────────────────────────────────────────────────────
+btnExport.addEventListener('click', () => {
+  const data = {
+    exportedAt: new Date().toISOString(),
+    modelFile:  fileNm.textContent || 'unknown',
+    pinCount:   pins.length,
+    pins: pins.map(p => ({
+      id: p.id, label: p.label, description: p.desc,
+      position: {
+        x: parseFloat(p.position.x.toFixed(5)),
+        y: parseFloat(p.position.y.toFixed(5)),
+        z: parseFloat(p.position.z.toFixed(5)),
+      },
+    })),
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'pin-map.json'; a.click();
+  URL.revokeObjectURL(url);
+});
+
+// ── Animation loop ────────────────────────────────────────────────────────────
+const clock = new THREE.Clock();
+
+function animate() {
+  rafId = requestAnimationFrame(animate);
+  resizeRenderer();
+  const t = clock.getElapsedTime();
+  if (pendingPinData) {
+    const s = 1 + Math.sin(t * 5) * 0.2;
+    pendingPinData.group.children[0].scale.setScalar(s);
+  }
+  if (hierarchyHighlight) hierarchyHighlight.update();
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+resizeRenderer();
+animate();
+window.addEventListener('resize', resizeRenderer);
+
+// ── Cleanup (called by router on navigate away) ───────────────────────────────
+window.__mmCleanup = () => {
+  document.body.classList.remove('mm-page');
+  cancelAnimationFrame(rafId);
+  renderer.dispose();
+  controls.dispose();
+  window.removeEventListener('resize', resizeRenderer);
+  window.__mmCleanup = null;
+};
+</script>

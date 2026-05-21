@@ -10,11 +10,12 @@ const app = document.getElementById('app');
 
 // Map URL pathnames to page fragment files
 const ROUTES = {
-  '/':         '/pages/home.html',
-  '/projects': '/pages/projects.html',
-  '/project':  '/pages/project.html',
-  '/iyai':     '/pages/iyai.html',
-  '/designer': '/pages/designer.html',
+  '/':          '/pages/home.html',
+  '/projects':  '/pages/projects.html',
+  '/project':   '/pages/project.html',
+  '/iyai':      '/pages/iyai.html',
+  '/designer':  '/pages/designer.html',
+  '/model-map': '/pages/model-map.html',
 };
 
 // Cache fetched fragments so we don't re-fetch on back/forward
@@ -33,11 +34,11 @@ async function fetchPage(url) {
 function runInlineScripts(container) {
   container.querySelectorAll('script').forEach(oldScript => {
     const newScript = document.createElement('script');
-    if (oldScript.src) {
-      newScript.src = oldScript.src;
-    } else {
-      newScript.textContent = oldScript.textContent;
+    // Copy all attributes so type="module" and other attrs are preserved
+    for (const { name, value } of oldScript.attributes) {
+      newScript.setAttribute(name, value);
     }
+    if (!oldScript.src) newScript.textContent = oldScript.textContent;
     oldScript.replaceWith(newScript);
   });
 }
@@ -76,7 +77,9 @@ async function swapContent(html) {
   if (typeof stopShowcaseAnimations === 'function') stopShowcaseAnimations();
   if (typeof window.__ibCleanup === 'function') window.__ibCleanup();
   if (typeof window.__bmCleanup === 'function') window.__bmCleanup();
+  if (typeof window.__mmCleanup === 'function') window.__mmCleanup();
   document.body.classList.remove('ib-page');
+  document.body.classList.remove('mm-page');
   app.classList.add('page-exit');
   await new Promise(r => setTimeout(r, 180));
   app.innerHTML = html;
@@ -213,10 +216,11 @@ async function navigate(pathname, pushState = true) {
 
   // Update document title
   const titles = {
-    '/':         'imluri',
-    '/projects': 'Projects | imluri',
-    '/iyai':     'IYAI Bridge | imluri',
-    '/designer': 'Designer | imluri',
+    '/':          'imluri',
+    '/projects':  'Projects | imluri',
+    '/iyai':      'IYAI Bridge | imluri',
+    '/designer':  'Designer | imluri',
+    '/model-map': '3D Model Mapper | imluri',
   };
   if (pathname.startsWith('/project/')) {
     const slug = pathname.replace('/project/', '');

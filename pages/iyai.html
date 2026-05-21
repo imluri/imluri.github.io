@@ -11,6 +11,9 @@
       <button class="ib-help-btn" id="ibSettingsBtn" onclick="ibOpenSettings()" title="Settings">
         <iconify-icon icon="mdi:cog-outline" width="15" height="15"></iconify-icon>
       </button>
+      <button class="ib-help-btn" id="ibSyncBtn" onclick="ibSyncAll()" title="Sync — fetch tree, tabs, skills and state from plugin" disabled>
+        <iconify-icon icon="mdi:refresh" width="15" height="15"></iconify-icon>
+      </button>
       <div class="ib-status">
         <span class="ib-status-dot" id="ibStatusDot"></span>
         <span id="ibStatusText">Disconnected</span>
@@ -166,9 +169,17 @@
       <div class="ib-win-header">
         <iconify-icon icon="mdi:code-braces" width="12" height="12"></iconify-icon>
         <span>Code</span>
-        <button class="ib-header-btn" id="ibCodeRunBtn" onclick="ibRunCode()" title="Run" disabled>
-          <iconify-icon icon="mdi:play" width="13" height="13"></iconify-icon>
-        </button>
+        <div style="margin-left:auto;display:flex;gap:2px">
+          <button class="ib-header-btn" style="margin-left:0" id="ibCodeClearBtn" onclick="ibClearCode()" title="Clear" disabled>
+            <iconify-icon icon="mdi:delete-outline" width="13" height="13"></iconify-icon>
+          </button>
+          <button class="ib-header-btn" style="margin-left:0" id="ibCodeCopyBtn" onclick="ibCopyCode()" title="Copy" disabled>
+            <iconify-icon icon="mdi:content-copy" width="13" height="13"></iconify-icon>
+          </button>
+          <button class="ib-header-btn" style="margin-left:0" id="ibCodeRunBtn" onclick="ibRunCode()" title="Run" disabled>
+            <iconify-icon icon="mdi:play" width="13" height="13"></iconify-icon>
+          </button>
+        </div>
       </div>
       <div class="ib-win-body ib-code-body" id="ibCodeBody">
         <div id="ibCodeEmpty" style="flex:1;display:flex;flex-direction:column">
@@ -177,9 +188,9 @@
             <span>Connect to load code</span>
           </div>
         </div>
-        <div class="ib-code-editor-wrap" id="ibCodeEditorWrap" style="display:none;flex:1;flex-direction:column;min-height:0">
+        <div class="ib-code-editor-wrap" id="ibCodeEditorWrap" style="display:none">
           <div class="ib-code-tabs" id="ibCodeTabs"></div>
-          <textarea class="ib-code-editor" id="ibCodeEditor" spellcheck="false" oninput="ibCodeEditorInput()"></textarea>
+          <div class="ib-code-editor" id="ibCodeEditor"></div>
           <div class="ib-code-output" id="ibCodeOutput"></div>
         </div>
       </div>
@@ -190,9 +201,10 @@
       <div class="ib-win-header">
         <iconify-icon icon="mdi:puzzle-outline" width="12" height="12"></iconify-icon>
         <span>Skills</span>
+        <span id="ibSkillsCount" class="ib-skills-count" style="display:none"></span>
       </div>
       <div class="ib-win-body">
-        <div id="ibSkillsList" style="flex:1;overflow-y:auto;display:flex;flex-direction:column">
+        <div id="ibSkillsList" class="ib-skills-list">
           <div class="ib-empty-state">
             <iconify-icon icon="mdi:connection" width="22" height="22"></iconify-icon>
             <span>Connect to load skills</span>
@@ -201,7 +213,29 @@
       </div>
     </div>
 
+    <!-- Decompile window -->
+    <div class="ib-window" id="ibWinDecompile">
+      <div class="ib-win-header">
+        <iconify-icon icon="mdi:code-json" width="12" height="12"></iconify-icon>
+        <span id="ibDecompileTitle">Decompile</span>
+        <div style="margin-left:auto;display:flex;gap:2px">
+          <button class="ib-header-btn" id="ibDecompileCopyBtn" onclick="ibDecompileCopy()" title="Copy source">
+            <iconify-icon icon="mdi:content-copy" width="13" height="13"></iconify-icon>
+          </button>
+          <button class="ib-header-btn" onclick="ibToggleWindow('ibWinDecompile')" title="Close">
+            <iconify-icon icon="mdi:close" width="13" height="13"></iconify-icon>
+          </button>
+        </div>
+      </div>
+      <div class="ib-win-body ib-decompile-body">
+        <pre class="ib-decompile-pre" id="ibDecompilePre"></pre>
+      </div>
+    </div>
+
   </div>
+
+  <!-- Context menu (fixed-position, hidden by default) -->
+  <div class="ib-ctx-menu" id="ibCtxMenu" style="display:none"></div>
 
 </section>
 
@@ -358,18 +392,19 @@ let ibEventSource = null;
 let ibBaseUrl     = 'http://localhost:7402';
 let ibCurrentHistory = [];
 let ibSettings = { host: 'OpenRouter', model: '', apiKey: '' };
-const IB_HOSTS = ['OpenRouter', 'Groq', 'Mistral', 'Pollinations', 'HuggingFace', 'Google AI Studio', 'Ollama'];
+const IB_HOSTS = ['OpenRouter', 'Groq', 'Mistral', 'Pollinations', 'HuggingFace', 'Google AI Studio', 'Ollama', '9router', 'OpenCode'];
 
 // Per-window position/visibility state
 const ibWinState = new Map([
-  ['ibWinExplorer', { visible:false, x:0, y:0, w:280, h:400, z:1 }],
-  ['ibWinChat',     { visible:false, x:0, y:0, w:480, h:520, z:2 }],
-  ['ibWinProps',    { visible:false, x:0, y:0, w:280, h:400, z:3 }],
-  ['ibWinOutput',   { visible:false, x:0, y:0, w:420, h:200, z:4 }],
-  ['ibWinHistory',  { visible:false, x:0, y:0, w:280, h:320, z:5 }],
-  ['ibWinTools',    { visible:false, x:0, y:0, w:280, h:320, z:6 }],
-  ['ibWinCode',     { visible:false, x:0, y:0, w:420, h:420, z:7 }],
-  ['ibWinSkills',   { visible:false, x:0, y:0, w:280, h:320, z:8 }],
+  ['ibWinExplorer',  { visible:false, x:0, y:0, w:280, h:400, z:1 }],
+  ['ibWinChat',      { visible:false, x:0, y:0, w:480, h:520, z:2 }],
+  ['ibWinProps',     { visible:false, x:0, y:0, w:280, h:400, z:3 }],
+  ['ibWinOutput',    { visible:false, x:0, y:0, w:420, h:200, z:4 }],
+  ['ibWinHistory',   { visible:false, x:0, y:0, w:280, h:320, z:5 }],
+  ['ibWinTools',     { visible:false, x:0, y:0, w:280, h:320, z:6 }],
+  ['ibWinCode',      { visible:false, x:0, y:0, w:420, h:420, z:7 }],
+  ['ibWinSkills',    { visible:false, x:0, y:0, w:280, h:320, z:8 }],
+  ['ibWinDecompile', { visible:false, x:0, y:0, w:540, h:420, z:9 }],
 ]);
 let ibWinTopZ = 10;
 
@@ -437,9 +472,12 @@ function ibOpenEventStream() {
   es.onmessage = (e) => {
     try {
       const msg = JSON.parse(e.data);
-      ibLog(`← ${msg.type}${msg.text ? ': ' + msg.text.slice(0,80) : ''}`, 'in');
+      const detail = msg.name ? ' ' + msg.name : (msg.text ? ': ' + msg.text.slice(0,60) : '');
+      ibLog(`← ${msg.type}${detail}`, 'in');
       ibHandleMsg(msg);
-    } catch {}
+    } catch (err) {
+      ibLog(`← [parse error] ${String(err).slice(0,80)} — data: ${e.data.slice(0,120)}`, 'err');
+    }
   };
   es.onerror = () => {
     if (!ibConnected) return;
@@ -479,8 +517,46 @@ function ibHandleMsg(msg) {
   if (msg.type === 'sync_state')   ibApplySyncState(msg);
   if (msg.type === 'session_loaded') ibSessionLoaded(msg.id, msg.history);
   if (msg.type === 'tabs_state')   ibApplyTabsState(msg.tabs || []);
+  if (msg.type === 'tabs_meta')    ibApplyTabsMeta(msg.tabs || []);
   if (msg.type === 'run_result')   ibShowRunResult(msg.output || '');
   if (msg.type === 'skills_state') ibRenderSkills(msg.skills || []);
+  if (msg.type === 'tool_result' && msg.reqId) ibDeliverToolResult(msg);
+  if (msg.type === 'code_update')  ibApplyCodeUpdate(msg.tabIndex, msg.code || '');
+}
+
+// ── Direct tool calls ─────────────────────────────────────────
+const ibToolPending = {};   // reqId -> { resolve, reject, timer }
+let   ibToolReqSeq  = 0;
+
+function ibDeliverToolResult(msg) {
+  const p = ibToolPending[msg.reqId];
+  if (!p) return;
+  clearTimeout(p.timer);
+  delete ibToolPending[msg.reqId];
+  if (msg.ok) p.resolve(msg.result);
+  else        p.reject(new Error(msg.result));
+}
+
+/**
+ * Call any Roblox tool by name directly from the browser.
+ * args is a plain object; it is JSON-encoded before sending.
+ *
+ * Usage:
+ *   const result = await ibCallTool('tree', { path: 'game', depth: 2 });
+ *   const result = await ibCallTool('find_name', { name: 'HumanoidRootPart' });
+ *   const result = await ibCallTool('set_property', { path: 'game.Workspace.Part', property: 'BrickColor', value: 'Bright red' });
+ */
+function ibCallTool(name, args = {}, timeoutMs = 8000) {
+  if (!ibConnected) return Promise.reject(new Error('Not connected'));
+  const reqId = 'tr_' + (++ibToolReqSeq);
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      delete ibToolPending[reqId];
+      reject(new Error(`Tool "${name}" timed out`));
+    }, timeoutMs);
+    ibToolPending[reqId] = { resolve, reject, timer };
+    ibSendCmd({ type: 'call_tool', name, args: JSON.stringify(args), reqId });
+  });
 }
 
 // ── Status ────────────────────────────────────────────────────
@@ -493,17 +569,54 @@ function ibSetStatus(state) {
   txt.textContent = state === 'connected' ? 'Connected' : state === 'connecting' ? 'Connecting…' : 'Disconnected';
   btn.textContent = state === 'connected' ? 'Disconnect' : 'Connect';
   btn.disabled    = state === 'connecting';
+  ibSetWindowsLoading(state === 'connecting');
   if (state !== 'connected') ibEnableControls(false);
 }
 
+function ibSetWindowsLoading(loading) {
+  document.querySelectorAll('.ib-window').forEach(win => {
+    if (loading) {
+      if (!win.querySelector('.ib-win-loader')) {
+        const loader = document.createElement('div');
+        loader.className = 'ib-win-loader';
+        (win.querySelector('.ib-win-body') || win).appendChild(loader);
+      }
+      win.classList.add('ib-win-loading');
+    } else {
+      win.classList.remove('ib-win-loading');
+    }
+  });
+}
+
 function ibEnableControls(on) {
-  document.getElementById('ibMsgInput').disabled  = !on;
-  document.getElementById('ibSendBtn').disabled   = !on;
-  const settingsBtn = document.getElementById('ibSettingsBtn');
-  if (settingsBtn) settingsBtn.disabled = !on;
-  const refreshBtn = document.getElementById('ibExplorerRefreshBtn');
-  if (refreshBtn) refreshBtn.disabled = !on;
-  if (on) { ibSendCmd({ type: 'get_tabs' }); ibSendCmd({ type: 'get_skills' }); }
+  document.getElementById('ibMsgInput').disabled = !on;
+  document.getElementById('ibSendBtn').disabled  = !on;
+  ['ibSettingsBtn','ibExplorerRefreshBtn','ibSyncBtn'].forEach(id => {
+    const b = document.getElementById(id); if (b) b.disabled = !on;
+  });
+  if (on) ibSyncAll();
+}
+
+async function ibSyncAll() {
+  if (!ibConnected) return;
+  const btn = document.getElementById('ibSyncBtn');
+  if (btn) btn.querySelector('iconify-icon')?.setAttribute('class', 'ib-tool-spin');
+
+  // Reset explorer so we get a fresh tree
+  ibTree = []; ibNodeMap.clear(); ibOpen.clear(); ibPendingLoads.clear(); ibSelectedKey = null;
+  ibRenderExplorer();
+
+  await Promise.all([
+    ibSendCmd({ type: 'get_tree' }),
+    ibSendCmd({ type: 'get_tabs' }),
+    ibSendCmd({ type: 'get_skills' }),
+    ibSendCmd({ type: 'get_state' }),
+  ]);
+
+  // Stop spinner after a short delay (responses come in async via SSE)
+  setTimeout(() => {
+    if (btn) btn.querySelector('iconify-icon')?.removeAttribute('class');
+  }, 1200);
 }
 
 function ibRefreshExplorer() {
@@ -522,37 +635,29 @@ function ibAddMsg(role, text, tool, aiText) {
   if (welcome) welcome.remove();
   const el = document.createElement('div');
   if (role === 'user') {
-    el.className = 'ib-msg ib-msg-user';
+    el.className = 'ib-msg-user';
     el.innerHTML = `<span>${text}</span>`;
   } else if (role === 'ai') {
-    el.className = 'ib-msg ib-msg-ai';
+    el.className = 'ib-msg-ai';
     const md = ibParseMarkdown(aiText || '');
-    el.innerHTML = `
-      <div class="ib-msg-tag"><iconify-icon icon="mdi:robot-outline" width="11"></iconify-icon> IYAI</div>
-      ${tool ? `<div class="ib-msg-tool"><span class="ib-tool-dot"></span>${tool}</div>` : ''}
-      <div class="ib-msg-text ib-md">${md}</div>`;
+    el.innerHTML = `<div class="ib-md">${md}</div>`;
   } else if (role === 'tool_start') {
-    el.className = 'ib-msg ib-msg-tool ib-tool-busy';
-    el.innerHTML = `
-      <iconify-icon icon="mdi:cog-outline" width="12" class="ib-tool-spin"></iconify-icon>
-      <span class="ib-tool-name">${text}</span>`;
+    el.className = 'ib-tool-row ib-tool-row-busy';
+    el.innerHTML = `<span class="ib-tool-dot"></span><span class="ib-tool-name">${text}</span>`;
     ibToolFrames.set(text, el);
   } else if (role === 'tool_result') {
-    // Resolve the pending tool_start bubble
     const pending = ibToolFrames.get(text);
     const target = pending || document.createElement('div');
     if (!pending) box.appendChild(target);
     ibToolFrames.delete(text);
-    target.className = `ib-msg ib-msg-tool ${tool ? 'ib-tool-ok' : 'ib-tool-fail'}`;
+    const ok = !!tool;
+    target.className = `ib-tool-row ${ok ? 'ib-tool-row-ok' : 'ib-tool-row-fail'}`;
     const preview = aiText ? aiText.slice(0, 120).replace(/\n/g, ' ') : '';
-    target.innerHTML = `
-      <iconify-icon icon="${tool ? 'mdi:check-circle-outline' : 'mdi:alert-circle-outline'}" width="12"></iconify-icon>
-      <span class="ib-tool-name">${text}</span>
-      ${preview ? `<span class="ib-tool-preview">${preview}</span>` : ''}`;
+    target.innerHTML = `<span class="ib-tool-dot"></span><span class="ib-tool-name">${text}</span>${preview ? `<span class="ib-tool-preview">${preview}</span>` : ''}`;
     box.scrollTop = box.scrollHeight;
     return;
   } else {
-    el.className = 'ib-msg ib-msg-system';
+    el.className = 'ib-msg-system';
     el.textContent = text;
   }
   box.appendChild(el);
@@ -654,10 +759,12 @@ const ibNodeMap      = new Map();   // id → node
 let   ibTree         = [];
 let   ibSelectedKey  = null;
 
-function ibRegisterNodes(nodes) {
+function ibRegisterNodes(nodes, parentPath) {
+  const base = parentPath != null ? parentPath : 'game';
   for (const n of nodes) {
+    n.fullPath = base + '.' + n.name;
     if (n.id != null) ibNodeMap.set(n.id, n);
-    if (n.children) ibRegisterNodes(n.children);
+    if (n.children) ibRegisterNodes(n.children, n.fullPath);
   }
 }
 
@@ -673,7 +780,7 @@ function ibDeliverChildren(id, children) {
   if (!node) return;
   node.lazy     = false;
   node.children = children;
-  ibRegisterNodes(children);
+  ibRegisterNodes(children, node.fullPath);
   ibPendingLoads.delete(id);
   ibRenderExplorer();
 }
@@ -711,6 +818,7 @@ function ibRenderExplorer() {
     const row       = document.createElement('div');
     row.className   = 'ib-node' + (ibSelectedKey === key ? ' ib-node-sel' : '');
     row.style.paddingLeft = (6 + depth * 14) + 'px';
+    row._ibNode = node;
     row.innerHTML = `
       <span class="ib-node-arrow ${canExpand ? (open ? 'ib-open' : '') : 'ib-leaf'}">${canExpand ? '▶' : ''}</span>
       ${ibIcon(node.cls, 14)}
@@ -1270,12 +1378,12 @@ function ibToggleWindow(id) {
   st.visible = !st.visible;
   if (st.visible) {
     const main = document.getElementById('ibMain');
-    // First time shown with no position — center in workspace
     if (main && st.x === 0 && st.y === 0) {
       st.x = Math.max(20, Math.round((main.offsetWidth  - st.w) / 2));
       st.y = Math.max(20, Math.round((main.offsetHeight - st.h) / 2));
     }
     ibWinTopZ++; st.z = ibWinTopZ;
+    if (id === 'ibWinCode') requestAnimationFrame(() => ibMonacoEditor?.layout());
   }
   ibApplyWinState();
   ibMarkActivePreset(null);
@@ -1302,6 +1410,8 @@ function ibApplyPreset(name) {
   ibWinTopZ = defs.length + 1;
   ibApplyWinState();
   ibMarkActivePreset(name);
+  const codeVisible = ibWinState.get('ibWinCode')?.visible;
+  if (codeVisible) requestAnimationFrame(() => ibMonacoEditor?.layout());
 }
 
 function ibMarkActivePreset(name) {
@@ -1333,6 +1443,7 @@ function ibToggleHelp() {
 // Cleanup on navigation away
 window.__ibCleanup = function() {
   if (ibEventSource) { ibEventSource.close(); ibEventSource = null; }
+  if (ibMonacoEditor) { ibMonacoEditor.dispose(); ibMonacoEditor = null; }
   ibConnected = false;
   ibWinState.forEach((st, id) => {
     const w = document.getElementById(id);
@@ -1427,61 +1538,404 @@ function ibRenderTools(tools) {
 let ibCodeTabsData = [];
 let ibCodeActiveIdx = 0;
 let ibCodeSaveTimer = null;
+let ibMonacoEditor  = null;
+
+const _MONACO_VS = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs';
+
+function ibInitMonaco() {
+  if (typeof require !== 'undefined') { _ibLoadMonacoMain(); return; }
+  const s = document.createElement('script');
+  s.src = _MONACO_VS + '/loader.js';
+  s.onload  = _ibLoadMonacoMain;
+  s.onerror = () => console.error('[Monaco] Failed to load loader.js');
+  document.head.appendChild(s);
+}
+
+function _ibLoadMonacoMain() {
+  require.config({ paths: { vs: _MONACO_VS } });
+  window.MonacoEnvironment = {
+    getWorkerUrl: (_m, _l) => `data:text/javascript;charset=utf-8,${encodeURIComponent(
+      `self.MonacoEnvironment={baseUrl:'${_MONACO_VS}/../'};` +
+      `importScripts('${_MONACO_VS}/base/worker/workerMain.js');`
+    )}`
+  };
+  require(['vs/editor/editor.main'], function () {
+    monaco.editor.defineTheme('iyai-dark', {
+      base: 'vs-dark', inherit: true,
+      rules: [
+        { token: 'keyword',   foreground: 'ff7070' },
+        { token: 'comment',   foreground: '6b7280', fontStyle: 'italic' },
+        { token: 'string',    foreground: 'a3e635' },
+        { token: 'number',    foreground: 'fb923c' },
+        { token: 'delimiter', foreground: 'd1d5db' },
+        { token: 'operator',  foreground: 'd1d5db' },
+      ],
+      colors: {
+        'editor.background':                '#0e1013',
+        'editor.lineHighlightBackground':   '#ffffff09',
+        'editorLineNumber.foreground':      '#3f4a56',
+        'editorLineNumber.activeForeground':'#8b949e',
+        'editor.selectionBackground':       '#ff706038',
+        'editorCursor.foreground':          '#ff7070',
+        'editorIndentGuide.background1':    '#ffffff0c',
+        'editorBracketMatch.background':    '#ff707030',
+        'editorBracketMatch.border':        '#ff707080',
+      }
+    });
+
+    // ── Roblox / Luau completion provider ─────────────────────
+    monaco.languages.registerCompletionItemProvider('lua', {
+      provideCompletionItems(model, position) {
+        const word  = model.getWordUntilPosition(position);
+        const range = { startLineNumber: position.lineNumber, endLineNumber: position.lineNumber,
+                        startColumn: word.startColumn, endColumn: word.endColumn };
+        const K = monaco.languages.CompletionItemKind;
+        const R = monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet;
+        const fn = (label, insert, detail, doc) =>
+          ({ label, kind: K.Function, insertText: insert, detail, documentation: doc, range, insertTextRules: R });
+        const va = (label, detail) =>
+          ({ label, kind: K.Variable, insertText: label, detail, range });
+        const sn = (label, insert, detail) =>
+          ({ label, kind: K.Snippet, insertText: insert, detail, range, insertTextRules: R });
+        return { suggestions: [
+          // ── Globals ──
+          va('game',      'DataModel'),
+          va('workspace', 'Workspace'),
+          va('script',    'Script | LocalScript | ModuleScript'),
+          va('_G',        'global shared table'),
+          va('Enum',      'Enum root'),
+          // ── Constructors ──
+          fn('Vector3.new',       'Vector3.new(${1:x}, ${2:y}, ${3:z})',                    'Vector3'),
+          fn('Vector2.new',       'Vector2.new(${1:x}, ${2:y})',                            'Vector2'),
+          fn('CFrame.new',        'CFrame.new(${1:x}, ${2:y}, ${3:z})',                     'CFrame'),
+          fn('CFrame.lookAt',     'CFrame.lookAt(${1:at}, ${2:lookAt})',                    'CFrame'),
+          fn('Color3.new',        'Color3.new(${1:r}, ${2:g}, ${3:b})',                     'Color3 — 0–1'),
+          fn('Color3.fromRGB',    'Color3.fromRGB(${1:255}, ${2:255}, ${3:255})',           'Color3'),
+          fn('Color3.fromHex',    'Color3.fromHex("${1:#ffffff}")',                         'Color3'),
+          fn('UDim2.new',         'UDim2.new(${1:xS}, ${2:xO}, ${3:yS}, ${4:yO})',         'UDim2'),
+          fn('UDim2.fromScale',   'UDim2.fromScale(${1:x}, ${2:y})',                       'UDim2'),
+          fn('UDim2.fromOffset',  'UDim2.fromOffset(${1:x}, ${2:y})',                      'UDim2'),
+          fn('UDim.new',          'UDim.new(${1:scale}, ${2:offset})',                     'UDim'),
+          fn('TweenInfo.new',     'TweenInfo.new(${1:1}, Enum.EasingStyle.${2:Quad}, Enum.EasingDirection.${3:Out})', 'TweenInfo'),
+          fn('Instance.new',      'Instance.new("${1:ClassName}")',                         'Instance'),
+          fn('NumberSequence.new','NumberSequence.new(${1:0})',                             'NumberSequence'),
+          fn('ColorSequence.new', 'ColorSequence.new(${1:Color3.new(1,1,1)})',             'ColorSequence'),
+          fn('Ray.new',           'Ray.new(${1:origin}, ${2:direction})',                  'Ray'),
+          fn('Rect.new',          'Rect.new(${1:x0}, ${2:y0}, ${3:x1}, ${4:y1})',         'Rect'),
+          // ── task ──
+          fn('task.wait',   'task.wait(${1:seconds})',         'task', 'Yield current thread'),
+          fn('task.spawn',  'task.spawn(${1:func})',           'task', 'Spawn in new thread (immediate)'),
+          fn('task.defer',  'task.defer(${1:func})',           'task', 'Spawn after current frame'),
+          fn('task.delay',  'task.delay(${1:secs}, ${2:func})','task', 'Run after delay'),
+          fn('task.cancel', 'task.cancel(${1:thread})',        'task', 'Cancel a thread'),
+          // ── Luau builtins ──
+          fn('print',       'print(${1:...})',                    'builtin'),
+          fn('warn',        'warn(${1:...})',                     'builtin'),
+          fn('error',       'error(${1:message}, ${2:2})',        'builtin'),
+          fn('assert',      'assert(${1:condition}, ${2:msg})',   'builtin'),
+          fn('tostring',    'tostring(${1:value})',               'builtin'),
+          fn('tonumber',    'tonumber(${1:value})',               'builtin'),
+          fn('typeof',      'typeof(${1:value})',                 'Luau'),
+          fn('type',        'type(${1:value})',                   'builtin'),
+          fn('pairs',       'pairs(${1:table})',                  'builtin'),
+          fn('ipairs',      'ipairs(${1:table})',                 'builtin'),
+          fn('next',        'next(${1:table})',                   'builtin'),
+          fn('select',      'select(${1:index}, ${2:...})',       'builtin'),
+          fn('rawget',      'rawget(${1:t}, ${2:key})',           'builtin'),
+          fn('rawset',      'rawset(${1:t}, ${2:key}, ${3:val})', 'builtin'),
+          fn('rawequal',    'rawequal(${1:a}, ${2:b})',           'builtin'),
+          fn('setmetatable','setmetatable(${1:t}, ${2:mt})',      'builtin'),
+          fn('getmetatable','getmetatable(${1:obj})',             'builtin'),
+          fn('pcall',       'pcall(${1:func}, ${2:...})',         'builtin', 'Protected call'),
+          fn('xpcall',      'xpcall(${1:func}, ${2:handler})',    'builtin'),
+          fn('unpack',      'unpack(${1:t})',                     'builtin'),
+          fn('load',        'load(${1:chunk})',                   'builtin'),
+          // ── math ──
+          fn('math.floor',  'math.floor(${1:n})',          'math'),
+          fn('math.ceil',   'math.ceil(${1:n})',           'math'),
+          fn('math.round',  'math.round(${1:n})',          'math'),
+          fn('math.abs',    'math.abs(${1:n})',            'math'),
+          fn('math.sqrt',   'math.sqrt(${1:n})',           'math'),
+          fn('math.exp',    'math.exp(${1:n})',            'math'),
+          fn('math.log',    'math.log(${1:n})',            'math'),
+          fn('math.max',    'math.max(${1:a}, ${2:b})',    'math'),
+          fn('math.min',    'math.min(${1:a}, ${2:b})',    'math'),
+          fn('math.clamp',  'math.clamp(${1:n}, ${2:min}, ${3:max})', 'math'),
+          fn('math.random', 'math.random(${1:min}, ${2:max})', 'math'),
+          fn('math.sin',    'math.sin(${1:n})',            'math'),
+          fn('math.cos',    'math.cos(${1:n})',            'math'),
+          fn('math.tan',    'math.tan(${1:n})',            'math'),
+          fn('math.asin',   'math.asin(${1:n})',           'math'),
+          fn('math.acos',   'math.acos(${1:n})',           'math'),
+          fn('math.atan2',  'math.atan2(${1:y}, ${2:x})', 'math'),
+          fn('math.atan',   'math.atan(${1:y}, ${2:x})',  'math (Luau)'),
+          fn('math.pow',    'math.pow(${1:x}, ${2:y})',   'math'),
+          fn('math.fmod',   'math.fmod(${1:x}, ${2:y})',  'math'),
+          fn('math.sign',   'math.sign(${1:n})',           'math (Luau)'),
+          fn('math.noise',  'math.noise(${1:x}, ${2:y}, ${3:z})', 'math — Perlin noise'),
+          va('math.huge',   'math — infinity'),
+          va('math.pi',     'math — π'),
+          // ── string ──
+          fn('string.format', 'string.format("${1:%s}", ${2:...})', 'string'),
+          fn('string.find',   'string.find(${1:s}, ${2:pat})',      'string'),
+          fn('string.match',  'string.match(${1:s}, ${2:pat})',     'string'),
+          fn('string.gmatch', 'string.gmatch(${1:s}, ${2:pat})',    'string'),
+          fn('string.gsub',   'string.gsub(${1:s}, ${2:pat}, ${3:repl})', 'string'),
+          fn('string.sub',    'string.sub(${1:s}, ${2:i}, ${3:j})', 'string'),
+          fn('string.len',    'string.len(${1:s})',                 'string'),
+          fn('string.upper',  'string.upper(${1:s})',               'string'),
+          fn('string.lower',  'string.lower(${1:s})',               'string'),
+          fn('string.rep',    'string.rep(${1:s}, ${2:n})',         'string'),
+          fn('string.byte',   'string.byte(${1:s}, ${2:i})',        'string'),
+          fn('string.char',   'string.char(${1:...})',              'string'),
+          fn('string.split',  'string.split(${1:s}, ${2:sep})',     'string (Roblox)'),
+          fn('string.reverse','string.reverse(${1:s})',             'string'),
+          // ── table ──
+          fn('table.insert',  'table.insert(${1:t}, ${2:value})',          'table'),
+          fn('table.remove',  'table.remove(${1:t}, ${2:i})',              'table'),
+          fn('table.sort',    'table.sort(${1:t}, ${2:function(a,b) end})','table'),
+          fn('table.concat',  'table.concat(${1:t}, "${2:sep}")',          'table'),
+          fn('table.find',    'table.find(${1:t}, ${2:value})',            'table (Roblox)'),
+          fn('table.move',    'table.move(${1:a1}, ${2:f}, ${3:e}, ${4:t}, ${5:a2})', 'table'),
+          fn('table.unpack',  'table.unpack(${1:t})',                      'table'),
+          fn('table.create',  'table.create(${1:n}, ${2:value})',          'table (Roblox)'),
+          fn('table.clear',   'table.clear(${1:t})',                       'table (Roblox)'),
+          fn('table.clone',   'table.clone(${1:t})',                       'table (Luau)'),
+          fn('table.freeze',  'table.freeze(${1:t})',                      'table (Luau)'),
+          fn('table.isfrozen','table.isfrozen(${1:t})',                    'table (Luau)'),
+          // ── coroutine ──
+          fn('coroutine.create', 'coroutine.create(${1:func})',     'coroutine'),
+          fn('coroutine.wrap',   'coroutine.wrap(${1:func})',       'coroutine'),
+          fn('coroutine.resume', 'coroutine.resume(${1:co})',       'coroutine'),
+          fn('coroutine.yield',  'coroutine.yield(${1:...})',       'coroutine'),
+          fn('coroutine.status', 'coroutine.status(${1:co})',       'coroutine'),
+          fn('coroutine.running','coroutine.running()',             'coroutine'),
+          // ── game:GetService ──
+          fn('game:GetService', 'game:GetService("${1|Players,RunService,TweenService,UserInputService,ContextActionService,HttpService,DataStoreService,MessagingService,ReplicatedStorage,ServerStorage,ServerScriptService,StarterGui,StarterPlayer,Teams,SoundService,Lighting,TextService,MarketplaceService,GuiService,PathfindingService,PhysicsService,CollectionService,DebrisService,GroupService,KeyframeSequenceProvider|}")', 'DataModel'),
+          // ── Common services ──
+          va('Players',             'Players service'),
+          va('RunService',          'RunService service'),
+          va('TweenService',        'TweenService service'),
+          va('UserInputService',    'UserInputService service'),
+          va('ContextActionService','ContextActionService service'),
+          va('HttpService',         'HttpService service'),
+          va('DataStoreService',    'DataStoreService service'),
+          va('ReplicatedStorage',   'ReplicatedStorage'),
+          va('ServerStorage',       'ServerStorage'),
+          va('ServerScriptService', 'ServerScriptService'),
+          va('StarterGui',          'StarterGui'),
+          va('StarterPlayer',       'StarterPlayer'),
+          va('Teams',               'Teams service'),
+          va('SoundService',        'SoundService service'),
+          va('Lighting',            'Lighting service'),
+          va('TextService',         'TextService service'),
+          va('MarketplaceService',  'MarketplaceService service'),
+          va('CollectionService',   'CollectionService service'),
+          va('PathfindingService',  'PathfindingService service'),
+          va('PhysicsService',      'PhysicsService service'),
+          va('DebrisService',       'DebrisService service'),
+          // ── Instance methods ──
+          fn(':FindFirstChild',             ':FindFirstChild("${1:name}")',         'Instance'),
+          fn(':FindFirstChildOfClass',      ':FindFirstChildOfClass("${1:cls}")',   'Instance'),
+          fn(':FindFirstChildWhichIsA',     ':FindFirstChildWhichIsA("${1:cls}")',  'Instance'),
+          fn(':FindFirstAncestorOfClass',   ':FindFirstAncestorOfClass("${1:cls}")', 'Instance'),
+          fn(':FindFirstAncestorWhichIsA',  ':FindFirstAncestorWhichIsA("${1:cls}")', 'Instance'),
+          fn(':WaitForChild',               ':WaitForChild("${1:name}")',           'Instance'),
+          fn(':GetChildren',               ':GetChildren()',                        'Instance → {Instance}'),
+          fn(':GetDescendants',            ':GetDescendants()',                     'Instance → {Instance}'),
+          fn(':GetAncestors',              ':GetAncestors()',                       'Instance → {Instance}'),
+          fn(':IsA',                       ':IsA("${1:ClassName}")',               'Instance → bool'),
+          fn(':IsDescendantOf',            ':IsDescendantOf(${1:ancestor})',       'Instance → bool'),
+          fn(':IsAncestorOf',              ':IsAncestorOf(${1:descendant})',       'Instance → bool'),
+          fn(':Clone',                     ':Clone()',                             'Instance'),
+          fn(':Destroy',                   ':Destroy()',                           'Instance'),
+          fn(':GetPropertyChangedSignal',  ':GetPropertyChangedSignal("${1:prop}")', 'Instance → RBXScriptSignal'),
+          fn(':GetAttributeChangedSignal', ':GetAttributeChangedSignal("${1:attr}")', 'Instance → RBXScriptSignal'),
+          fn(':GetAttribute',              ':GetAttribute("${1:attr}")',           'Instance'),
+          fn(':SetAttribute',              ':SetAttribute("${1:attr}", ${2:val})', 'Instance'),
+          fn(':GetAttributes',             ':GetAttributes()',                     'Instance → dict'),
+          fn(':GetTags',                   ':GetTags()',                           'CollectionService'),
+          fn(':HasTag',                    ':HasTag("${1:tag}")',                  'CollectionService'),
+          fn(':AddTag',                    ':AddTag("${1:tag}")',                  'CollectionService'),
+          // ── RBXScriptSignal ──
+          fn(':Connect',    ':Connect(${1:function(...) end})',  'RBXScriptSignal'),
+          fn(':Once',       ':Once(${1:function(...) end})',     'RBXScriptSignal'),
+          fn(':Wait',       ':Wait()',                           'RBXScriptSignal'),
+          fn(':Disconnect', ':Disconnect()',                     'RBXScriptConnection'),
+          // ── TweenService ──
+          fn('TweenService:Create', 'TweenService:Create(${1:inst}, TweenInfo.new(${2:1}), {\n\t${3:Property} = ${4:value},\n})', 'TweenService'),
+          fn(':Play',   ':Play()',   'Tween | AnimationTrack'),
+          fn(':Pause',  ':Pause()',  'Tween | AnimationTrack'),
+          fn(':Cancel', ':Cancel()', 'Tween'),
+          fn(':Stop',   ':Stop()',   'AnimationTrack'),
+          // ── Players ──
+          fn('Players:GetPlayerByUserId', 'Players:GetPlayerByUserId(${1:userId})', 'Players'),
+          fn('Players:GetPlayerFromCharacter', 'Players:GetPlayerFromCharacter(${1:char})', 'Players'),
+          fn('Players:GetPlayers', 'Players:GetPlayers()', 'Players → {Player}'),
+          va('Players.LocalPlayer', 'Player — LocalScript only'),
+          // ── Snippets ──
+          sn('for i=',            'for ${1:i} = ${2:1}, ${3:10} do\n\t${0}\nend',                       'Numeric for loop'),
+          sn('for _, v in pairs', 'for ${1:_}, ${2:v} in pairs(${3:t}) do\n\t${0}\nend',               'pairs loop'),
+          sn('for i, v in ipairs','for ${1:i}, ${2:v} in ipairs(${3:t}) do\n\t${0}\nend',              'ipairs loop'),
+          sn('while',             'while ${1:condition} do\n\t${0}\nend',                               'While loop'),
+          sn('repeat',            'repeat\n\t${0}\nuntil ${1:condition}',                              'Repeat-until loop'),
+          sn('if',                'if ${1:condition} then\n\t${0}\nend',                               'If statement'),
+          sn('if-else',           'if ${1:condition} then\n\t${2}\nelse\n\t${0}\nend',                 'If-else'),
+          sn('function',          'function ${1:name}(${2:...})\n\t${0}\nend',                         'Function'),
+          sn('local function',    'local function ${1:name}(${2:...})\n\t${0}\nend',                   'Local function'),
+          sn('local',             'local ${1:name} = ${0}',                                            'Local variable'),
+          sn('pcall block',       'local ok, err = pcall(function()\n\t${0}\nend)\nif not ok then warn(err) end', 'pcall block'),
+          sn('RunService.Heartbeat', 'RunService.Heartbeat:Connect(function(dt)\n\t${0}\nend)', 'Heartbeat loop'),
+          sn('RunService.RenderStepped', 'RunService.RenderStepped:Connect(function(dt)\n\t${0}\nend)', 'RenderStepped loop'),
+        ]};
+      }
+    });
+
+    ibMonacoEditor = monaco.editor.create(document.getElementById('ibCodeEditor'), {
+      value: '',
+      language: 'lua',
+      theme: 'iyai-dark',
+      fontSize: 12.5,
+      fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+      fontLigatures: true,
+      minimap: { enabled: false },
+      scrollBeyondLastLine: false,
+      automaticLayout: true,
+      tabSize: 4,
+      insertSpaces: false,
+      wordWrap: 'off',
+      lineNumbersMinChars: 3,
+      overviewRulerLanes: 0,
+      renderWhitespace: 'none',
+      scrollbar: { verticalScrollbarSize: 6, horizontalScrollbarSize: 6, useShadows: false },
+      suggest: { showKeywords: true, showSnippets: true },
+      quickSuggestions: { other: true, comments: false, strings: false },
+      parameterHints: { enabled: false },
+      contextmenu: false,
+    });
+
+    // Catch up: if ibApplyTabsState already ran before Monaco loaded
+    if (ibCodeTabsData.length > 0) {
+      ibMonacoEditor.setValue(ibCodeTabsData[ibCodeActiveIdx]?.code || '');
+      const wrap = document.getElementById('ibCodeEditorWrap');
+      if (wrap) wrap.style.display = 'flex';
+      const empty = document.getElementById('ibCodeEmpty');
+      if (empty) empty.style.display = 'none';
+      ['ibCodeRunBtn','ibCodeClearBtn','ibCodeCopyBtn'].forEach(id => {
+        const b = document.getElementById(id); if (b) b.disabled = false;
+      });
+    }
+    requestAnimationFrame(() => ibMonacoEditor?.layout());
+
+    ibMonacoEditor.onDidChangeModelContent(() => {
+      clearTimeout(ibCodeSaveTimer);
+      ibCodeSaveTimer = setTimeout(() => {
+        if (!ibMonacoEditor || ibCodeActiveIdx >= ibCodeTabsData.length) return;
+        const code = ibMonacoEditor.getValue();
+        ibCodeTabsData[ibCodeActiveIdx].code = code;
+        ibSendCmd({ type: 'set_code', tabIndex: ibCodeActiveIdx + 1, code });
+      }, 300);
+    });
+
+    // Ctrl+Enter / Cmd+Enter to run
+    ibMonacoEditor.addCommand(
+      monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+      () => { if (typeof ibRunCode === 'function') ibRunCode(); }
+    );
+  });
+}
 
 function ibApplyTabsState(tabs) {
   ibCodeTabsData = tabs;
   const activeIdx = tabs.findIndex(t => t.active);
   ibCodeActiveIdx = activeIdx >= 0 ? activeIdx : 0;
-  // Switch from empty-state to editor
   const empty = document.getElementById('ibCodeEmpty');
   const wrap  = document.getElementById('ibCodeEditorWrap');
   if (empty) empty.style.display = 'none';
   if (wrap)  wrap.style.display  = 'flex';
   ibRenderCodeTabBar();
-  const editor = document.getElementById('ibCodeEditor');
-  if (editor) editor.value = tabs[ibCodeActiveIdx]?.code || '';
-  const runBtn = document.getElementById('ibCodeRunBtn');
-  if (runBtn) runBtn.disabled = false;
+  if (ibMonacoEditor) {
+    ibMonacoEditor.setValue(tabs[ibCodeActiveIdx]?.code || '');
+    requestAnimationFrame(() => ibMonacoEditor?.layout());
+  }
+  ['ibCodeRunBtn','ibCodeClearBtn','ibCodeCopyBtn','ibCodeNewTabBtn'].forEach(id => {
+    const b = document.getElementById(id); if (b) b.disabled = false;
+  });
   const output = document.getElementById('ibCodeOutput');
   if (output) output.textContent = '';
+}
+
+function ibApplyTabsMeta(tabs) {
+  // Merge name/active from plugin without touching code content
+  tabs.forEach((t, i) => {
+    if (ibCodeTabsData[i]) {
+      ibCodeTabsData[i].name   = t.name;
+      ibCodeTabsData[i].active = t.active;
+    } else {
+      ibCodeTabsData.push({ name: t.name, active: t.active, code: '' });
+    }
+  });
+  ibCodeTabsData.splice(tabs.length);
+  const activeIdx = tabs.findIndex(t => t.active);
+  const prevIdx = ibCodeActiveIdx;
+  ibCodeActiveIdx = activeIdx >= 0 ? activeIdx : 0;
+  // Ensure editor wrap is visible (might be first time seeing tabs)
+  const empty = document.getElementById('ibCodeEmpty');
+  const wrap  = document.getElementById('ibCodeEditorWrap');
+  if (empty) empty.style.display = 'none';
+  if (wrap)  wrap.style.display  = 'flex';
+  ['ibCodeRunBtn','ibCodeClearBtn','ibCodeCopyBtn','ibCodeNewTabBtn'].forEach(id => {
+    const b = document.getElementById(id); if (b) b.disabled = false;
+  });
+  ibRenderCodeTabBar();
+  // If active tab changed, load its code into editor
+  if (ibCodeActiveIdx !== prevIdx && ibMonacoEditor) {
+    ibMonacoEditor.setValue(ibCodeTabsData[ibCodeActiveIdx]?.code || '');
+    requestAnimationFrame(() => ibMonacoEditor?.layout());
+  }
+}
+
+function ibNewTab() {
+  if (!ibConnected) return;
+  ibSendCmd({ type: 'new_tab' });
+}
+
+function ibRemoveTab(idx) {
+  if (!ibConnected) return;
+  ibSendCmd({ type: 'remove_tab', tabIndex: idx + 1 });
 }
 
 function ibRenderCodeTabBar() {
   const el = document.getElementById('ibCodeTabs');
   if (!el) return;
+  const canClose = ibCodeTabsData.length > 1;
   el.innerHTML = ibCodeTabsData.map((t, i) =>
-    `<button class="ib-code-tab${i === ibCodeActiveIdx ? ' ib-code-tab-active' : ''}" onclick="ibSwitchCodeTab(${i})">${t.name}</button>`
-  ).join('');
+    `<button class="ib-code-tab${i === ibCodeActiveIdx ? ' ib-code-tab-active' : ''}" onclick="ibSwitchCodeTab(${i})" data-tab-idx="${i}" title="${t.name}">` +
+    `<span class="ib-code-tab-name">${t.name}</span>` +
+    (canClose ? `<span class="ib-code-tab-close" onclick="event.stopPropagation();ibRemoveTab(${i})" title="Close">×</span>` : '') +
+    `</button>`
+  ).join('') +
+  (ibCodeTabsData.length < 10 ?
+    `<button class="ib-code-tab-new" id="ibCodeNewTabBtn" onclick="ibNewTab()" title="New tab"><iconify-icon icon="mdi:plus" width="12" height="12"></iconify-icon></button>` : '');
 }
 
 function ibSwitchCodeTab(idx) {
-  const editor = document.getElementById('ibCodeEditor');
-  if (editor && ibCodeTabsData[ibCodeActiveIdx]) {
-    ibCodeTabsData[ibCodeActiveIdx].code = editor.value;
+  if (ibMonacoEditor && ibCodeTabsData[ibCodeActiveIdx]) {
+    ibCodeTabsData[ibCodeActiveIdx].code = ibMonacoEditor.getValue();
   }
   ibCodeActiveIdx = idx;
   ibCodeTabsData.forEach((t, i) => t.active = i === idx);
   ibRenderCodeTabBar();
-  if (editor) editor.value = ibCodeTabsData[idx]?.code || '';
+  if (ibMonacoEditor) ibMonacoEditor.setValue(ibCodeTabsData[idx]?.code || '');
   ibSendCmd({ type: 'switch_tab', tabIndex: idx + 1 });
 }
 
-function ibCodeEditorInput() {
-  clearTimeout(ibCodeSaveTimer);
-  ibCodeSaveTimer = setTimeout(() => {
-    const editor = document.getElementById('ibCodeEditor');
-    if (!editor || ibCodeActiveIdx >= ibCodeTabsData.length) return;
-    const code = editor.value;
-    ibCodeTabsData[ibCodeActiveIdx].code = code;
-    ibSendCmd({ type: 'set_code', tabIndex: ibCodeActiveIdx + 1, code });
-  }, 300);
-}
+function ibCodeEditorInput() { /* Monaco handles changes via onDidChangeModelContent */ }
 
 function ibRunCode() {
   if (!ibConnected) return;
-  const editor = document.getElementById('ibCodeEditor');
-  if (editor && ibCodeTabsData[ibCodeActiveIdx] != null) {
-    const code = editor.value;
+  if (ibMonacoEditor && ibCodeTabsData[ibCodeActiveIdx] != null) {
+    const code = ibMonacoEditor.getValue();
     ibCodeTabsData[ibCodeActiveIdx].code = code;
     ibSendCmd({ type: 'set_code', tabIndex: ibCodeActiveIdx + 1, code });
   }
@@ -1498,26 +1952,60 @@ function ibShowRunResult(out) {
   el.textContent = out;
 }
 
+function ibClearCode() {
+  if (!ibConnected || !ibMonacoEditor) return;
+  ibMonacoEditor.setValue('');
+  if (ibCodeTabsData[ibCodeActiveIdx]) ibCodeTabsData[ibCodeActiveIdx].code = '';
+  ibSendCmd({ type: 'set_code', tabIndex: ibCodeActiveIdx + 1, code: '' });
+}
+
+async function ibCopyCode() {
+  if (!ibMonacoEditor) return;
+  try {
+    await navigator.clipboard.writeText(ibMonacoEditor.getValue());
+    const btn = document.getElementById('ibCodeCopyBtn');
+    if (btn) {
+      btn.innerHTML = '<iconify-icon icon="mdi:check" width="13" height="13"></iconify-icon>';
+      setTimeout(() => { btn.innerHTML = '<iconify-icon icon="mdi:content-copy" width="13" height="13"></iconify-icon>'; }, 1200);
+    }
+  } catch { ibLog('Copy failed', 'err'); }
+}
+
+// In-game → browser: plugin pushes code_update when active tab changes in-game
+function ibApplyCodeUpdate(tabIndex, code) {
+  const idx = tabIndex - 1;
+  if (ibCodeTabsData[idx] == null) return;
+  ibCodeTabsData[idx].code = code;
+  if (idx !== ibCodeActiveIdx) return;
+  if (ibMonacoEditor && !ibMonacoEditor.hasTextFocus()) ibMonacoEditor.setValue(code);
+}
+
 // ── Skills dock ───────────────────────────────────────────────
 function ibRenderSkills(skills) {
-  const el = document.getElementById('ibSkillsList');
+  const el    = document.getElementById('ibSkillsList');
+  const badge = document.getElementById('ibSkillsCount');
   if (!el) return;
   if (!skills || !skills.length) {
     el.innerHTML = `<div class="ib-empty-state"><iconify-icon icon="mdi:puzzle-outline" width="22" height="22"></iconify-icon><span>No skills found</span></div>`;
+    if (badge) badge.style.display = 'none';
     return;
   }
+  if (badge) { badge.textContent = skills.length; badge.style.display = ''; }
   el.innerHTML = skills.map(s =>
-    `<div class="ib-skill-item">
+    `<div class="ib-skill-card">
       <div class="ib-skill-info">
         <div class="ib-skill-name">${s.name}</div>
         ${s.desc ? `<div class="ib-skill-desc">${s.desc}</div>` : ''}
       </div>
-      <button class="ib-skill-toggle${s.enabled ? ' ib-skill-on' : ''}" onclick="ibToggleSkill(${JSON.stringify(s.name)})">${s.enabled ? 'On' : 'Off'}</button>
+      <button class="ib-skill-toggle${s.enabled ? ' ib-skill-on' : ''}"
+              onclick="ibToggleSkill(this,${JSON.stringify(s.name)})"
+              title="${s.enabled ? 'Disable' : 'Enable'} skill"></button>
     </div>`
   ).join('');
 }
 
-function ibToggleSkill(name) {
+function ibToggleSkill(btn, name) {
+  btn.classList.toggle('ib-skill-on');
   ibSendCmd({ type: 'toggle_skill', name });
 }
 
@@ -1562,7 +2050,140 @@ function ibSaveSettings() {
   ibCloseSettings();
 }
 
+// ── Context menu ─────────────────────────────────────────────
+const IB_SCRIPT_CLASSES = new Set(['Script','LocalScript','ModuleScript']);
+let ibCtxNode   = null;
+let ibCtxTabIdx = -1;
+
+function ibShowCtxMenu(x, y, items) {
+  const el = document.getElementById('ibCtxMenu');
+  if (!el) return;
+  el.innerHTML = items.map(item => {
+    if (item === 'sep') return '<div class="ib-ctx-sep"></div>';
+    if (item.header)   return `<div class="ib-ctx-header">${item.header}</div>`;
+    return `<div class="ib-ctx-item${item.disabled?' ib-ctx-disabled':''}${item.danger?' ib-ctx-danger':''}" data-action="${item.action}">${item.label}</div>`;
+  }).join('');
+  el.style.display = 'block';
+  el.style.left = x + 'px';
+  el.style.top  = y + 'px';
+  requestAnimationFrame(() => {
+    const r = el.getBoundingClientRect();
+    if (r.right  > window.innerWidth)  el.style.left = (x - r.width)  + 'px';
+    if (r.bottom > window.innerHeight) el.style.top  = (y - r.height) + 'px';
+  });
+  el.querySelectorAll('.ib-ctx-item:not(.ib-ctx-disabled)').forEach(item => {
+    item.addEventListener('click', e => {
+      e.stopPropagation();
+      ibHandleCtxAction(item.dataset.action);
+      ibHideCtxMenu();
+    });
+  });
+}
+
+function ibHideCtxMenu() {
+  const el = document.getElementById('ibCtxMenu');
+  if (el) el.style.display = 'none';
+}
+
+document.addEventListener('mousedown', e => {
+  const menu = document.getElementById('ibCtxMenu');
+  if (menu && menu.style.display !== 'none' && !menu.contains(e.target)) ibHideCtxMenu();
+});
+
+function ibHandleCtxAction(action) {
+  switch (action) {
+    case 'tab_new':          ibNewTab(); break;
+    case 'tab_close':        if (ibCtxTabIdx >= 0) ibRemoveTab(ibCtxTabIdx); break;
+    case 'tab_close_others': if (ibCtxTabIdx >= 0) ibCloseOtherTabs(ibCtxTabIdx); break;
+    case 'copy_name':        if (ibCtxNode) navigator.clipboard.writeText(ibCtxNode.name).catch(()=>{}); break;
+    case 'copy_path':        if (ibCtxNode) navigator.clipboard.writeText(ibCtxNode.fullPath || ibCtxNode.name).catch(()=>{}); break;
+    case 'decompile':        if (ibCtxNode) ibDecompileNode(ibCtxNode); break;
+  }
+}
+
+// Tab bar right-click
+document.addEventListener('contextmenu', e => {
+  const tab = e.target.closest('[data-tab-idx]');
+  if (!tab) return;
+  const tabBar = e.target.closest('#ibCodeTabs');
+  if (!tabBar) return;
+  e.preventDefault();
+  ibCtxTabIdx = parseInt(tab.dataset.tabIdx, 10);
+  const onlyOne = ibCodeTabsData.length <= 1;
+  ibShowCtxMenu(e.clientX, e.clientY, [
+    { action: 'tab_new',          label: 'New Tab',         disabled: ibCodeTabsData.length >= 10 },
+    'sep',
+    { action: 'tab_close',        label: 'Close Tab',       disabled: onlyOne },
+    { action: 'tab_close_others', label: 'Close Others',    disabled: onlyOne, danger: true },
+  ]);
+});
+
+// Explorer tree right-click
+document.addEventListener('contextmenu', e => {
+  const row = e.target.closest('.ib-node');
+  if (!row || !row._ibNode) return;
+  const explorer = e.target.closest('#ibExplorer');
+  if (!explorer) return;
+  e.preventDefault();
+  ibCtxNode = row._ibNode;
+  const isScript = IB_SCRIPT_CLASSES.has(ibCtxNode.cls);
+  ibShowCtxMenu(e.clientX, e.clientY, [
+    { header: ibCtxNode.cls },
+    { action: 'copy_name', label: 'Copy Name' },
+    { action: 'copy_path', label: 'Copy Path' },
+    ...(isScript ? ['sep', { action: 'decompile', label: 'Decompile Script' }] : []),
+  ]);
+});
+
+function ibCloseOtherTabs(keepIdx) {
+  if (!ibConnected) return;
+  ibSendCmd({ type: 'close_other_tabs', tabIndex: keepIdx + 1 });
+}
+
+async function ibDecompileNode(node) {
+  if (!ibConnected) return;
+  const path = node.fullPath || node.name;
+  ibLog(`Decompiling ${path}…`);
+  const st = ibWinState.get('ibWinDecompile');
+  if (st) {
+    const main = document.getElementById('ibMain');
+    if (main && !st.visible) {
+      st.x = Math.max(20, Math.round((main.offsetWidth  - st.w) / 2));
+      st.y = Math.max(20, Math.round((main.offsetHeight - st.h) / 2));
+    }
+    st.visible = true;
+    ibWinTopZ++; st.z = ibWinTopZ;
+    ibApplyWinState();
+  }
+  const title = document.getElementById('ibDecompileTitle');
+  const pre   = document.getElementById('ibDecompilePre');
+  if (title) title.textContent = `Decompile: ${node.name}`;
+  if (pre)   pre.textContent   = 'Decompiling…';
+  try {
+    const result = await ibCallTool('decompile', { path }, 20000);
+    if (pre) pre.textContent = result || '-- (empty)';
+    ibLog(`Decompiled ${node.name} (${(result || '').length} chars).`, 'ok');
+  } catch (err) {
+    if (pre) pre.textContent = `-- Error: ${err.message}`;
+    ibLog(`Decompile failed: ${err.message}`, 'err');
+  }
+}
+
+async function ibDecompileCopy() {
+  const pre = document.getElementById('ibDecompilePre');
+  if (!pre || !pre.textContent || pre.textContent === 'Decompiling…') return;
+  try {
+    await navigator.clipboard.writeText(pre.textContent);
+    const btn = document.getElementById('ibDecompileCopyBtn');
+    if (btn) {
+      btn.innerHTML = '<iconify-icon icon="mdi:check" width="13" height="13"></iconify-icon>';
+      setTimeout(() => { btn.innerHTML = '<iconify-icon icon="mdi:content-copy" width="13" height="13"></iconify-icon>'; }, 1200);
+    }
+  } catch { ibLog('Copy failed', 'err'); }
+}
+
 requestAnimationFrame(() => requestAnimationFrame(ibInitWindows));
+ibInitMonaco();
 
 // Expose functions called from inline onclick attributes
 window.ibConnect         = ibConnect;
@@ -1577,9 +2198,15 @@ window.ibSaveSettings    = ibSaveSettings;
 window.ibToggleApiKeyVis = ibToggleApiKeyVis;
 window.ibLoadSession     = ibLoadSession;
 window.ibRefreshExplorer = ibRefreshExplorer;
+window.ibSyncAll         = ibSyncAll;
 window.ibRunCode         = ibRunCode;
+window.ibClearCode       = ibClearCode;
+window.ibCopyCode        = ibCopyCode;
 window.ibSwitchCodeTab   = ibSwitchCodeTab;
+window.ibNewTab          = ibNewTab;
+window.ibRemoveTab       = ibRemoveTab;
 window.ibCodeEditorInput = ibCodeEditorInput;
 window.ibToggleSkill     = ibToggleSkill;
+window.ibDecompileCopy   = ibDecompileCopy;
 })();
 </script>
