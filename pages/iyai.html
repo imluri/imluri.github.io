@@ -892,12 +892,41 @@ function ibApplyWinState() {
     });
   });
   ibUpdateToggleStates();
+  ibApplyWindowBorders();
 }
 
 function ibUpdateToggleStates() {
   document.querySelectorAll('.ib-toggle-btn[data-panel]').forEach(btn => {
     const st = ibWinState.get(btn.dataset.panel);
     btn.classList.toggle('ib-toggle-active', !!(st?.visible));
+  });
+}
+
+// ── Edge-flush border-radius ───────────────────────────────────
+
+function ibApplyWindowBorders() {
+  const main = document.getElementById('ibMain');
+  if (!main) return;
+  const mw = main.offsetWidth, mh = main.offsetHeight;
+  const T  = 2; // tolerance: within 2px = flush
+  ibWinState.forEach((st, id) => {
+    const panel = document.getElementById(id);
+    if (!panel || !st.visible) return;
+    let atL = st.x <= T;
+    let atT = st.y <= T;
+    let atR = st.x + st.w >= mw - T;
+    let atB = st.y + st.h >= mh - T;
+    // Also check edges flush against another visible window
+    ibWinState.forEach((ost, oid) => {
+      if (oid === id || !ost.visible) return;
+      if (Math.abs(st.x        - (ost.x + ost.w)) <= T) atL = true;
+      if (Math.abs(st.y        - (ost.y + ost.h)) <= T) atT = true;
+      if (Math.abs(st.x + st.w -  ost.x)          <= T) atR = true;
+      if (Math.abs(st.y + st.h -  ost.y)          <= T) atB = true;
+    });
+    const r = '8px', z = '0';
+    panel.style.borderRadius =
+      `${atT||atL?z:r} ${atT||atR?z:r} ${atB||atR?z:r} ${atB||atL?z:r}`;
   });
 }
 
@@ -909,12 +938,55 @@ function ibBindDrag(panel) {
   header._ibDragBound = true;
   header.style.cursor = 'grab';
 
+  header.addEventListener('dblclick', (e) => {
+    if (e.target.closest('button')) return;
+    const st   = ibWinState.get(panel.id);
+    const main = document.getElementById('ibMain');
+    if (!st || !main) return;
+    if (st._preFill) {
+      // Restore pre-fill size/position
+      Object.assign(st, st._preFill);
+      delete st._preFill;
+    } else {
+      // Find the empty region around this window's center
+      const mw = main.offsetWidth, mh = main.offsetHeight;
+      const cx = st.x + st.w / 2, cy = st.y + st.h / 2;
+      let x1 = 0, x2 = mw, y1 = 0, y2 = mh;
+      // Pass 1: constrain X using windows that overlap the horizontal center line
+      ibWinState.forEach((ost, oid) => {
+        if (oid === panel.id || !ost.visible) return;
+        if (ost.y < cy && ost.y + ost.h > cy) {
+          if (ost.x + ost.w <= cx) x1 = Math.max(x1, ost.x + ost.w);
+          if (ost.x          >= cx) x2 = Math.min(x2, ost.x);
+        }
+      });
+      // Pass 2: constrain Y using windows that overlap the found X band
+      ibWinState.forEach((ost, oid) => {
+        if (oid === panel.id || !ost.visible) return;
+        if (ost.x < x2 && ost.x + ost.w > x1) {
+          if (ost.y + ost.h <= cy) y1 = Math.max(y1, ost.y + ost.h);
+          if (ost.y          >= cy) y2 = Math.min(y2, ost.y);
+        }
+      });
+      st._preFill = { x: st.x, y: st.y, w: st.w, h: st.h };
+      st.x = x1; st.y = y1; st.w = x2 - x1; st.h = y2 - y1;
+    }
+    ibWinTopZ++; st.z = ibWinTopZ;
+    Object.assign(panel.style, {
+      left: st.x + 'px', top:    st.y + 'px',
+      width: st.w + 'px', height: st.h + 'px',
+      zIndex: String(st.z),
+    });
+    ibApplyWindowBorders();
+  });
+
   header.addEventListener('mousedown', (e) => {
     if (e.button !== 0 || e.target.closest('button')) return;
     e.preventDefault();
     const st = ibWinState.get(panel.id);
     if (!st) return;
 
+    delete st._preFill;
     ibWinTopZ++; st.z = ibWinTopZ;
     panel.style.zIndex = String(ibWinTopZ);
 
@@ -926,7 +998,15 @@ function ibBindDrag(panel) {
     header.style.cursor = 'grabbing';
     document.body.style.userSelect = 'none';
 
-    const SNAP_T = 10;
+    // Ghost preview element — shows snap target before committing
+    const ghost = document.createElement('div');
+    ghost.className = 'ib-snap-ghost';
+    ghost.style.cssText = `width:${st.w}px;height:${st.h}px;`;
+    if (main) main.appendChild(ghost);
+
+    const SNAP_T = 18;
+    let pendingSnapX = null, pendingSnapY = null;
+
     const onMove = (ev) => {
       let nx = ev.clientX - offX;
       let ny = ev.clientY - offY;
@@ -936,37 +1016,57 @@ function ibBindDrag(panel) {
         ny = Math.max(0,            Math.min(mh - 30, ny));
       }
 
-      // Snap dragged window edges to other visible windows' edges and workspace edges
-      let bdx = SNAP_T, bdy = SNAP_T, snapX = null, snapY = null;
-      const xTargets = [0, mw];
-      const yTargets = [0, mh];
+      // Collect snap edges from workspace boundaries and all other visible windows
+      const xEdges = [0, mw];
+      const yEdges = [0, mh];
       ibWinState.forEach((ost, oid) => {
         if (oid === panel.id || !ost.visible) return;
-        xTargets.push(ost.x, ost.x + ost.w);
-        yTargets.push(ost.y, ost.y + ost.h);
+        xEdges.push(ost.x, ost.x + ost.w);
+        yEdges.push(ost.y, ost.y + ost.h);
       });
-      for (const tx of xTargets) {
+      let snapX = null, snapY = null, bdx = SNAP_T, bdy = SNAP_T;
+      for (const tx of xEdges) {
         const dL = Math.abs(nx - tx), dR = Math.abs(nx + st.w - tx);
         if (dL < bdx) { bdx = dL; snapX = tx; }
         if (dR < bdx) { bdx = dR; snapX = tx - st.w; }
       }
-      for (const ty of yTargets) {
+      for (const ty of yEdges) {
         const dT = Math.abs(ny - ty), dB = Math.abs(ny + st.h - ty);
         if (dT < bdy) { bdy = dT; snapY = ty; }
         if (dB < bdy) { bdy = dB; snapY = ty - st.h; }
       }
-      if (snapX !== null) nx = snapX;
-      if (snapY !== null) ny = snapY;
 
+      // Show ghost at snap target when both axes qualify; window keeps following cursor
+      if (snapX !== null && snapY !== null) {
+        pendingSnapX = snapX; pendingSnapY = snapY;
+        Object.assign(ghost.style, {
+          display: 'block',
+          left: snapX + 'px', top: snapY + 'px',
+          width: st.w + 'px', height: st.h + 'px',
+        });
+      } else {
+        pendingSnapX = null; pendingSnapY = null;
+        ghost.style.display = 'none';
+      }
+
+      // Window follows cursor freely — snap commits on release
       st.x = nx; st.y = ny;
       panel.style.left = nx + 'px';
       panel.style.top  = ny + 'px';
     };
     const onUp = () => {
+      ghost.remove();
       header.style.cursor = 'grab';
       document.body.style.userSelect = '';
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseup',   onUp);
+      // Commit snap on release
+      if (pendingSnapX !== null && pendingSnapY !== null) {
+        st.x = pendingSnapX; st.y = pendingSnapY;
+        panel.style.left = st.x + 'px';
+        panel.style.top  = st.y + 'px';
+      }
+      ibApplyWindowBorders();
     };
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup',   onUp);
@@ -988,11 +1088,75 @@ function ibBindFrontOnClick(panel) {
 
 // ── Resize (8-direction handles) ──────────────────────────────
 
+function ibGetOrCreateRzHighlight() {
+  let el = document.getElementById('ibRzHighlight');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'ibRzHighlight';
+    el.style.display = 'none';
+    const main = document.getElementById('ibMain');
+    if (main) main.appendChild(el);
+  }
+  return el;
+}
+
+function ibShowRzHighlight(panel, dir) {
+  const st = ibWinState.get(panel.id);
+  if (!st || !st.visible) return;
+  const main = document.getElementById('ibMain');
+  if (!main) return;
+  const hi = ibGetOrCreateRzHighlight();
+  const FLUSH_T = 2, THICK = 3;
+  let hx, hy, hw, hh;
+
+  if (dir.includes('e')) {
+    const edgeX = st.x + st.w;
+    let minY = st.y, maxY = st.y + st.h;
+    ibWinState.forEach(ost => {
+      if (!ost.visible) return;
+      if (Math.abs((ost.x + ost.w) - edgeX) <= FLUSH_T) { minY = Math.min(minY, ost.y); maxY = Math.max(maxY, ost.y + ost.h); }
+    });
+    hx = edgeX - 1; hy = minY; hw = THICK; hh = maxY - minY;
+  } else if (dir.includes('w')) {
+    const edgeX = st.x;
+    let minY = st.y, maxY = st.y + st.h;
+    ibWinState.forEach(ost => {
+      if (!ost.visible) return;
+      if (Math.abs(ost.x - edgeX) <= FLUSH_T) { minY = Math.min(minY, ost.y); maxY = Math.max(maxY, ost.y + ost.h); }
+    });
+    hx = edgeX - 1; hy = minY; hw = THICK; hh = maxY - minY;
+  } else if (dir === 's') {
+    const edgeY = st.y + st.h;
+    let minX = st.x, maxX = st.x + st.w;
+    ibWinState.forEach(ost => {
+      if (!ost.visible) return;
+      if (Math.abs((ost.y + ost.h) - edgeY) <= FLUSH_T) { minX = Math.min(minX, ost.x); maxX = Math.max(maxX, ost.x + ost.w); }
+    });
+    hx = minX; hy = edgeY - 1; hw = maxX - minX; hh = THICK;
+  } else if (dir === 'n') {
+    const edgeY = st.y;
+    let minX = st.x, maxX = st.x + st.w;
+    ibWinState.forEach(ost => {
+      if (!ost.visible) return;
+      if (Math.abs(ost.y - edgeY) <= FLUSH_T) { minX = Math.min(minX, ost.x); maxX = Math.max(maxX, ost.x + ost.w); }
+    });
+    hx = minX; hy = edgeY - 1; hw = maxX - minX; hh = THICK;
+  } else { return; }
+
+  Object.assign(hi.style, { display:'block', left:hx+'px', top:hy+'px', width:hw+'px', height:hh+'px' });
+}
+
 function ibAddResizeHandles(panel) {
   if (panel.querySelector('.ib-rz')) return;
+  const FLUSH_T = 2;
   ['n','s','e','w','ne','nw','se','sw'].forEach(dir => {
     const h = document.createElement('div');
     h.className = `ib-rz ib-rz-${dir}`;
+    h.addEventListener('mouseenter', () => ibShowRzHighlight(panel, dir));
+    h.addEventListener('mouseleave', () => {
+      const hi = document.getElementById('ibRzHighlight');
+      if (hi && !hi._dragging) hi.style.display = 'none';
+    });
     h.addEventListener('mousedown', (e) => {
       e.preventDefault(); e.stopPropagation();
       const st = ibWinState.get(panel.id);
@@ -1004,21 +1168,92 @@ function ibAddResizeHandles(panel) {
       const ox = e.clientX, oy = e.clientY;
       const MIN_W = 220, MIN_H = 140;
 
+      // eN/wN/sN/nN: opposite-side neighbors (window on the far side of this edge)
+      // eC/wC/sC/nC: co-primary windows sharing the SAME edge as primary
+      const eN = [], wN = [], sN = [], nN = [];
+      const eC = [], wC = [], sC = [], nC = [];
+      ibWinState.forEach((ost, oid) => {
+        if (oid === panel.id || !ost.visible) return;
+        if (dir.includes('e')) {
+          if (Math.abs(ost.x           - (sx + sw)) <= FLUSH_T) eN.push({ id: oid, ost, far: ost.x + ost.w, y0: ost.y, h0: ost.h });
+          if (Math.abs((ost.x + ost.w) - (sx + sw)) <= FLUSH_T) eC.push({ id: oid, ost, x0: ost.x, y0: ost.y, h0: ost.h });
+        }
+        if (dir.includes('w')) {
+          if (Math.abs((ost.x + ost.w) - sx)        <= FLUSH_T) wN.push({ id: oid, ost, far: ost.x, y0: ost.y, h0: ost.h });
+          if (Math.abs(ost.x           - sx)         <= FLUSH_T) wC.push({ id: oid, ost, x0: ost.x, w0: ost.w, y0: ost.y, h0: ost.h });
+        }
+        if (dir.includes('s')) {
+          if (Math.abs(ost.y           - (sy + sh)) <= FLUSH_T) sN.push({ id: oid, ost, far: ost.y + ost.h, x0: ost.x, w0: ost.w });
+          if (Math.abs((ost.y + ost.h) - (sy + sh)) <= FLUSH_T) sC.push({ id: oid, ost, y0: ost.y, x0: ost.x, w0: ost.w });
+        }
+        if (dir.includes('n')) {
+          if (Math.abs((ost.y + ost.h) - sy)        <= FLUSH_T) nN.push({ id: oid, ost, far: ost.y, x0: ost.x, w0: ost.w });
+          if (Math.abs(ost.y           - sy)         <= FLUSH_T) nC.push({ id: oid, ost, x0: ost.x, y0: ost.y, w0: ost.w, h0: ost.h });
+        }
+      });
+
+      const applyNeighbor = (n, x, y, w, h) => {
+        Object.assign(n.ost, { x, y, w, h });
+        const el = document.getElementById(n.id);
+        if (el) Object.assign(el.style, { left:x+'px', top:y+'px', width:w+'px', height:h+'px' });
+      };
+
       document.body.style.userSelect = 'none';
       const onMove = (ev) => {
         const dx = ev.clientX - ox, dy = ev.clientY - oy;
         let { x, y, w, h } = { x: sx, y: sy, w: sw, h: sh };
-        if (dir.includes('e')) w = Math.max(MIN_W, sw + dx);
-        if (dir.includes('s')) h = Math.max(MIN_H, sh + dy);
-        if (dir.includes('w')) { w = Math.max(MIN_W, sw - dx); x = sx + sw - w; }
-        if (dir.includes('n')) { h = Math.max(MIN_H, sh - dy); y = sy + sh - h; }
+
+        if (dir.includes('e')) {
+          const maxR = eN.length ? Math.min(...eN.map(n => n.far - MIN_W)) : Infinity;
+          const minR = Math.max(sx + MIN_W, ...eC.map(n => n.x0 + MIN_W));
+          const newR = Math.min(Math.max(sx + sw + dx, minR), maxR);
+          w = newR - sx;
+          eC.forEach(n => applyNeighbor(n, n.x0, n.y0, newR - n.x0, n.h0));
+          eN.forEach(n => applyNeighbor(n, newR, n.y0, n.far - newR, n.h0));
+        }
+        if (dir.includes('s')) {
+          const maxB = sN.length ? Math.min(...sN.map(n => n.far - MIN_H)) : Infinity;
+          const minB = Math.max(sy + MIN_H, ...sC.map(n => n.y0 + MIN_H));
+          const newB = Math.min(Math.max(sy + sh + dy, minB), maxB);
+          h = newB - sy;
+          sC.forEach(n => applyNeighbor(n, n.x0, n.y0, n.w0, newB - n.y0));
+          sN.forEach(n => applyNeighbor(n, n.x0, newB, n.w0, n.far - newB));
+        }
+        if (dir.includes('w')) {
+          const minL = wN.length ? Math.max(...wN.map(n => n.far + MIN_W)) : -Infinity;
+          const maxL = Math.min(sx + sw - MIN_W, ...wC.map(n => n.x0 + n.w0 - MIN_W));
+          const newL = Math.max(minL, Math.min(maxL, sx + dx));
+          w = sx + sw - newL;
+          x = newL;
+          wC.forEach(n => applyNeighbor(n, newL, n.y0, n.x0 + n.w0 - newL, n.h0));
+          wN.forEach(n => applyNeighbor(n, n.far, n.y0, newL - n.far, n.h0));
+        }
+        if (dir.includes('n')) {
+          const minT = nN.length ? Math.max(...nN.map(n => n.far + MIN_H)) : -Infinity;
+          const maxT = Math.min(sy + sh - MIN_H, ...nC.map(n => n.y0 + n.h0 - MIN_H));
+          const newT = Math.max(minT, Math.min(maxT, sy + dy));
+          h = sy + sh - newT;
+          y = newT;
+          nC.forEach(n => applyNeighbor(n, n.x0, newT, n.w0, n.y0 + n.h0 - newT));
+          nN.forEach(n => applyNeighbor(n, n.x0, n.far, n.w0, newT - n.far));
+        }
+
         Object.assign(st, { x, y, w, h });
         Object.assign(panel.style, { left:x+'px', top:y+'px', width:w+'px', height:h+'px' });
+        ibShowRzHighlight(panel, dir);
       };
+      h.classList.add('ib-rz-active');
+      const hi = ibGetOrCreateRzHighlight();
+      hi._dragging = true;
+      ibShowRzHighlight(panel, dir);
       const onUp = () => {
+        h.classList.remove('ib-rz-active');
+        hi._dragging = false;
+        hi.style.display = 'none';
         document.body.style.userSelect = '';
         document.removeEventListener('mousemove', onMove);
         document.removeEventListener('mouseup',   onUp);
+        ibApplyWindowBorders();
       };
       document.addEventListener('mousemove', onMove);
       document.addEventListener('mouseup',   onUp);

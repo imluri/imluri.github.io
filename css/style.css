@@ -2204,25 +2204,51 @@ body.bm-page #app {
   display: none;
   flex-direction: column;
   position: absolute;
-  background: var(--bg-elevated);
+  background: rgba(8, 4, 4, 0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 8px;
-  box-shadow: 0 16px 56px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+  box-shadow: 0 16px 56px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
   overflow: hidden;
   min-width: 220px;
   min-height: 140px;
 }
 
+/* ── Snap ghost preview ──────────────────────────────────────── */
+.ib-snap-ghost {
+  display: none;
+  position: absolute;
+  border: 2px dashed rgba(255,112,112,0.55);
+  border-radius: 8px;
+  background: rgba(255,112,112,0.06);
+  box-shadow: inset 0 0 24px rgba(255,112,112,0.05), 0 0 0 1px rgba(255,112,112,0.12);
+  pointer-events: none;
+  z-index: 9998;
+  transition: left 0.07s ease, top 0.07s ease, width 0.07s ease, height 0.07s ease;
+}
+
 /* ── 8-direction resize handles ─────────────────────────────── */
 .ib-rz { position: absolute; z-index: 10; }
-.ib-rz-n  { top:-4px;    left:8px;   right:8px;  height:8px;  cursor:n-resize;  }
-.ib-rz-s  { bottom:-4px; left:8px;   right:8px;  height:8px;  cursor:s-resize;  }
-.ib-rz-e  { right:-4px;  top:8px;    bottom:8px; width:8px;   cursor:e-resize;  }
-.ib-rz-w  { left:-4px;   top:8px;    bottom:8px; width:8px;   cursor:w-resize;  }
-.ib-rz-ne { top:-4px;    right:-4px; width:14px; height:14px; cursor:ne-resize; }
-.ib-rz-nw { top:-4px;    left:-4px;  width:14px; height:14px; cursor:nw-resize; }
-.ib-rz-se { bottom:-4px; right:-4px; width:14px; height:14px; cursor:se-resize; }
-.ib-rz-sw { bottom:-4px; left:-4px;  width:14px; height:14px; cursor:sw-resize; }
+.ib-rz-n  { top:0;    left:10px;  right:10px; height:5px;  cursor:n-resize;  }
+.ib-rz-s  { bottom:0; left:10px;  right:10px; height:5px;  cursor:s-resize;  }
+.ib-rz-e  { right:0;  top:10px;   bottom:10px;width:5px;   cursor:e-resize;  }
+.ib-rz-w  { left:0;   top:10px;   bottom:10px;width:5px;   cursor:w-resize;  }
+.ib-rz-ne { top:0;    right:0;    width:14px; height:14px; cursor:ne-resize; }
+.ib-rz-nw { top:0;    left:0;     width:14px; height:14px; cursor:nw-resize; }
+.ib-rz-se { bottom:0; right:0;    width:14px; height:14px; cursor:se-resize; }
+.ib-rz-sw { bottom:0; left:0;     width:14px; height:14px; cursor:sw-resize; }
+
+
+/* Full-edge spanning highlight overlay (positioned in ibMain, not inside window) */
+#ibRzHighlight {
+  position: absolute;
+  pointer-events: none;
+  z-index: 9997;
+  background: rgba(255, 112, 112, 0.55);
+  box-shadow: 0 0 8px 2px rgba(255, 112, 112, 0.35);
+  border-radius: 2px;
+}
 
 .ib-win-header {
   display: flex;
