@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoldIQ Field Kit — 3D Hardware Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Three.js importmap — swap the version string to upgrade at any time -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<style>
+/* ── Reset & tokens ────────────────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:        #0a0700;
+  --surface:   #160f00;
+  --gold:      #c9960c;
+  --gold-lt:   #f0c040;
+  --copper:    #cd7f32;
+  --white:     #fffdf0;
+  --grey:      #9a8a60;
+  --border:    rgba(201,150,12,0.18);
+  --mono:      'IBM Plex Mono', monospace;
+}
+
+html { scroll-behavior: auto; }
+
+body {
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--white);
+  /* Tall body creates the scroll space that drives scene rotation */
+  height: 500vh;
+  overflow-x: hidden;
+}
+
+/* ── Canvas (full-viewport, fixed) ────────────────────────────────────── */
+#three-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+}
+
+/* ── Loading screen ────────────────────────────────────────────────────── */
+#loader {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  transition: opacity 0.6s ease;
+}
+#loader.hidden { opacity: 0; pointer-events: none; }
+
+.loader-logo {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--gold-lt);
+}
+.loader-logo span { color: var(--copper); }
+
+.loader-bar-wrap {
+  width: 200px;
+  height: 2px;
+  background: rgba(201,150,12,0.15);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.loader-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-lt));
+  border-radius: 999px;
+  animation: loaderFill 1.4s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+@keyframes loaderFill { to { width: 100%; } }
+
+.loader-text {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--grey);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ── Header / nav overlay ──────────────────────────────────────────────── */
+#site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.1rem 2rem;
+  background: rgba(10,7,0,0.72);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-back {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--grey);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.header-back:hover { color: var(--gold-lt); }
+.header-back svg { flex-shrink: 0; }
+
+.header-title {
+  position: absolute;
+  left: 50%; transform: translateX(-50%);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.header-right {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--grey);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── Battery widget ────────────────────────────────────────────────────── */
+#battery-widget {
+  position: fixed;
+  top: 72px;
+  right: 20px;
+  z-index: 50;
+  background: rgba(22,15,0,0.88);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  width: 160px;
+  backdrop-filter: blur(12px);
+}
+
+.batt-label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--grey);
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.batt-pct { color: var(--gold-lt); font-weight: 600; }
+
+.batt-bar-wrap {
+  position: relative;
+  height: 10px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 6px;
+  overflow: visible;
+}
+
+#battery-glow {
+  height: 100%;
+  border-radius: 6px;
+  width: 100%;
+  transition: background 0.5s, box-shadow 0.5s;
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+  box-shadow: 0 0 12px rgba(74,222,128,0.5);
+}
+
+#battery-fill {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.3s linear, background 0.5s, box-shadow 0.5s;
+  width: 100%;
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+  box-shadow: 0 0 10px rgba(74,222,128,0.5);
+}
+
+.batt-nub {
+  position: absolute;
+  right: -5px; top: 50%; transform: translateY(-50%);
+  width: 4px; height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 0 2px 2px 0;
+}
+
+/* ── Connection status ─────────────────────────────────────────────────── */
+#conn-status {
+  position: fixed;
+  top: 72px;
+  left: 20px;
+  z-index: 50;
+  background: rgba(22,15,0,0.88);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  backdrop-filter: blur(12px);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.conn-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--grey);
+}
+
+.conn-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.conn-dot.green { background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,0.7); animation: connPulse 2s ease-in-out infinite; }
+.conn-dot.blue  { background: #60a5fa; box-shadow: 0 0 6px rgba(96,165,250,0.7); animation: connPulse 2s ease-in-out infinite 0.5s; }
+
+@keyframes connPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.conn-val { color: var(--white); }
+
+/* ── Scroll hint ───────────────────────────────────────────────────────── */
+#scroll-hint {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  opacity: 1;
+  transition: opacity 0.4s;
+}
+#scroll-hint.hidden { opacity: 0; pointer-events: none; }
+#scroll-hint span {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+.scroll-arrow {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(180deg, var(--gold), transparent);
+  border-radius: 999px;
+  animation: scrollBounce 1.8s ease-in-out infinite;
+}
+@keyframes scrollBounce {
+  0%, 100% { transform: scaleY(1); opacity: 0.7; }
+  50%       { transform: scaleY(1.3); opacity: 1; }
+}
+
+/* ── Tooltip ───────────────────────────────────────────────────────────── */
+#tooltip {
+  position: fixed;
+  z-index: 60;
+  background: rgba(22,15,0,0.96);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  min-width: 210px;
+  max-width: 260px;
+  backdrop-filter: blur(14px);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px) scale(0.97);
+  transition: opacity 0.15s, transform 0.15s;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+}
+#tooltip.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.tt-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 3px;
+}
+.tt-role {
+  font-size: 0.68rem;
+  font-family: var(--mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.tt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 0.76rem;
+}
+.tt-key { color: var(--grey); flex-shrink: 0; }
+.tt-val { color: var(--gold-lt); font-family: var(--mono); font-size: 0.72rem; text-align: right; }
+
+.tt-hint {
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid var(--border);
+  font-size: 0.67rem;
+  font-family: var(--mono);
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+
+/* ── Data Modal ────────────────────────────────────────────────────────── */
+#data-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10,7,0,0.8);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+#data-modal.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  min-width: 340px;
+  max-width: 460px;
+  width: 90%;
+  box-shadow: 0 32px 64px rgba(0,0,0,0.6);
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.4rem;
+}
+
+.modal-title {
+  font-size: 0.68rem;
+  font-family: var(--mono);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 5px;
+}
+.modal-sample { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; }
+
+.modal-close {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--grey);
+  width: 28px; height: 28px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+.modal-close:hover { background: rgba(201,150,12,0.12); color: var(--gold-lt); }
+
+.modal-loc {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--grey);
+  margin-bottom: 1.4rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(201,150,12,0.07);
+  font-size: 0.85rem;
+}
+.modal-row:last-child { border-bottom: none; }
+.modal-key { color: var(--grey); }
+.modal-val {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gold-lt);
+}
+.modal-val.high { color: #4ade80; }
+.modal-val.warn { color: #fbbf24; }
+
+.modal-footer {
+  margin-top: 1.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-timestamp { font-family: var(--mono); font-size: 0.65rem; color: var(--grey); }
+.modal-btn {
+  padding: 7px 16px;
+  background: rgba(201,150,12,0.12);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--gold-lt);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.modal-btn:hover { background: rgba(201,150,12,0.22); }
+
+/* ── Scroll progress bar ───────────────────────────────────────────────── */
+#progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-lt));
+  z-index: 100;
+  transition: width 0.1s linear;
+}
+
+/* ── Component legend ──────────────────────────────────────────────────── */
+#legend {
+  position: fixed;
+  bottom: 28px;
+  right: 20px;
+  z-index: 50;
+  background: rgba(22,15,0,0.88);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  backdrop-filter: blur(12px);
+  font-family: var(--mono);
+  font-size: 0.64rem;
+}
+.legend-title {
+  color: var(--grey);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--grey);
+  padding: 2px 0;
+}
+.legend-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Mobile ────────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  #battery-widget { width: 130px; font-size: 0.6rem; }
+  #conn-status    { font-size: 0.6rem; padding: 8px 10px; }
+  #legend         { display: none; }
+  .header-title   { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Progress bar ── -->
+<div id="progress-bar"></div>
+
+<!-- ── Loading screen ── -->
+<div id="loader">
+  <div class="loader-logo">Gold<span>IQ</span></div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+  <div class="loader-text">Initialising Field Kit</div>
+</div>
+
+<!-- ── Three.js canvas ── -->
+<canvas id="three-canvas"></canvas>
+
+<!-- ── Header ── -->
+<header id="site-header">
+  <a href="/" class="header-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    Portfolio
+  </a>
+  <span class="header-title">GoldIQ Field Kit · 3D Explorer</span>
+  <div class="header-right">
+    <span>Scroll to rotate</span>
+    <span>·</span>
+    <span>Drag to orbit</span>
+  </div>
+</header>
+
+<!-- ── Battery widget ── -->
+<div id="battery-widget">
+  <div class="batt-label">
+    <span>Field Kit Power</span>
+    <span class="batt-pct" id="battery-pct">100%</span>
+  </div>
+  <div class="batt-bar-wrap">
+    <div id="battery-glow"></div>
+    <div id="battery-fill"></div>
+    <div class="batt-nub"></div>
+  </div>
+</div>
+
+<!-- ── Connection status ── -->
+<div id="conn-status">
+  <div class="conn-row">
+    <div class="conn-dot green"></div>
+    <span>4G: <span class="conn-val">Connected</span></span>
+  </div>
+  <div class="conn-row">
+    <div class="conn-dot blue"></div>
+    <span>GPS: <span class="conn-val">3D Fix · 12 sats</span></span>
+  </div>
+</div>
+
+<!-- ── Scroll hint ── -->
+<div id="scroll-hint">
+  <span>Scroll to rotate</span>
+  <div class="scroll-arrow"></div>
+</div>
+
+<!-- ── Component legend ── -->
+<div id="legend">
+  <div class="legend-title">Components</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div> ESP32 Controller</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div> pH · EC Probes</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f0c040"></div> GPS · 4G Modules</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#60a5fa"></div> Rugged Tablet</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#cd7f32"></div> Soil Core Sample</div>
+  <div class="legend-item" style="margin-top:6px; border-top:1px solid rgba(201,150,12,0.15); padding-top:6px">
+    <div class="legend-dot" style="background:#f0c040; box-shadow:0 0 4px rgba(240,192,64,0.8)"></div> Data flow (gold)
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#00ccff; box-shadow:0 0 4px rgba(0,204,255,0.8)"></div> Sensor flow (cyan)
+  </div>
+</div>
+
+<!-- ── Hover tooltip ── -->
+<div id="tooltip">
+  <div class="tt-name" id="tt-name">—</div>
+  <div class="tt-role" id="tt-role">—</div>
+  <div id="tt-rows"></div>
+  <div class="tt-hint" id="tt-hint" style="display:none">↖ Click to open sensor data</div>
+</div>
+
+<!-- ── Data modal (opens when rugged tablet is clicked) ── -->
+<div id="data-modal">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Live Field Data</div>
+        <div class="modal-sample">Sample #47</div>
+      </div>
+      <button class="modal-close" id="modal-close">✕</button>
+    </div>
+    <div class="modal-loc">📍 4.3057° N, 101.4658° E · Pahang, Malaysia</div>
+    <div class="modal-row"><span class="modal-key">pH</span><span class="modal-val">6.8</span></div>
+    <div class="modal-row"><span class="modal-key">Conductivity</span><span class="modal-val">245 µS/cm</span></div>
+    <div class="modal-row"><span class="modal-key">Au Prediction</span><span class="modal-val high">3.8 g/t</span></div>
+    <div class="modal-row"><span class="modal-key">Confidence</span><span class="modal-val high">High (91%)</span></div>
+    <div class="modal-row"><span class="modal-key">Arsenic</span><span class="modal-val warn">12 ppm (Pathfinder ↑)</span></div>
+    <div class="modal-row"><span class="modal-key">Copper</span><span class="modal-val">8.4 ppm</span></div>
+    <div class="modal-row"><span class="modal-key">Depth</span><span class="modal-val">30 cm</span></div>
+    <div class="modal-footer">
+      <span class="modal-timestamp">2026-05-21 · 09:14:33 UTC+8</span>
+      <button class="modal-btn">Export CSV</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Three.js scene ──────────────────────────────────────────────────────── -->
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  RENDERER
+// ─────────────────────────────────────────────────────────────────────────────
+const canvas   = document.getElementById('three-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled  = true;
+renderer.shadowMap.type     = THREE.PCFSoftShadowMap;
+renderer.toneMapping        = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.25;
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SCENE & CAMERA
+// ─────────────────────────────────────────────────────────────────────────────
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0700);
+scene.fog        = new THREE.Fog(0x0a0700, 16, 28);
+
+const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.1, 100);
+camera.position.set(0, 8, 12);
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SCENE GROUP  — everything in here rotates with scroll
+// ─────────────────────────────────────────────────────────────────────────────
+const kit = new THREE.Group();
+scene.add(kit);
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  LIGHTING
+// ─────────────────────────────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0x2a1500, 1.0));
+
+const sun = new THREE.DirectionalLight(0xffd580, 1.8);
+sun.position.set(6, 12, 6);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+['left','right','top','bottom'].forEach((s,i) => sun.shadow.camera[s] = [-9,9,9,-9][i]);
+sun.shadow.camera.far = 32;
+scene.add(sun);
+
+const fill = new THREE.DirectionalLight(0x3355aa, 0.35);
+fill.position.set(-6, 4, -6);
+scene.add(fill);
+
+// Warm gold point at workbench center — pulses in animation loop
+const goldPt = new THREE.PointLight(0xc9960c, 1.8, 10);
+goldPt.position.set(0, 0.5, 0);
+kit.add(goldPt);
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  WORKBENCH SURFACE
+// ─────────────────────────────────────────────────────────────────────────────
+const benchMat = new THREE.MeshStandardMaterial({
+  color: 0x0d0906, roughness: 0.95, metalness: 0.04
+});
+const bench = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), benchMat);
+bench.rotation.x = -Math.PI / 2;
+bench.receiveShadow = true;
+kit.add(bench);
+
+// Gold grid overlay
+const gridHelper = new THREE.GridHelper(14, 14, 0x2a1800, 0x160d00);
+gridHelper.position.y = 0.002;
+kit.add(gridHelper);
+
+// Subtle outer edge ring glow (large torus flat on bench)
+const rimGeo = new THREE.TorusGeometry(6, 0.03, 4, 80);
+const rimMat = new THREE.MeshBasicMaterial({ color: 0x3a2200, transparent: true, opacity: 0.5 });
+const rim = new THREE.Mesh(rimGeo, rimMat);
+rim.rotation.x = Math.PI / 2;
+rim.position.y = 0.003;
+kit.add(rim);
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  COMPONENT DATA  — tooltip info and colors
+//  To add a new component: add an entry here with matching id.
+// ─────────────────────────────────────────────────────────────────────────────
+const COMPONENTS = {
+  esp32: {
+    label: 'ESP32 Dev Board',
+    roleColor: '#4ade80',
+    rows: [
+      ['Role',        'Central Controller'],
+      ['Cores',       'Dual-core Xtensa LX6'],
+      ['Clock',       '240 MHz'],
+      ['Radio',       'WiFi · Bluetooth 5.0'],
+      ['I/O',         'GPIO · I²C · UART · SPI'],
+    ],
+    hint: false,
+  },
+  gps: {
+    label: 'GPS Module (u-blox NEO-M9N)',
+    roleColor: '#f0c040',
+    rows: [
+      ['Role',        'Location Tracking'],
+      ['Accuracy',    '2 cm (RTK mode)'],
+      ['Output',      'NMEA @ 10 Hz'],
+      ['Constellations', 'GPS + GLONASS + BeiDou'],
+    ],
+    hint: false,
+  },
+  lte: {
+    label: '4G Module (SIM7600)',
+    roleColor: '#60a5fa',
+    rows: [
+      ['Role',        'Cloud Uplink'],
+      ['Standard',    'LTE Cat-4'],
+      ['Bands',       'Global (B1/3/5/7/8/28)'],
+      ['Protocol',    'MQTT / HTTPS'],
+    ],
+    hint: false,
+  },
+  ph: {
+    label: 'Atlas Scientific pH Probe',
+    roleColor: '#34d399',
+    rows: [
+      ['Role',        'Soil Acidity Sensor'],
+      ['Range',       '0–14 pH'],
+      ['Accuracy',    '±0.01 pH'],
+      ['Compensation','Temperature corrected'],
+    ],
+    hint: false,
+  },
+  ec: {
+    label: 'Conductivity Probe (EC)',
+    roleColor: '#a78bfa',
+    rows: [
+      ['Role',        'Salinity / Ion Detector'],
+      ['Range',       '0.07–200 mS/cm'],
+      ['Use',         'Detects dissolved metals'],
+      ['Pathfinders', 'Cu · As · Pb · Zn'],
+    ],
+    hint: false,
+  },
+  tablet: {
+    label: 'Rugged Tablet',
+    roleColor: '#f87171',
+    rows: [
+      ['Role',        'Field Interface'],
+      ['Rating',      'IP67 waterproof'],
+      ['Display',     'Glove-touch 10"'],
+      ['Software',    'GoldIQ Field App'],
+    ],
+    hint: true,
+  },
+  soil: {
+    label: 'Soil Core Sample',
+    roleColor: '#cd7f32',
+    rows: [
+      ['Role',        'Geological Target'],
+      ['Depth',       '30 cm extraction'],
+      ['Analysis',    'pH · EC · XRF target'],
+    ],
+    hint: false,
+  },
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  COMPONENT BUILDER HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+const MAT = {
+  pcbGreen:  new THREE.MeshStandardMaterial({ color: 0x0a2208, roughness: 0.7, metalness: 0.1 }),
+  pcbDark:   new THREE.MeshStandardMaterial({ color: 0x080808, roughness: 0.6, metalness: 0.3 }),
+  chip:      new THREE.MeshStandardMaterial({ color: 0x202020, roughness: 0.3, metalness: 0.85 }),
+  metalSilv: new THREE.MeshStandardMaterial({ color: 0x888899, roughness: 0.25, metalness: 0.9 }),
+  metalGold: new THREE.MeshStandardMaterial({ color: 0xc9960c, roughness: 0.3,  metalness: 0.8 }),
+  probe:     new THREE.MeshStandardMaterial({ color: 0x111b22, roughness: 0.5,  metalness: 0.2 }),
+  glass:     new THREE.MeshStandardMaterial({ color: 0x8ae8e8, roughness: 0.05, metalness: 0.0, transparent: true, opacity: 0.65 }),
+  screen:    new THREE.MeshStandardMaterial({ color: 0x071014, roughness: 0.3,  metalness: 0.1, emissive: 0x0a3020, emissiveIntensity: 0.5 }),
+  tabBody:   new THREE.MeshStandardMaterial({ color: 0x151010, roughness: 0.6,  metalness: 0.3 }),
+  soil:      new THREE.MeshStandardMaterial({ color: 0x3d2410, roughness: 1.0,  metalness: 0.0 }),
+  soilDark:  new THREE.MeshStandardMaterial({ color: 0x251508, roughness: 1.0,  metalness: 0.0 }),
+  emGreen:   new THREE.MeshStandardMaterial({ color: 0x00ff44, roughness: 0.5,  emissive: 0x00ff44, emissiveIntensity: 1.5, transparent: true, opacity: 0.9 }),
+  emGold:    new THREE.MeshStandardMaterial({ color: 0xf0c040, roughness: 0.5,  emissive: 0xf0c040, emissiveIntensity: 1.2, transparent: true, opacity: 0.9 }),
+};
+
+function box(w,h,d,mat)    { return new THREE.Mesh(new THREE.BoxGeometry(w,h,d), mat); }
+function cyl(r,h,seg,mat)  { return new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,seg), mat); }
+function sph(r,seg,mat)    { return new THREE.Mesh(new THREE.SphereGeometry(r,seg,seg), mat); }
+function tor(r,t,seg,mat)  { return new THREE.Mesh(new THREE.TorusGeometry(r,t,6,seg), mat); }
+
+// ── ESP32 board ─────────────────────────────────────────────────────────────
+//  Swap this function body to load your own .glb:
+//    const { scene: m } = await gltfLoader.loadAsync('models/esp32.glb');
+//    return m;
+function buildESP32() {
+  const g = new THREE.Group();
+
+  // PCB
+  const pcb = box(2.2, 0.07, 1.1, MAT.pcbGreen);
+  pcb.castShadow = true;
+  g.add(pcb);
+
+  // Main SoC chip
+  const soc = box(0.52, 0.1, 0.52, MAT.chip);
+  soc.position.set(0, 0.085, 0);
+  g.add(soc);
+
+  // Metal can / RF shield
+  const can = box(0.38, 0.12, 0.38, MAT.metalSilv);
+  can.position.set(0.28, 0.09, 0.05);
+  g.add(can);
+
+  // Antenna trace pad (small gold rectangle on edge)
+  const ant = box(0.18, 0.02, 0.06, MAT.metalGold);
+  ant.position.set(1.0, 0.06, 0);
+  g.add(ant);
+
+  // USB connector
+  const usb = box(0.22, 0.08, 0.14, MAT.metalSilv);
+  usb.position.set(-1.0, 0.04, 0);
+  g.add(usb);
+
+  // Pin headers (left side)
+  for (let i = 0; i < 9; i++) {
+    const pin = box(0.04, 0.18, 0.04, MAT.metalSilv);
+    pin.position.set(-0.84 + i * 0.19, 0.06, 0.5);
+    g.add(pin);
+  }
+  // Pin headers (right side)
+  for (let i = 0; i < 9; i++) {
+    const pin = box(0.04, 0.18, 0.04, MAT.metalSilv);
+    pin.position.set(-0.84 + i * 0.19, 0.06, -0.5);
+    g.add(pin);
+  }
+
+  // Status LED (emissive)
+  const led = sph(0.04, 6, MAT.emGreen.clone());
+  led.position.set(-0.95, 0.1, 0.35);
+  g.add(led);
+
+  return g;
+}
+
+// ── pH Probe ─────────────────────────────────────────────────────────────────
+//  Replace with: gltfLoader.loadAsync('models/ph_probe.glb')
+function buildPHProbe() {
+  const g = new THREE.Group();
+  // Probe body
+  const body = cyl(0.09, 2.2, 12, MAT.probe);
+  body.position.y = 1.1;
+  g.add(body);
+  // Upper cap (wider grip)
+  const cap = cyl(0.14, 0.3, 12, MAT.probe.clone());
+  cap.position.y = 2.35;
+  g.add(cap);
+  // Cable exit
+  const cable = cyl(0.04, 0.4, 6, new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 }));
+  cable.position.y = 2.65;
+  g.add(cable);
+  // Glass electrode tip
+  const tip = sph(0.13, 10, MAT.glass.clone());
+  tip.position.y = 0.02;
+  g.add(tip);
+  // Metal reference ring
+  const ring = tor(0.09, 0.025, 12, MAT.metalSilv.clone());
+  ring.position.y = 0.2;
+  ring.rotation.x = Math.PI / 2;
+  g.add(ring);
+  return g;
+}
+
+// ── Conductivity / EC Probe ───────────────────────────────────────────────────
+//  Replace with: gltfLoader.loadAsync('models/ec_probe.glb')
+function buildECProbe() {
+  const g = new THREE.Group();
+  const body = cyl(0.09, 2.2, 12, new THREE.MeshStandardMaterial({ color: 0x08180d, roughness: 0.5, metalness: 0.15 }));
+  body.position.y = 1.1;
+  g.add(body);
+  const cap = cyl(0.14, 0.3, 12, new THREE.MeshStandardMaterial({ color: 0x08180d, roughness: 0.5 }));
+  cap.position.y = 2.35;
+  g.add(cap);
+  const cable = cyl(0.04, 0.4, 6, new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 }));
+  cable.position.y = 2.65;
+  g.add(cable);
+  // Electrode rings (metal conductivity bands)
+  [0.15, 0.4, 0.65].forEach(y => {
+    const band = tor(0.09, 0.028, 12, MAT.metalSilv.clone());
+    band.rotation.x = Math.PI / 2;
+    band.position.y = y;
+    g.add(band);
+  });
+  // Bottom vent holes (visual detail)
+  const tip = cyl(0.06, 0.15, 8, MAT.metalSilv.clone());
+  tip.position.y = 0.075;
+  g.add(tip);
+  return g;
+}
+
+// ── GPS Module ────────────────────────────────────────────────────────────────
+//  Replace with: gltfLoader.loadAsync('models/gps_neom9n.glb')
+function buildGPS() {
+  const g = new THREE.Group();
+  // PCB
+  const pcb = box(0.9, 0.05, 0.9, MAT.pcbGreen.clone());
+  g.add(pcb);
+  // Metal shield (RF can)
+  const shield = box(0.75, 0.18, 0.75, MAT.metalSilv.clone());
+  shield.position.y = 0.115;
+  g.add(shield);
+  // Ground plane ring on top of shield
+  const gp = box(0.72, 0.012, 0.72, MAT.metalGold.clone());
+  gp.position.y = 0.22;
+  g.add(gp);
+  // Antenna pad (ceramic)
+  const ant = box(0.22, 0.03, 0.22, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 }));
+  ant.position.set(0, 0.245, 0);
+  g.add(ant);
+  // Connector
+  const conn = box(0.12, 0.06, 0.06, MAT.metalSilv.clone());
+  conn.position.set(-0.39, 0.03, 0);
+  g.add(conn);
+  return g;
+}
+
+// ── 4G Module (SIM7600) ───────────────────────────────────────────────────────
+//  Replace with: gltfLoader.loadAsync('models/sim7600.glb')
+function buildLTE() {
+  const g = new THREE.Group();
+  // PCB
+  const pcb = box(1.0, 0.05, 0.75, MAT.pcbDark.clone());
+  g.add(pcb);
+  // Main module (dark chip)
+  const chip = box(0.7, 0.22, 0.5, MAT.chip.clone());
+  chip.position.y = 0.135;
+  g.add(chip);
+  // SIM card slot
+  const sim = box(0.22, 0.06, 0.32, MAT.metalSilv.clone());
+  sim.position.set(0.35, 0.055, 0);
+  g.add(sim);
+  // Antenna connector u.FL
+  const ufl = cyl(0.04, 0.07, 6, MAT.metalSilv.clone());
+  ufl.position.set(0, 0.085, -0.34);
+  g.add(ufl);
+  // Pin headers
+  for (let i = 0; i < 7; i++) {
+    const pin = box(0.04, 0.18, 0.04, MAT.metalSilv.clone());
+    pin.position.set(-0.42 + i * 0.14, 0.06, 0.35);
+    g.add(pin);
+  }
+  // LED
+  const led = sph(0.04, 6, MAT.emGold.clone());
+  led.position.set(-0.42, 0.1, 0.3);
+  g.add(led);
+  return g;
+}
+
+// ── Rugged Tablet ─────────────────────────────────────────────────────────────
+//  Replace with: gltfLoader.loadAsync('models/tablet.glb')
+function buildTablet() {
+  const g = new THREE.Group();
+  // Body
+  const body = box(2.8, 0.16, 1.9, MAT.tabBody.clone());
+  g.add(body);
+  // Screen bezel (inset)
+  const bezel = box(2.6, 0.01, 1.7, new THREE.MeshStandardMaterial({ color: 0x080a08, roughness: 0.8 }));
+  bezel.position.y = 0.085;
+  g.add(bezel);
+  // Screen surface (emissive)
+  const screen = box(2.4, 0.01, 1.5, MAT.screen.clone());
+  screen.position.y = 0.092;
+  g.add(screen);
+  // Rubber corner bumpers
+  const bumpMat = new THREE.MeshStandardMaterial({ color: 0x1a1000, roughness: 1.0 });
+  [[-1.3, 0, -0.85], [1.3, 0, -0.85], [-1.3, 0, 0.85], [1.3, 0, 0.85]].forEach(([x,y,z]) => {
+    const bump = box(0.12, 0.18, 0.12, bumpMat);
+    bump.position.set(x, y, z);
+    g.add(bump);
+  });
+  // Camera dot
+  const cam = cyl(0.04, 0.02, 8, MAT.metalSilv.clone());
+  cam.rotation.x = Math.PI / 2;
+  cam.position.set(-1.25, 0.094, 0);
+  g.add(cam);
+  return g;
+}
+
+// ── Soil Core Sample ──────────────────────────────────────────────────────────
+//  Replace with: gltfLoader.loadAsync('models/soil_core.glb')
+function buildSoil() {
+  const g = new THREE.Group();
+  // Core tube (plastic liner)
+  const tube = cyl(0.45, 0.5, 14, new THREE.MeshStandardMaterial({ color: 0x1e1208, roughness: 1.0 }));
+  tube.position.y = 0.25;
+  g.add(tube);
+  // Soil fill
+  const fill = cyl(0.43, 0.48, 14, MAT.soil.clone());
+  fill.position.y = 0.26;
+  g.add(fill);
+  // Top layer (slightly lighter)
+  const top = cyl(0.43, 0.04, 14, new THREE.MeshStandardMaterial({ color: 0x4a2e14, roughness: 1.0 }));
+  top.position.y = 0.52;
+  g.add(top);
+  // Depth marker
+  const marker = box(0.04, 0.6, 0.04, new THREE.MeshStandardMaterial({ color: 0xc9960c, roughness: 0.4 }));
+  marker.position.set(0.5, 0.3, 0);
+  g.add(marker);
+  return g;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  PLACE COMPONENTS ON WORKBENCH
+//  positions: [x, y, z]  —  y is height above bench surface
+// ─────────────────────────────────────────────────────────────────────────────
+const PLACEMENTS = [
+  { id: 'esp32',  build: buildESP32,   pos: new THREE.Vector3( 0,    0.04,  0   ), rotY: 0           },
+  { id: 'ph',     build: buildPHProbe, pos: new THREE.Vector3(-3,    0,    -1.2 ), rotY: 0           },
+  { id: 'ec',     build: buildECProbe, pos: new THREE.Vector3(-3,    0,     1.2 ), rotY: 0           },
+  { id: 'gps',    build: buildGPS,     pos: new THREE.Vector3( 2.6,  0.03, -1.6 ), rotY: 0.4         },
+  { id: 'lte',    build: buildLTE,     pos: new THREE.Vector3( 2.6,  0.03,  1.6 ), rotY: -0.3        },
+  { id: 'tablet', build: buildTablet,  pos: new THREE.Vector3( 0,    0.08, -3.6 ), rotY: 0           },
+  { id: 'soil',   build: buildSoil,    pos: new THREE.Vector3( 1.2,  0,     3.2 ), rotY: 0.6         },
+];
+
+// Raycaster targets
+const interactables = [];
+// Map from mesh UUID → component id (for fast lookup on intersection)
+const meshToId = new Map();
+// Map from id → group (for position lookup when building flow lines)
+const idToGroup = {};
+
+PLACEMENTS.forEach(({ id, build, pos, rotY }) => {
+  const group = build();
+  group.position.copy(pos);
+  group.rotation.y = rotY;
+  group.userData.id  = id;
+  group.userData.baseY = pos.y;
+
+  // Assign componentId to every mesh in this group for raycasting
+  group.traverse(obj => {
+    if (obj.isMesh) {
+      obj.castShadow    = true;
+      obj.receiveShadow = true;
+      obj.userData.componentId = id;
+      meshToId.set(obj.uuid, id);
+      interactables.push(obj);
+    }
+  });
+
+  kit.add(group);
+  idToGroup[id] = group;
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  FLOATING SPRITE LABELS
+//  Canvas-based sprites that always face the camera.
+// ─────────────────────────────────────────────────────────────────────────────
+function makeLabel(text, color = '#f0c040') {
+  const c   = document.createElement('canvas');
+  c.width   = 320;
+  c.height  = 72;
+  const ctx = c.getContext('2d');
+
+  // background pill
+  ctx.fillStyle = 'rgba(10,7,0,0.82)';
+  ctx.beginPath();
+  ctx.roundRect(4, 4, 312, 64, 12);
+  ctx.fill();
+
+  ctx.strokeStyle = color + '55';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.fillStyle = color;
+  ctx.font = '500 26px "IBM Plex Mono"';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 160, 36);
+
+  const tex = new THREE.CanvasTexture(c);
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false });
+  const spr = new THREE.Sprite(mat);
+  spr.scale.set(1.8, 0.4, 1);
+  return spr;
+}
+
+// Label heights above component origin
+const LABEL_Y = { esp32: 0.7, ph: 3.0, ec: 3.0, gps: 0.8, lte: 0.8, tablet: 0.8, soil: 1.0 };
+
+PLACEMENTS.forEach(({ id }) => {
+  const grp   = idToGroup[id];
+  const label = makeLabel(COMPONENTS[id].label, COMPONENTS[id].roleColor);
+  label.position.set(0, LABEL_Y[id], 0);
+  label.userData.isLabel = true;
+  grp.add(label);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  ELECTRIC FLOW CONNECTIONS
+//  Each entry: { from, to, color }
+//  Connection points are computed from group world positions + a height offset.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Height from which the arc leaves each component (above its origin)
+const CONNECT_H = { esp32: 0.5, ph: 2.4, ec: 2.4, gps: 0.5, lte: 0.5, tablet: 0.4, soil: 0.6 };
+
+const FLOW_DEFS = [
+  { from: 'esp32', to: 'gps',    color: 0xf0c040, speed: 0.28 },
+  { from: 'esp32', to: 'lte',    color: 0xf0c040, speed: 0.32 },
+  { from: 'esp32', to: 'ph',     color: 0x00ccff, speed: 0.22 },
+  { from: 'esp32', to: 'ec',     color: 0x00ccff, speed: 0.25 },
+  { from: 'esp32', to: 'tablet', color: 0xf0c040, speed: 0.30 },
+];
+
+// Particle count per flow line
+const PARTICLE_N = 14;
+
+const flowLines = []; // updated each frame
+
+FLOW_DEFS.forEach(({ from, to, color, speed }) => {
+  const fromGroup = idToGroup[from];
+  const toGroup   = idToGroup[to];
+
+  // World positions of the connection points
+  const fromPos = fromGroup.position.clone().add(new THREE.Vector3(0, CONNECT_H[from], 0));
+  const toPos   = toGroup.position.clone().add(new THREE.Vector3(0, CONNECT_H[to],   0));
+
+  // Arc midpoint: lerp midXZ, raise Y to create a graceful curve
+  const mid = fromPos.clone().lerp(toPos, 0.5);
+  mid.y = Math.max(fromPos.y, toPos.y) + 2.0;
+
+  const curve = new THREE.CatmullRomCurve3([fromPos, mid, toPos], false, 'catmullrom', 0.5);
+
+  // ── Static dim line (the "wire") ──
+  const linePts = curve.getPoints(80);
+  const lineGeo = new THREE.BufferGeometry().setFromPoints(linePts);
+  const lineMat = new THREE.LineBasicMaterial({
+    color,
+    transparent: true,
+    opacity: 0.18,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  });
+  kit.add(new THREE.Line(lineGeo, lineMat));
+
+  // ── Animated particles ──
+  const partGeo  = new THREE.BufferGeometry();
+  const partPos  = new Float32Array(PARTICLE_N * 3);
+  partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
+
+  // Glow particle texture (soft radial gradient)
+  const ptCanvas = document.createElement('canvas');
+  ptCanvas.width  = 64;
+  ptCanvas.height = 64;
+  const ptCtx = ptCanvas.getContext('2d');
+  const grad  = ptCtx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grad.addColorStop(0,   'rgba(255,255,255,1)');
+  grad.addColorStop(0.35,'rgba(255,200,50,0.7)');
+  grad.addColorStop(1,   'rgba(255,140,0,0)');
+  ptCtx.fillStyle = grad;
+  ptCtx.fillRect(0, 0, 64, 64);
+  const ptTex = new THREE.CanvasTexture(ptCanvas);
+
+  const partMat = new THREE.PointsMaterial({
+    map: ptTex,
+    color,
+    size: 0.16,
+    transparent: true,
+    opacity: 0.88,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    sizeAttenuation: true,
+  });
+  const particles = new THREE.Points(partGeo, partMat);
+  kit.add(particles);
+
+  flowLines.push({ curve, partPos, partGeo, speed });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  ORBIT CONTROLS
+// ─────────────────────────────────────────────────────────────────────────────
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping  = true;
+controls.dampingFactor  = 0.055;
+controls.minDistance    = 4;
+controls.maxDistance    = 18;
+controls.minPolarAngle  = 0.18;
+controls.maxPolarAngle  = 1.42;
+controls.target.set(0, 0.5, 0);
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  SCROLL → SCENE ROTATION
+// ─────────────────────────────────────────────────────────────────────────────
+const progressBar = document.getElementById('progress-bar');
+const scrollHint  = document.getElementById('scroll-hint');
+let   targetRotY  = 0;
+let   scrolled    = false;
+
+window.addEventListener('scroll', () => {
+  const progress = window.scrollY / (document.body.scrollHeight - innerHeight);
+  targetRotY = progress * Math.PI * 2; // 0 → 2π over full scroll
+  progressBar.style.width = (progress * 100).toFixed(1) + '%';
+
+  if (!scrolled && window.scrollY > 40) {
+    scrolled = true;
+    scrollHint.classList.add('hidden');
+  }
+}, { passive: true });
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  RAYCASTING — hover tooltip + click modal
+// ─────────────────────────────────────────────────────────────────────────────
+const raycaster = new THREE.Raycaster();
+const pointer   = new THREE.Vector2(-9999, -9999);
+const tooltip   = document.getElementById('tooltip');
+const ttName    = document.getElementById('tt-name');
+const ttRole    = document.getElementById('tt-role');
+const ttRows    = document.getElementById('tt-rows');
+const ttHint    = document.getElementById('tt-hint');
+let   hoveredId = null;
+
+function showTooltip(id, cx, cy) {
+  const data = COMPONENTS[id];
+  if (!data) return;
+
+  ttName.textContent  = data.label;
+  ttRole.textContent  = data.rows[0][1]; // first row = role
+  ttRole.style.color  = data.roleColor;
+
+  ttRows.innerHTML = data.rows.map(([k,v]) =>
+    `<div class="tt-row"><span class="tt-key">${k}</span><span class="tt-val">${v}</span></div>`
+  ).join('');
+
+  ttHint.style.display = data.hint ? '' : 'none';
+
+  // Position near cursor, clamped to viewport
+  const pad = 14;
+  const tw  = 240;
+  const th  = 160;
+  let   lx  = cx + 16;
+  let   ly  = cy - 20;
+  if (lx + tw > innerWidth  - pad) lx = cx - tw - 16;
+  if (ly + th > innerHeight - pad) ly = innerHeight - th - pad;
+  if (ly < pad) ly = pad;
+
+  tooltip.style.left = lx + 'px';
+  tooltip.style.top  = ly + 'px';
+  tooltip.classList.add('visible');
+}
+
+function hideTooltip() {
+  hoveredId = null;
+  tooltip.classList.remove('visible');
+  canvas.style.cursor = 'default';
+}
+
+window.addEventListener('mousemove', e => {
+  pointer.x = ( e.clientX / innerWidth  ) * 2 - 1;
+  pointer.y = -(e.clientY / innerHeight ) * 2 + 1;
+
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(interactables, false);
+
+  if (hits.length > 0) {
+    const id = hits[0].object.userData.componentId;
+    if (id && COMPONENTS[id]) {
+      hoveredId = id;
+      showTooltip(id, e.clientX, e.clientY);
+      canvas.style.cursor = id === 'tablet' ? 'pointer' : 'crosshair';
+    } else {
+      hideTooltip();
+    }
+  } else {
+    hideTooltip();
+  }
+});
+
+// Mobile tap
+window.addEventListener('touchstart', e => {
+  const touch = e.touches[0];
+  pointer.x = ( touch.clientX / innerWidth  ) * 2 - 1;
+  pointer.y = -(touch.clientY / innerHeight ) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(interactables, false);
+  if (hits.length > 0) {
+    const id = hits[0].object.userData.componentId;
+    if (id && COMPONENTS[id]) {
+      hoveredId = id;
+      showTooltip(id, touch.clientX, touch.clientY);
+      if (id === 'tablet') openModal();
+    } else {
+      hideTooltip();
+    }
+  }
+}, { passive: true });
+
+// Click to open tablet modal
+window.addEventListener('click', () => {
+  if (hoveredId === 'tablet') openModal();
+});
+
+const dataModal  = document.getElementById('data-modal');
+const modalClose = document.getElementById('modal-close');
+
+function openModal()  { dataModal.classList.add('visible'); }
+function closeModal() { dataModal.classList.remove('visible'); }
+
+modalClose.addEventListener('click', closeModal);
+dataModal.addEventListener('click', e => { if (e.target === dataModal) closeModal(); });
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  BATTERY ANIMATION
+//  10-second loop: 100% → 0% → reset
+// ─────────────────────────────────────────────────────────────────────────────
+const battFill = document.getElementById('battery-fill');
+const battPct  = document.getElementById('battery-pct');
+const battGlow = document.getElementById('battery-glow');
+let   battLevel = 100;
+
+setInterval(() => {
+  battLevel = battLevel <= 0 ? 100 : battLevel - 1;
+  battFill.style.width = battLevel + '%';
+  battGlow.style.width = battLevel + '%';
+  battPct.textContent  = battLevel + '%';
+
+  if (battLevel > 60) {
+    const c = 'linear-gradient(90deg,#4ade80,#22c55e)';
+    const s = '0 0 10px rgba(74,222,128,0.55)';
+    battFill.style.background  = c;
+    battFill.style.boxShadow   = s;
+    battGlow.style.background  = c;
+    battGlow.style.boxShadow   = s;
+  } else if (battLevel > 30) {
+    const c = 'linear-gradient(90deg,#fbbf24,#f59e0b)';
+    const s = '0 0 10px rgba(251,191,36,0.55)';
+    battFill.style.background  = c;
+    battFill.style.boxShadow   = s;
+    battGlow.style.background  = c;
+    battGlow.style.boxShadow   = s;
+  } else {
+    const c = 'linear-gradient(90deg,#f87171,#ef4444)';
+    const s = '0 0 10px rgba(248,113,113,0.55)';
+    battFill.style.background  = c;
+    battFill.style.boxShadow   = s;
+    battGlow.style.background  = c;
+    battGlow.style.boxShadow   = s;
+  }
+}, 100); // 100ms × 100 steps = 10 second loop
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  RESIZE HANDLER
+// ─────────────────────────────────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  ANIMATION LOOP
+// ─────────────────────────────────────────────────────────────────────────────
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  // ── Smooth scene rotation (lerp toward scroll target) ──
+  kit.rotation.y += (targetRotY - kit.rotation.y) * 0.06;
+
+  // ── Flow particle positions ──
+  flowLines.forEach((fl, fi) => {
+    for (let i = 0; i < PARTICLE_N; i++) {
+      // Each particle is offset along the curve, moving at fl.speed
+      const u = ((t * fl.speed + i / PARTICLE_N) % 1);
+      const pt = fl.curve.getPointAt(u);
+      fl.partPos[i * 3]     = pt.x;
+      fl.partPos[i * 3 + 1] = pt.y;
+      fl.partPos[i * 3 + 2] = pt.z;
+    }
+    fl.partGeo.attributes.position.needsUpdate = true;
+  });
+
+  // ── Gentle component bob ──
+  PLACEMENTS.forEach(({ id }, i) => {
+    const grp  = idToGroup[id];
+    grp.position.y = grp.userData.baseY + Math.sin(t * 0.55 + i * 1.1) * 0.055;
+  });
+
+  // ── Gold point light pulse ──
+  goldPt.intensity = 1.6 + Math.sin(t * 1.8) * 0.4;
+
+  // ── Rim glow pulse ──
+  rim.material.opacity = 0.3 + Math.sin(t * 0.9) * 0.15;
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  INIT — hide loader after short delay (scene is ready by then)
+// ─────────────────────────────────────────────────────────────────────────────
+const loader = document.getElementById('loader');
+setTimeout(() => {
+  loader.classList.add('hidden');
+  setTimeout(() => { loader.style.display = 'none'; }, 650);
+  animate();
+}, 1500); // 1.4s matches the CSS bar animation
+</script>
+</body>
+</html>

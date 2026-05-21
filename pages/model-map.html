@@ -231,13 +231,39 @@
     0%,100% { box-shadow: 0 0 0 0 rgba(227,95,95,0.25); }
     50%      { box-shadow: 0 0 0 5px rgba(227,95,95,0); }
   }
+  @media (prefers-reduced-motion: reduce) {
+    .mm-wrap #mode-badge.pin { animation: none; }
+  }
+
+  /* Loading overlay */
+  .mm-wrap #mm-loading {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 12px;
+    background: rgba(8,6,8,0.82); backdrop-filter: blur(4px);
+    z-index: 10; opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .mm-wrap #mm-loading.visible { opacity: 1; pointer-events: auto; }
+  .mm-wrap .mm-spinner {
+    width: 32px; height: 32px;
+    border: 2px solid rgba(255,255,255,0.08);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: mmSpin 0.8s linear infinite;
+  }
+  @keyframes mmSpin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .mm-wrap .mm-spinner { animation: none; border-top-color: var(--accent); opacity: 0.6; }
+  }
+  .mm-wrap .mm-loading-text { font-size: 0.75rem; color: var(--muted); font-family: var(--mono); }
+
   .mm-wrap #no-model {
     position: absolute; inset: 0; display: flex; flex-direction: column;
     align-items: center; justify-content: center; gap: 10px;
     pointer-events: none; transition: opacity 0.4s;
   }
   .mm-wrap #no-model.hidden { opacity: 0; }
-  .mm-wrap .no-model-icon { font-size: 2.5rem; opacity: 0.3; }
+  .mm-wrap .no-model-icon { line-height: 1; }
   .mm-wrap .no-model-text { font-size: 0.82rem; color: var(--muted); }
   .mm-wrap .canvas-wrap.pin-mode #three-canvas { cursor: crosshair; }
   .mm-wrap .canvas-wrap.orbit-mode #three-canvas { cursor: grab; }
@@ -292,7 +318,7 @@
         <div class="sb-label">Model File</div>
         <div class="upload-area" id="uploadArea">
           <input type="file" id="fileInput" accept=".glb,.gltf,.bin,.png,.jpg,.jpeg,.webp" multiple />
-          <div class="upload-icon">📦</div>
+          <div class="upload-icon"><iconify-icon icon="mdi:package-variant-closed" width="28" height="28" style="color:rgba(255,255,255,0.25)"></iconify-icon></div>
           <div class="upload-text">
             <strong>Click or drag to load</strong><br>
             <small>.GLB (single file) or<br>.GLTF + .BIN + textures together</small>
@@ -324,7 +350,7 @@
       </div>
 
       <div class="sb-section" id="pending-section" style="display:none">
-        <div class="sb-label" style="color:var(--accent-br)">📍 New Pin</div>
+        <div class="sb-label" style="color:var(--accent-br);display:flex;align-items:center;gap:5px"><iconify-icon icon="mdi:map-marker" width="13" height="13"></iconify-icon> New Pin</div>
         <div id="pending-form" class="visible">
           <div>
             <div class="form-label">Label <span style="color:var(--accent)">*</span></div>
@@ -357,7 +383,7 @@
       </div>
 
       <div class="sb-section">
-        <button class="export-btn" id="btnExport" disabled>⬇ Export JSON</button>
+        <button class="export-btn" id="btnExport" disabled style="display:flex;align-items:center;justify-content:center;gap:7px"><iconify-icon icon="mdi:download" width="16" height="16"></iconify-icon> Export JSON</button>
         <div class="export-hint">Downloads a <code style="font-family:var(--mono);font-size:0.65rem">pin-map.json</code> file with all pin positions and labels.</div>
       </div>
 
@@ -368,8 +394,12 @@
       <canvas id="three-canvas"></canvas>
       <div id="mode-badge" class="orbit">ORBIT</div>
       <div class="canvas-hint" id="canvasHint">Drag to orbit · Scroll to zoom</div>
+      <div id="mm-loading">
+        <div class="mm-spinner"></div>
+        <div class="mm-loading-text">Parsing model…</div>
+      </div>
       <div id="no-model">
-        <div class="no-model-icon">🗂</div>
+        <div class="no-model-icon"><iconify-icon icon="mdi:cube-outline" width="48" height="48" style="opacity:0.25;color:#e9ebf0"></iconify-icon></div>
         <div class="no-model-text">Load a model to get started</div>
       </div>
     </div>
@@ -445,12 +475,14 @@ let nextPinId      = 1;
 let selectedPinId  = null;
 
 // ── GLTF Loader ───────────────────────────────────────────────────────────────
-const fileIn  = document.getElementById('fileInput');
-const fileNm  = document.getElementById('fileName');
-const noModel = document.getElementById('no-model');
+const fileIn    = document.getElementById('fileInput');
+const fileNm    = document.getElementById('fileName');
+const noModel   = document.getElementById('no-model');
+const mmLoading = document.getElementById('mm-loading');
 
 function loadFiles(files) {
   if (!files || files.length === 0) return;
+  mmLoading.classList.add('visible');
   const fileMap = new Map();
   for (const f of files) fileMap.set(f.name, URL.createObjectURL(f));
   const entry = [...files].find(f => /\.(glb|gltf)$/i.test(f.name));
@@ -487,6 +519,7 @@ function loadModel(loader, url, filename, onDone) {
 
   loader.load(url, gltf => {
     if (onDone) onDone();
+    mmLoading.classList.remove('visible');
     modelRoot = gltf.scene;
 
     const box    = new THREE.Box3().setFromObject(modelRoot);
@@ -530,6 +563,7 @@ function loadModel(loader, url, filename, onDone) {
     buildHierarchy(modelRoot);
   }, undefined, err => {
     if (onDone) onDone();
+    mmLoading.classList.remove('visible');
     console.error('GLTF load error:', err);
     alert('Failed to load model. Make sure all companion files (.bin, textures) are selected together with the .gltf.');
   });

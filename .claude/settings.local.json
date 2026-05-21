@@ -43,7 +43,10 @@
       "Bash(del \"c:\\\\Users\\\\luri\\\\Documents\\\\Programming\\\\imluri.github.io\\\\pages\\\\banner.html\")",
       "Bash(ls -la \"C:\\\\Users\\\\luri\\\\Documents\\\\Programming\\\\InvestmentTeaser\\\\\")",
       "Read(//c/Users/luri/Documents/Programming/**)",
-      "Read(//c/Users/luri/Documents/Programming/InvestmentTeaser/**)"
+      "Read(//c/Users/luri/Documents/Programming/InvestmentTeaser/**)",
+      "Bash(python3 \"C:\\\\Users\\\\luri\\\\.claude\\\\plugins\\\\cache\\\\ui-ux-pro-max-skill\\\\ui-ux-pro-max\\\\2.5.0\\\\.claude\\\\skills\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"developer portfolio tools dark glassmorphism modern minimal\" --design-system -p \"imluri.github.io\" -f markdown)",
+      "Bash(py \"C:\\\\Users\\\\luri\\\\.claude\\\\plugins\\\\cache\\\\ui-ux-pro-max-skill\\\\ui-ux-pro-max\\\\2.5.0\\\\.claude\\\\skills\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"developer portfolio dark minimal tools\" --design-system -p \"imluri\")",
+      "Bash(py \"C:\\\\Users\\\\luri\\\\.claude\\\\plugins\\\\cache\\\\ui-ux-pro-max-skill\\\\ui-ux-pro-max\\\\2.5.0\\\\src\\\\ui-ux-pro-max\\\\scripts\\\\search.py\" \"developer portfolio tools dark minimal glassmorphism\" --design-system -p \"imluri\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\luri\\Downloads\\lurimous.github.io-main\\assets"
