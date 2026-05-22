@@ -668,7 +668,7 @@ function startShowcaseAnimations() {
   window.addEventListener('wheel', (e) => {
     if (window.innerWidth <= 768) return;
     // Let native scroll handle wheel events inside scrollable sub-panels
-    if (e.target.closest('.ib-win-body, .ib-explorer, .ib-props, .ib-log-entries, .ib-history-list, .ib-tools-list, .bm-sidebar, .bm-shortcuts-grid, .bm-ctx-menu, .bm-toolbar-drop, .bm-layers-list')) return;
+    if (e.target.closest('.ib-win-body, .ib-explorer, .ib-props, .ib-log-entries, .ib-history-list, .ib-tools-list, .bm-sidebar, .bm-shortcuts-grid, .bm-ctx-menu, .bm-toolbar-drop, .bm-layers-list, #pin-list, #hierarchy-tree')) return;
     e.preventDefault();
 
     if (locked) return;

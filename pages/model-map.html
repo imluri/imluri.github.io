@@ -77,13 +77,42 @@
     display: flex; flex-direction: column;
     background: var(--surface);
     border-right: 1px solid var(--border);
-    overflow-y: auto; overflow-x: hidden;
+    overflow: hidden;
   }
-  .mm-wrap .sidebar::-webkit-scrollbar { width: 4px; }
-  .mm-wrap .sidebar::-webkit-scrollbar-track { background: transparent; }
-  .mm-wrap .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
 
-  .mm-wrap .sb-section { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  /* Pins section grows to fill remaining sidebar space */
+  .mm-wrap #pins-section {
+    flex: 1; min-height: 0;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  /* Only the list itself scrolls */
+  .mm-wrap #pin-list {
+    flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0;
+  }
+  .mm-wrap #pin-list::-webkit-scrollbar { width: 4px; }
+  .mm-wrap #pin-list::-webkit-scrollbar-track { background: transparent; }
+  .mm-wrap #pin-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+
+  /* Model-loaded compact header */
+  .mm-wrap .model-loaded-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .mm-wrap .model-loaded-name {
+    flex: 1; font-family: var(--mono); font-size: 0.7rem;
+    color: var(--white); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .mm-wrap .model-change-btn {
+    background: none; border: 1px solid var(--border); border-radius: 5px;
+    color: var(--muted); font-size: 0.68rem; padding: 3px 8px; cursor: pointer;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    transition: color 0.15s, border-color 0.15s; white-space: nowrap; flex-shrink: 0;
+  }
+  .mm-wrap .model-change-btn:hover { color: var(--white); border-color: rgba(255,255,255,0.2); }
+
+  .mm-wrap .sb-section { padding: 12px 16px; border-bottom: 1px solid var(--border); }
 
   .mm-wrap .sb-label {
     font-family: var(--mono); font-size: 0.62rem;
@@ -118,14 +147,29 @@
     color: var(--accent-br); word-break: break-all; display: none;
   }
 
-  /* Instructions */
-  .mm-wrap .instructions { font-size: 0.75rem; color: var(--muted); line-height: 1.7; }
-  .mm-wrap .instructions ol { padding-left: 16px; }
-  .mm-wrap .instructions li { margin-bottom: 4px; }
-  .mm-wrap .instructions code {
-    font-family: var(--mono); font-size: 0.68rem;
-    background: rgba(255,255,255,0.06); padding: 1px 4px; border-radius: 3px; color: var(--white);
+  /* Shortcut legend in toolbar */
+  .mm-wrap .mm-shortcuts {
+    display: flex; align-items: center; gap: 10px; margin-left: 6px;
+    border-left: 1px solid var(--border); padding-left: 12px;
   }
+  .mm-wrap .mm-shortcut-item { display: flex; align-items: center; gap: 4px; font-size: 0.68rem; color: var(--muted); }
+  .mm-wrap .mm-shortcut-item kbd {
+    font-family: var(--mono); font-size: 0.6rem;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 3px; padding: 1px 5px; color: var(--white); line-height: 1.4;
+  }
+
+  /* Part search */
+  .mm-wrap .hier-search {
+    width: 100%; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 10px; color: var(--white);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 0.76rem; outline: none; transition: border-color 0.15s;
+    margin-bottom: 8px; box-sizing: border-box; flex-shrink: 0;
+  }
+  .mm-wrap .hier-search:focus { border-color: rgba(240,192,64,0.35); }
+  .mm-wrap .hier-search::placeholder { color: var(--muted); }
 
   /* Pending pin form */
   .mm-wrap #pending-form { display: none; flex-direction: column; gap: 8px; }
@@ -202,7 +246,17 @@
   }
   .mm-wrap .export-btn:hover { background: rgba(240,192,64,0.14); border-color: rgba(240,192,64,0.35); }
   .mm-wrap .export-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .mm-wrap .export-hint { font-size: 0.68rem; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  .mm-wrap .import-btn {
+    width: 100%; padding: 9px;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    border-radius: 7px; color: var(--muted);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-size: 0.8rem; font-weight: 600; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    box-sizing: border-box;
+  }
+  .mm-wrap .import-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); color: var(--white); }
 
   /* Canvas area */
   .mm-wrap .canvas-wrap { flex: 1; position: relative; overflow: hidden; }
@@ -227,12 +281,21 @@
     background: rgba(227,95,95,0.12); border: 1px solid rgba(227,95,95,0.3);
     color: var(--accent-br); animation: mmBadgePulse 1.8s ease-in-out infinite;
   }
+  .mm-wrap #mode-badge.select {
+    background: rgba(240,192,64,0.12); border: 1px solid rgba(240,192,64,0.3);
+    color: var(--gold); animation: mmBadgePulseGold 1.8s ease-in-out infinite;
+  }
   @keyframes mmBadgePulse {
     0%,100% { box-shadow: 0 0 0 0 rgba(227,95,95,0.25); }
     50%      { box-shadow: 0 0 0 5px rgba(227,95,95,0); }
   }
+  @keyframes mmBadgePulseGold {
+    0%,100% { box-shadow: 0 0 0 0 rgba(240,192,64,0.25); }
+    50%      { box-shadow: 0 0 0 5px rgba(240,192,64,0); }
+  }
   @media (prefers-reduced-motion: reduce) {
     .mm-wrap #mode-badge.pin { animation: none; }
+    .mm-wrap #mode-badge.select { animation: none; }
   }
 
   /* Loading overlay */
@@ -266,11 +329,12 @@
   .mm-wrap .no-model-icon { line-height: 1; }
   .mm-wrap .no-model-text { font-size: 0.82rem; color: var(--muted); }
   .mm-wrap .canvas-wrap.pin-mode #three-canvas { cursor: crosshair; }
+  .mm-wrap .canvas-wrap.select-mode #three-canvas { cursor: crosshair; }
   .mm-wrap .canvas-wrap.orbit-mode #three-canvas { cursor: grab; }
   .mm-wrap .canvas-wrap.orbit-mode #three-canvas:active { cursor: grabbing; }
 
-  /* Hierarchy tree */
-  .mm-wrap #hierarchy-tree { max-height: 220px; overflow-y: auto; margin-top: 2px; }
+  /* Hierarchy tree — own scroll region */
+  .mm-wrap #hierarchy-tree { max-height: 40vh; overflow-y: auto; overflow-x: hidden; }
   .mm-wrap #hierarchy-tree::-webkit-scrollbar { width: 4px; }
   .mm-wrap #hierarchy-tree::-webkit-scrollbar-track { background: transparent; }
   .mm-wrap #hierarchy-tree::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
@@ -304,7 +368,13 @@
     <span class="mm-title">3D Model Mapper</span>
     <div class="mm-modes">
       <button class="mode-btn active" id="btnOrbit"><span class="dot"></span> Orbit</button>
+      <button class="mode-btn" id="btnSelect"><span class="dot"></span> Select Part</button>
       <button class="mode-btn" id="btnPin"><span class="dot"></span> Place Pin</button>
+    </div>
+    <div class="mm-shortcuts">
+      <span class="mm-shortcut-item"><kbd>1</kbd> Orbit</span>
+      <span class="mm-shortcut-item"><kbd>2</kbd> Select</span>
+      <span class="mm-shortcut-item"><kbd>3</kbd> Pin</span>
     </div>
   </div>
 
@@ -314,7 +384,8 @@
     <!-- Sidebar -->
     <aside class="sidebar">
 
-      <div class="sb-section">
+      <!-- Upload (shown when no model loaded) -->
+      <div class="sb-section" id="upload-section">
         <div class="sb-label">Model File</div>
         <div class="upload-area" id="uploadArea">
           <input type="file" id="fileInput" accept=".glb,.gltf,.bin,.png,.jpg,.jpeg,.webp" multiple />
@@ -324,33 +395,33 @@
             <small>.GLB (single file) or<br>.GLTF + .BIN + textures together</small>
           </div>
         </div>
-        <div class="file-name" id="fileName"></div>
-      </div>
-
-      <div class="sb-section">
-        <div class="sb-label">How to Use</div>
-        <div class="instructions">
-          <ol>
-            <li>Load a <code>.glb</code> or <code>.gltf</code> file above</li>
-            <li>Switch to <code>Orbit</code> — drag to rotate, scroll to zoom</li>
-            <li>Switch to <code>Place Pin</code> and click any surface, <em>or</em> pick a part from <strong>Model Parts</strong> below</li>
-            <li>Give the pin a label and optional description</li>
-            <li>Repeat for all annotation points</li>
-            <li>Click <strong>Export JSON</strong> to download pin data</li>
-          </ol>
+        <div style="margin-top:10px;font-size:0.72rem;color:var(--muted);line-height:1.6;">
+          Load a model, then use <strong style="color:var(--white)">Select Part</strong> to click parts directly in the viewport, or <strong style="color:var(--white)">Place Pin</strong> to click any surface.
         </div>
       </div>
 
+      <!-- Compact model header (shown after load) -->
+      <div class="model-loaded-header" id="model-loaded-section" style="display:none">
+        <iconify-icon icon="mdi:cube-outline" width="15" height="15" style="color:var(--muted);flex-shrink:0"></iconify-icon>
+        <span class="model-loaded-name" id="modelLoadedName"></span>
+        <button class="model-change-btn" id="btnChangeModel">Start over</button>
+      </div>
+
+      <!-- Model Parts (shown after load, grows to fill space) -->
       <div class="sb-section" id="hierarchy-section" style="display:none">
         <div class="sb-label">
           Model Parts
-          <span style="font-size:0.6rem;font-weight:400;color:var(--muted);margin-left:4px">click to pin</span>
+          <span class="sb-label-count" id="hierCount">0</span>
         </div>
+        <input class="hier-search" id="hierSearch" placeholder="Filter parts…" autocomplete="off" spellcheck="false" />
         <div id="hierarchy-tree"></div>
       </div>
 
+      <!-- New Pin form (shown when pending) -->
       <div class="sb-section" id="pending-section" style="display:none">
-        <div class="sb-label" style="color:var(--accent-br);display:flex;align-items:center;gap:5px"><iconify-icon icon="mdi:map-marker" width="13" height="13"></iconify-icon> New Pin</div>
+        <div class="sb-label" style="color:var(--accent-br);display:flex;align-items:center;gap:5px;margin-bottom:10px">
+          <iconify-icon icon="mdi:map-marker" width="13" height="13"></iconify-icon> New Pin
+        </div>
         <div id="pending-form" class="visible">
           <div>
             <div class="form-label">Label <span style="color:var(--accent)">*</span></div>
@@ -372,19 +443,26 @@
         </div>
       </div>
 
-      <div class="sb-section" style="flex:1">
+      <!-- Pins list -->
+      <div class="sb-section" id="pins-section">
         <div class="sb-label">
           Pins
           <span class="sb-label-count" id="pinCount">0</span>
         </div>
         <div id="pin-list">
-          <div class="pin-empty">No pins placed yet.<br>Switch to <strong>Place Pin</strong> mode<br>and click the model.</div>
+          <div class="pin-empty">No pins yet.<br>Use <strong>Select Part</strong> or <strong>Place Pin</strong>.</div>
         </div>
       </div>
 
-      <div class="sb-section">
-        <button class="export-btn" id="btnExport" disabled style="display:flex;align-items:center;justify-content:center;gap:7px"><iconify-icon icon="mdi:download" width="16" height="16"></iconify-icon> Export JSON</button>
-        <div class="export-hint">Downloads a <code style="font-family:var(--mono);font-size:0.65rem">pin-map.json</code> file with all pin positions and labels.</div>
+      <!-- Export / Import -->
+      <div class="sb-section" style="flex-shrink:0;display:flex;flex-direction:column;gap:6px">
+        <button class="export-btn" id="btnExport" disabled style="display:flex;align-items:center;justify-content:center;gap:7px">
+          <iconify-icon icon="mdi:download" width="16" height="16"></iconify-icon> Export JSON
+        </button>
+        <label class="import-btn" id="btnImport">
+          <iconify-icon icon="mdi:upload" width="16" height="16"></iconify-icon> Load JSON
+          <input type="file" id="jsonFileInput" accept=".json" style="display:none">
+        </label>
       </div>
 
     </aside>
@@ -473,12 +551,16 @@ let pendingPinData = null;
 const pins         = [];
 let nextPinId      = 1;
 let selectedPinId  = null;
+let hoverHighlight = null;
+let hoverObj       = null;
 
 // ── GLTF Loader ───────────────────────────────────────────────────────────────
-const fileIn    = document.getElementById('fileInput');
-const fileNm    = document.getElementById('fileName');
-const noModel   = document.getElementById('no-model');
-const mmLoading = document.getElementById('mm-loading');
+const fileIn          = document.getElementById('fileInput');
+const noModel         = document.getElementById('no-model');
+const mmLoading       = document.getElementById('mm-loading');
+const uploadSection   = document.getElementById('upload-section');
+const modelLoadedSec  = document.getElementById('model-loaded-section');
+const modelLoadedName = document.getElementById('modelLoadedName');
 
 function loadFiles(files) {
   if (!files || files.length === 0) return;
@@ -508,14 +590,34 @@ uploadArea.addEventListener('drop', e => {
   loadFiles(e.dataTransfer.files);
 });
 
+document.getElementById('btnChangeModel').addEventListener('click', () => {
+  if (modelRoot) { scene.remove(modelRoot); modelRoot = null; modelMeshes = []; }
+  pins.forEach(p => scene.remove(p.group));
+  pins.length = 0;
+  selectedPinId = null;
+  cancelPendingPin(false);
+  clearHierarchyHighlight();
+  hierarchySection.style.display = 'none';
+  hierarchyTree.innerHTML = '';
+  hierSearch.value = '';
+  gridHelper.visible = false;
+  noModel.classList.remove('hidden');
+  modelLoadedSec.style.display  = 'none';
+  uploadSection.style.display   = '';
+  fileIn.value = '';
+  setMode('orbit');
+  renderPinList();
+});
+
 function loadModel(loader, url, filename, onDone) {
   if (modelRoot) { scene.remove(modelRoot); modelRoot = null; modelMeshes = []; }
   hierarchySection.style.display = 'none';
   hierarchyTree.innerHTML = '';
   clearHierarchyHighlight();
 
-  fileNm.textContent = filename;
-  fileNm.style.display = 'block';
+  modelLoadedName.textContent = filename;
+  uploadSection.style.display  = 'none';
+  modelLoadedSec.style.display = '';
 
   loader.load(url, gltf => {
     if (onDone) onDone();
@@ -572,6 +674,7 @@ function loadModel(loader, url, filename, onDone) {
 // ── Mode toggle ───────────────────────────────────────────────────────────────
 const btnOrbit   = document.getElementById('btnOrbit');
 const btnPin     = document.getElementById('btnPin');
+const btnSelect  = document.getElementById('btnSelect');
 const modeBadge  = document.getElementById('mode-badge');
 const canvasHint = document.getElementById('canvasHint');
 const canvasWrap = document.getElementById('canvasWrap');
@@ -579,18 +682,26 @@ const canvasWrap = document.getElementById('canvasWrap');
 function setMode(m) {
   mode = m;
   controls.enabled = (m === 'orbit');
-  btnOrbit.classList.toggle('active', m === 'orbit');
-  btnPin.classList.toggle('active',   m === 'pin');
-  modeBadge.textContent = m === 'orbit' ? 'ORBIT' : 'PIN MODE';
+  btnOrbit.classList.toggle('active',  m === 'orbit');
+  btnSelect.classList.toggle('active', m === 'select');
+  btnPin.classList.toggle('active',    m === 'pin');
+  if (m !== 'select') {
+    if (hoverHighlight) { scene.remove(hoverHighlight); hoverHighlight = null; }
+    hoverObj = null;
+  }
+  modeBadge.textContent = m === 'orbit' ? 'ORBIT' : m === 'select' ? 'SELECT PART' : 'PIN MODE';
   modeBadge.className   = m;
   canvasHint.textContent = m === 'orbit'
     ? 'Drag to orbit · Scroll to zoom'
+    : m === 'select'
+    ? 'Hover to preview part · Click to select & pin'
     : 'Click any surface on the model to place a pin';
   canvasWrap.className = `canvas-wrap ${m}-mode`;
 }
 
-btnOrbit.addEventListener('click', () => setMode('orbit'));
-btnPin.addEventListener('click',   () => { if (!modelRoot) { alert('Load a model first.'); return; } setMode('pin'); });
+btnOrbit.addEventListener('click',  () => setMode('orbit'));
+btnSelect.addEventListener('click', () => { if (!modelRoot) { alert('Load a model first.'); return; } setMode('select'); });
+btnPin.addEventListener('click',    () => { if (!modelRoot) { alert('Load a model first.'); return; } setMode('pin'); });
 
 // ── Pin placement (raycasting) ────────────────────────────────────────────────
 const raycaster = new THREE.Raycaster();
@@ -598,8 +709,24 @@ const pointer   = new THREE.Vector2();
 let mouseDown   = null;
 
 canvasEl.addEventListener('mousedown', e => { mouseDown = { x: e.clientX, y: e.clientY }; });
+
+canvasEl.addEventListener('mousemove', e => {
+  if (mode !== 'select' || !modelRoot || modelMeshes.length === 0) return;
+  const rect = canvasEl.getBoundingClientRect();
+  pointer.x  =  ((e.clientX - rect.left)  / rect.width)  * 2 - 1;
+  pointer.y  = -((e.clientY - rect.top)   / rect.height)  * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(modelMeshes, true);
+  const hit  = hits.length > 0 ? hits[0].object : null;
+  if (hit !== hoverObj) {
+    hoverObj = hit;
+    if (hoverHighlight) { scene.remove(hoverHighlight); hoverHighlight = null; }
+    if (hit) { hoverHighlight = new THREE.BoxHelper(hit, 0xf0c040); scene.add(hoverHighlight); }
+  }
+});
+
 canvasEl.addEventListener('mouseup', e => {
-  if (!mouseDown || mode !== 'pin') return;
+  if (!mouseDown) return;
   const dx = Math.abs(e.clientX - mouseDown.x);
   const dy = Math.abs(e.clientY - mouseDown.y);
   mouseDown = null;
@@ -610,8 +737,25 @@ canvasEl.addEventListener('mouseup', e => {
   pointer.x  =  ((e.clientX - rect.left)  / rect.width)  * 2 - 1;
   pointer.y  = -((e.clientY - rect.top)   / rect.height)  * 2 + 1;
   raycaster.setFromCamera(pointer, camera);
-  const hits = raycaster.intersectObjects(modelMeshes, true);
-  if (hits.length > 0) placePendingPin(hits[0].point.clone());
+
+  if (mode === 'pin') {
+    const hits = raycaster.intersectObjects(modelMeshes, true);
+    if (hits.length > 0) placePendingPin(hits[0].point.clone());
+  } else if (mode === 'select') {
+    const hits = raycaster.intersectObjects(modelMeshes, true);
+    if (hits.length === 0) return;
+    const hitMesh = hits[0].object;
+    const idx = findHierarchyIndex(hitMesh);
+    if (idx >= 0) {
+      hierSearch.value = '';
+      hierFilter = '';
+      selectedHierNode = idx;
+      renderHierarchy();
+      const nodeEl = hierarchyTree.querySelector(`[data-hidx="${idx}"]`);
+      if (nodeEl) nodeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      selectHierarchyPart(hierarchyNodes[idx].obj);
+    }
+  }
 });
 
 // ── Pending pin ───────────────────────────────────────────────────────────────
@@ -660,14 +804,12 @@ function placePendingPin(point) {
   pinLabelInput.value = '';
   pinDescInput.value  = '';
   pinLabelInput.focus();
-  setMode('orbit');
 }
 
-function cancelPendingPin(switchToPin = true) {
+function cancelPendingPin() {
   if (pendingPinData) { scene.remove(pendingPinData.group); pendingPinData = null; }
   pendingSection.style.display = 'none';
   clearHierarchyHighlight();
-  if (switchToPin) setMode('pin');
 }
 
 function confirmPin() {
@@ -690,7 +832,6 @@ function confirmPin() {
   pendingSection.style.display = 'none';
   clearHierarchyHighlight();
   renderPinList();
-  setMode('pin');
 }
 
 // ── Pin marker ────────────────────────────────────────────────────────────────
@@ -790,34 +931,47 @@ function deletePin(id) {
 // ── Hierarchy ─────────────────────────────────────────────────────────────────
 const hierarchySection = document.getElementById('hierarchy-section');
 const hierarchyTree    = document.getElementById('hierarchy-tree');
+const hierSearch       = document.getElementById('hierSearch');
+const hierCount        = document.getElementById('hierCount');
 let   hierarchyHighlight = null;
 let   hierarchyNodes     = [];
 let   selectedHierNode   = -1;
+let   hierFilter         = '';
 
 function buildHierarchy(root) {
   hierarchyNodes = [];
   function hasMesh(o) { return o.isMesh || o.children.some(hasMesh); }
   function walk(obj, depth) {
     if (!hasMesh(obj)) return;
-    hierarchyNodes.push({ obj, depth });
+    const name = obj.name || (obj.isMesh ? '(mesh)' : '(group)');
+    hierarchyNodes.push({ obj, depth, name });
     obj.children.forEach(c => walk(c, depth + 1));
   }
   root.children.forEach(c => walk(c, 0));
+  hierCount.textContent = hierarchyNodes.length;
+  renderHierarchy();
+  hierarchySection.style.display = '';
+}
 
-  if (hierarchyNodes.length === 0) {
-    hierarchyTree.innerHTML = '<div class="h-empty">No parts found.</div>';
-    hierarchySection.style.display = '';
+function renderHierarchy() {
+  const q = hierFilter.toLowerCase();
+  const visible = hierarchyNodes
+    .map((n, i) => ({ n, i }))
+    .filter(({ n }) => !q || n.name.toLowerCase().includes(q));
+
+  if (visible.length === 0) {
+    hierarchyTree.innerHTML = `<div class="h-empty">${hierFilter ? 'No match.' : 'No parts found.'}</div>`;
     return;
   }
 
-  hierarchyTree.innerHTML = hierarchyNodes.map((n, i) => {
-    const name    = n.obj.name || (n.obj.isMesh ? '(mesh)' : '(group)');
+  hierarchyTree.innerHTML = visible.map(({ n, i }) => {
     const icon    = n.obj.isMesh ? '●' : '▸';
     const meshCls = n.obj.isMesh ? ' h-node-mesh' : '';
-    const indent  = 8 + n.depth * 12;
-    return `<div class="h-node${meshCls}" data-hidx="${i}" style="padding-left:${indent}px" title="${name}">
+    const selCls  = selectedHierNode === i ? ' selected' : '';
+    const indent  = hierFilter ? 8 : 8 + n.depth * 12;
+    return `<div class="h-node${meshCls}${selCls}" data-hidx="${i}" style="padding-left:${indent}px" title="${n.name}">
       <span class="h-node-icon">${icon}</span>
-      <span class="h-node-name">${name}</span>
+      <span class="h-node-name">${n.name}</span>
     </div>`;
   }).join('');
 
@@ -826,17 +980,32 @@ function buildHierarchy(root) {
       const i = +el.dataset.hidx;
       if (selectedHierNode === i) {
         clearHierarchyHighlight();
-        hierarchyTree.querySelectorAll('.h-node').forEach(n => n.classList.remove('selected'));
         return;
       }
-      hierarchyTree.querySelectorAll('.h-node').forEach(n => n.classList.remove('selected'));
-      el.classList.add('selected');
       selectedHierNode = i;
+      renderHierarchy();
       selectHierarchyPart(hierarchyNodes[i].obj);
     });
   });
+}
 
-  hierarchySection.style.display = '';
+hierSearch.addEventListener('input', () => {
+  hierFilter = hierSearch.value.trim();
+  renderHierarchy();
+});
+
+function findHierarchyIndex(mesh) {
+  for (let i = 0; i < hierarchyNodes.length; i++) {
+    if (hierarchyNodes[i].obj === mesh) return i;
+  }
+  let parent = mesh.parent;
+  while (parent) {
+    for (let i = 0; i < hierarchyNodes.length; i++) {
+      if (hierarchyNodes[i].obj === parent) return i;
+    }
+    parent = parent.parent;
+  }
+  return -1;
 }
 
 function selectHierarchyPart(obj) {
@@ -852,12 +1021,12 @@ function selectHierarchyPart(obj) {
 function clearHierarchyHighlight() {
   if (hierarchyHighlight) { scene.remove(hierarchyHighlight); hierarchyHighlight = null; }
   selectedHierNode = -1;
-  hierarchyTree.querySelectorAll('.h-node').forEach(n => n.classList.remove('selected'));
+  if (hierarchyNodes.length > 0) renderHierarchy();
 }
 
 // ── Form buttons ──────────────────────────────────────────────────────────────
 document.getElementById('btnSavePin').addEventListener('click', confirmPin);
-document.getElementById('btnCancelPin').addEventListener('click', () => cancelPendingPin(true));
+document.getElementById('btnCancelPin').addEventListener('click', () => cancelPendingPin());
 pinLabelInput.addEventListener('keydown', e => { if (e.key === 'Enter') confirmPin(); });
 pinDescInput.addEventListener('keydown',  e => { if (e.key === 'Enter') confirmPin(); });
 
@@ -865,7 +1034,7 @@ pinDescInput.addEventListener('keydown',  e => { if (e.key === 'Enter') confirmP
 btnExport.addEventListener('click', () => {
   const data = {
     exportedAt: new Date().toISOString(),
-    modelFile:  fileNm.textContent || 'unknown',
+    modelFile:  modelLoadedName.textContent || 'unknown',
     pinCount:   pins.length,
     pins: pins.map(p => ({
       id: p.id, label: p.label, description: p.desc,
@@ -883,6 +1052,39 @@ btnExport.addEventListener('click', () => {
   URL.revokeObjectURL(url);
 });
 
+// ── Keyboard shortcuts ────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement?.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+  if (e.key === '1') setMode('orbit');
+  if (e.key === '2' && modelRoot) setMode('select');
+  if (e.key === '3' && modelRoot) setMode('pin');
+});
+
+// ── Import JSON ───────────────────────────────────────────────────────────────
+document.getElementById('jsonFileInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    let data;
+    try { data = JSON.parse(ev.target.result); } catch { alert('Invalid JSON file.'); return; }
+    if (!Array.isArray(data.pins) || data.pins.length === 0) { alert('No pins found in this file.'); return; }
+
+    data.pins.forEach(p => {
+      const point = new THREE.Vector3(p.position.x, p.position.y, p.position.z);
+      const group = buildPinMarker(p.label, point);
+      scene.add(group);
+      const id = nextPinId++;
+      pins.push({ id, label: p.label, desc: p.description || '', position: point, group });
+    });
+
+    renderPinList();
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+});
+
 // ── Animation loop ────────────────────────────────────────────────────────────
 const clock = new THREE.Clock();
 
@@ -895,6 +1097,7 @@ function animate() {
     pendingPinData.group.children[0].scale.setScalar(s);
   }
   if (hierarchyHighlight) hierarchyHighlight.update();
+  if (hoverHighlight) hoverHighlight.update();
   controls.update();
   renderer.render(scene, camera);
 }
