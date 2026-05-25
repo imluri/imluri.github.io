@@ -1,0 +1,2019 @@
+<!-- Arduino Simulator -->
+<style>
+  body.as-page footer { display: none; }
+
+  /* Local accent tokens — rest inherits from global site vars */
+  .as-wrap {
+    --as-accent:    #00979d;
+    --as-accent-br: #2ab8be;
+    --as-red:       #e35f5f;
+
+    position: fixed;
+    top: 58px; left: 0; right: 0; bottom: 0;
+    display: flex;
+    overflow: hidden;
+    background: var(--bg-deep);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--foreground);
+  }
+
+  /* ── Left sidebar: code editor ── */
+  .as-sidebar {
+    width: 350px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-default);
+    background: var(--bg-elevated);
+    min-height: 0;
+  }
+  .as-sidebar-header {
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid var(--border-default);
+    flex-shrink: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .as-sidebar-title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--foreground);
+  }
+  .as-sidebar-sub {
+    font-size: 0.6rem;
+    color: var(--foreground-muted);
+  }
+  #as-editor-mount {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+  /* Monaco overrides */
+  #as-editor-mount .monaco-editor,
+  #as-editor-mount .monaco-editor-background,
+  #as-editor-mount .monaco-editor .margin { background: var(--bg-deep) !important; }
+  #as-editor-mount .monaco-editor .margin-view-overlays { border-right: 1px solid var(--border-default); }
+
+  /* ── Resize handle ── */
+  .as-resize-handle {
+    width: 5px;
+    flex-shrink: 0;
+    cursor: col-resize;
+    background: transparent;
+    position: relative;
+    z-index: 10;
+    transition: background 0.15s;
+  }
+  .as-resize-handle::after {
+    content: '';
+    position: absolute;
+    inset: 0 1px;
+    background: var(--border-default);
+    transition: background 0.15s;
+  }
+  .as-resize-handle:hover::after,
+  .as-resize-handle.dragging::after {
+    background: var(--as-accent);
+    opacity: 0.5;
+  }
+
+  /* ── Right: canvas area ── */
+  .as-canvas-area {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-deep);
+    position: relative;
+  }
+
+  /* ── Toolbar (designer style) ── */
+  .as-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--border-default);
+    background: var(--bg-elevated);
+    flex-shrink: 0;
+    overflow-x: auto;
+  }
+  .as-toolbar::-webkit-scrollbar { display: none; }
+  .as-toolbar-sep {
+    width: 1px; height: 20px;
+    background: var(--border-default);
+    flex-shrink: 0;
+    margin: 0 4px;
+  }
+  .as-tool-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 28px;
+    padding: 0 9px;
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.03);
+    color: var(--foreground-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .as-tool-btn:hover:not(:disabled) { background: rgba(255,255,255,0.07); color: var(--foreground); }
+  .as-tool-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .as-tool-btn.as-btn-run {
+    background: rgba(0,151,157,0.08);
+    border-color: rgba(0,151,157,0.25);
+    color: var(--as-accent-br);
+  }
+  .as-tool-btn.as-btn-run:hover:not(:disabled) { background: rgba(0,151,157,0.18); border-color: var(--as-accent); }
+  .as-tool-btn.as-btn-stop {
+    background: rgba(227,95,95,0.07);
+    border-color: rgba(227,95,95,0.22);
+    color: var(--as-red);
+  }
+  .as-tool-btn.as-btn-stop:hover:not(:disabled) { background: rgba(227,95,95,0.16); border-color: var(--as-red); }
+  .as-speed-label {
+    font-size: 0.6rem;
+    color: var(--foreground-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.06em;
+  }
+  .as-speed {
+    width: 72px;
+    flex-shrink: 0;
+    accent-color: var(--as-accent);
+    cursor: pointer;
+  }
+  .as-speed-val {
+    font-size: 0.65rem;
+    color: var(--as-accent-br);
+    width: 34px;
+    flex-shrink: 0;
+  }
+  .as-toolbar-right {
+    margin-left: auto;
+    font-size: 0.58rem;
+    color: rgba(255,255,255,0.16);
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Middle: canvas + palette ── */
+  .as-middle {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* ── Circuit canvas ── */
+  .as-canvas-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-deep);
+  }
+  #as-svg {
+    width: 100%;
+    height: 100%;
+    cursor: default;
+    user-select: none;
+    touch-action: none;
+  }
+  .as-canvas-wrap.wire-mode #as-svg { cursor: crosshair; }
+  .as-mode-badge {
+    position: absolute;
+    top: 10px; right: 10px;
+    font-size: 0.58rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    pointer-events: none;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border-default);
+    color: var(--foreground-muted);
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .as-mode-badge.wire {
+    background: rgba(0,151,157,0.1);
+    border-color: rgba(0,151,157,0.35);
+    color: var(--as-accent-br);
+  }
+  .as-mode-badge.running {
+    background: rgba(0,151,157,0.14);
+    border-color: var(--as-accent);
+    color: var(--as-accent-br);
+    animation: asBadgePulse 1.5s ease-in-out infinite;
+  }
+  @keyframes asBadgePulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(0,151,157,0.3); }
+    50%      { box-shadow: 0 0 0 5px rgba(0,151,157,0); }
+  }
+
+  /* ── Component palette (right strip) ── */
+  .as-palette {
+    width: 100px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-elevated);
+    border-left: 1px solid var(--border-default);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .as-palette::-webkit-scrollbar { width: 3px; }
+  .as-palette::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 4px; }
+  .as-palette-header {
+    padding: 8px 8px 6px;
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--foreground-muted);
+    border-bottom: 1px solid var(--border-default);
+    flex-shrink: 0;
+  }
+  .as-palette-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 6px 10px;
+    border-bottom: 1px solid var(--border-default);
+    cursor: pointer;
+    transition: background 0.15s;
+    user-select: none;
+  }
+  .as-palette-item:hover { background: rgba(0,151,157,0.06); }
+  .as-palette-item:active { background: rgba(0,151,157,0.12); }
+  .as-palette-item svg { display: block; overflow: visible; }
+  .as-palette-label {
+    font-size: 0.58rem;
+    color: var(--foreground-muted);
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Serial monitor ── */
+  .as-serial {
+    height: 148px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--border-default);
+    background: var(--bg-elevated);
+    overflow: hidden;
+  }
+  .as-serial-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 12px;
+    border-bottom: 1px solid var(--border-default);
+    flex-shrink: 0;
+  }
+  .as-serial-title {
+    font-size: 0.6rem;
+    color: var(--foreground-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .as-serial-clear {
+    background: none;
+    border: none;
+    color: var(--foreground-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+  }
+  .as-serial-clear:hover { color: var(--foreground); background: rgba(255,255,255,0.05); }
+  .as-serial-output {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 12px;
+    font-size: 0.7rem;
+    line-height: 1.65;
+    color: var(--as-accent-br);
+  }
+  .as-serial-output::-webkit-scrollbar { width: 3px; }
+  .as-serial-output::-webkit-scrollbar-track { background: transparent; }
+  .as-serial-output::-webkit-scrollbar-thumb { background: rgba(0,151,157,0.2); border-radius: 4px; }
+  .as-serial-line { display: block; }
+  .as-serial-ts { color: var(--foreground-muted); margin-right: 6px; }
+
+  /* ── SVG component styles ── */
+  .as-pin-circle {
+    fill: var(--bg-deep);
+    stroke: rgba(255,255,255,0.18);
+    stroke-width: 1.2;
+    transition: fill 0.1s, stroke 0.1s;
+  }
+  /* Hit circle hover → adjacent visual circle */
+  [data-pin]:hover + .as-pin-circle {
+    fill: rgba(0,151,157,0.28);
+    stroke: var(--as-accent);
+  }
+  [data-pin].pending + .as-pin-circle {
+    fill: rgba(0,151,157,0.4);
+    stroke: var(--as-accent-br);
+    stroke-width: 2;
+  }
+  [data-pin].connected + .as-pin-circle {
+    fill: rgba(0,151,157,0.12);
+    stroke: var(--as-accent);
+  }
+
+  .as-wire { stroke: var(--as-accent); stroke-width: 2; fill: none; cursor: pointer; }
+  .as-wire.selected {
+    stroke: var(--as-accent-br);
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 4px rgba(0,151,157,0.6));
+  }
+  .as-wire-hit { stroke: transparent; stroke-width: 14; fill: none; cursor: pointer; }
+
+  .as-comp-body { cursor: move; }
+  .as-comp-body.selected-comp > * { filter: drop-shadow(0 0 6px rgba(0,151,157,0.5)); }
+  .as-led-on { filter: drop-shadow(0 0 6px var(--led-color, #e35f5f)); }
+
+  @keyframes asLedGlow {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.6; }
+  }
+
+  /* ── Examples dropdown ── */
+  .as-examples-drop {
+    display: none;
+    position: fixed;
+    min-width: 210px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 9999;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+  }
+  .as-examples-drop.open { display: block; }
+  .as-examples-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 9px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-default);
+    transition: background 0.12s;
+  }
+  .as-examples-item:last-child { border-bottom: none; }
+  .as-examples-item:hover { background: rgba(0,151,157,0.07); }
+  .as-examples-name {
+    font-size: 0.68rem;
+    color: var(--foreground);
+    letter-spacing: 0.04em;
+  }
+  .as-examples-desc {
+    font-size: 0.58rem;
+    color: var(--foreground-muted);
+    letter-spacing: 0.02em;
+  }
+</style>
+
+<!-- markup -->
+<div class="as-wrap" id="asWrap">
+
+  <!-- Left sidebar: code editor -->
+  <aside class="as-sidebar">
+    <div class="as-sidebar-header">
+      <span class="as-sidebar-title">sketch.ino</span>
+      <span class="as-sidebar-sub">Arduino Uno</span>
+    </div>
+    <div id="as-editor-mount"></div>
+  </aside>
+
+  <!-- Resize handle -->
+  <div class="as-resize-handle" id="asResizeHandle"></div>
+
+  <!-- Right: canvas area -->
+  <div class="as-canvas-area">
+
+    <!-- Toolbar -->
+    <div class="as-toolbar">
+      <button class="as-tool-btn as-btn-run" id="asBtnRun" title="Run sketch">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        Run
+      </button>
+      <button class="as-tool-btn as-btn-stop" id="asBtnStop" disabled title="Stop sketch">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+        Stop
+      </button>
+      <div class="as-toolbar-sep"></div>
+      <button class="as-tool-btn" id="asExamplesBtn" title="Load example sketch">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Examples
+      </button>
+      <div class="as-toolbar-sep"></div>
+      <span class="as-speed-label">Speed</span>
+      <input type="range" class="as-speed" id="asSpeed" min="0.1" max="10" step="0.1" value="1">
+      <span class="as-speed-val" id="asSpeedVal">1.0x</span>
+      <span class="as-toolbar-right">Click pin to start wire &nbsp;·&nbsp; [Esc] cancel &nbsp;·&nbsp; [Del] delete</span>
+    </div>
+
+    <!-- Middle: canvas + palette strip -->
+    <div class="as-middle">
+
+      <!-- Circuit canvas -->
+      <div class="as-canvas-wrap" id="asCanvasWrap">
+        <svg id="as-svg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <defs>
+            <filter id="as-led-glow-r" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="as-led-glow-y" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <g id="as-wires-layer"></g>
+          <g id="as-comps-layer"></g>
+          <g id="as-wire-preview"></g>
+        </svg>
+        <div class="as-mode-badge" id="asModeBadge">IDLE</div>
+      </div>
+
+      <!-- Component palette -->
+      <div class="as-palette" id="asPalette">
+        <div class="as-palette-header">Parts</div>
+
+        <div class="as-palette-item" data-add="led">
+          <svg width="40" height="68" viewBox="0 0 44 80">
+            <line x1="22" y1="0" x2="22" y2="18" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+            <polygon points="10,18 34,18 22,38" fill="rgba(227,95,95,0.45)" stroke="#e35f5f" stroke-width="1.2"/>
+            <line x1="10" y1="38" x2="34" y2="38" stroke="#e35f5f" stroke-width="2"/>
+            <line x1="22" y1="38" x2="22" y2="70" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+            <circle cx="22" cy="0"  r="4" fill="#333" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+            <circle cx="22" cy="70" r="4" fill="#333" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+          </svg>
+          <span class="as-palette-label">LED</span>
+        </div>
+
+        <div class="as-palette-item" data-add="button">
+          <svg width="60" height="48" viewBox="-2 0 68 60">
+            <line x1="0" y1="25" x2="14" y2="25" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+            <line x1="50" y1="25" x2="64" y2="25" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+            <rect x="14" y="10" width="36" height="30" rx="4" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.15)" stroke-width="1.2"/>
+            <circle cx="32" cy="25" r="7" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+            <circle cx="0"  cy="25" r="4" fill="#333" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+            <circle cx="64" cy="25" r="4" fill="#333" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+          </svg>
+          <span class="as-palette-label">Button</span>
+        </div>
+
+        <div class="as-palette-item" data-add="resistor">
+          <svg width="68" height="30" viewBox="-2 0 76 32">
+            <line x1="0" y1="15" x2="14" y2="15" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+            <line x1="58" y1="15" x2="72" y2="15" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+            <polyline points="14,15 18,5 22,25 26,5 30,25 34,5 38,25 42,5 46,25 50,5 54,15 58,15"
+              fill="none" stroke="rgba(200,160,60,0.85)" stroke-width="2"/>
+            <circle cx="0"  cy="15" r="4" fill="#333" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+            <circle cx="72" cy="15" r="4" fill="#333" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+          </svg>
+          <span class="as-palette-label">Resistor</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Serial monitor -->
+    <div class="as-serial">
+      <div class="as-serial-header">
+        <span class="as-serial-title">Serial Monitor · 9600 baud</span>
+        <button class="as-serial-clear" id="asSerialClear">Clear</button>
+      </div>
+      <div class="as-serial-output" id="asSerialOutput"></div>
+    </div>
+
+  </div>
+
+  <!-- Examples dropdown (outside toolbar to avoid overflow clipping) -->
+  <div class="as-examples-drop" id="asExamplesDrop">
+    <div class="as-examples-item" data-example="blink">
+      <span class="as-examples-name">Blink</span>
+      <span class="as-examples-desc">Flash built-in LED on pin 13</span>
+    </div>
+    <div class="as-examples-item" data-example="button-led">
+      <span class="as-examples-name">Button + LED</span>
+      <span class="as-examples-desc">Press button to light LED — circuit included</span>
+    </div>
+    <div class="as-examples-item" data-example="fade">
+      <span class="as-examples-name">PWM Fade</span>
+      <span class="as-examples-desc">Smooth LED brightness via analogWrite</span>
+    </div>
+    <div class="as-examples-item" data-example="serial-echo">
+      <span class="as-examples-name">Serial Counter</span>
+      <span class="as-examples-desc">Print incrementing counter to serial</span>
+    </div>
+    <div class="as-examples-item" data-example="traffic">
+      <span class="as-examples-name">Traffic Light</span>
+      <span class="as-examples-desc">Three LEDs, timed sequence — circuit included</span>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+document.body.classList.add('as-page');
+
+// ─────────────────────────────────────────────
+//  CodeMirror 6 import (lazy — don't block render)
+// ─────────────────────────────────────────────
+const DEFAULT_SKETCH = `#define LED_PIN 13
+#define BTN_PIN 2
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(BTN_PIN, INPUT_PULLUP);
+  Serial.begin(9600);
+  Serial.println("Ready!");
+}
+
+void loop() {
+  if (digitalRead(BTN_PIN) == LOW) {
+    digitalWrite(LED_PIN, HIGH);
+    Serial.println("Button pressed");
+    delay(200);
+  } else {
+    digitalWrite(LED_PIN, LOW);
+    delay(50);
+  }
+}`;
+
+let editorView = null; // Monaco IStandaloneCodeEditor
+
+const _MONACO_VS = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.47.0/min/vs';
+
+// Arduino teal Monaco theme — also exposed for other pages to reference
+window.AS_MONACO_THEME = {
+  base: 'vs-dark', inherit: true,
+  rules: [
+    { token: 'keyword',           foreground: '2ab8be' },
+    { token: 'keyword.control',   foreground: '2ab8be' },
+    { token: 'comment',           foreground: '6a8a6a', fontStyle: 'italic' },
+    { token: 'string',            foreground: 'a3d9a5' },
+    { token: 'number',            foreground: 'fb923c' },
+    { token: 'type',              foreground: '00c8cf' },
+    { token: 'delimiter',         foreground: 'cce8cc' },
+    { token: 'operator',          foreground: 'cce8cc' },
+    { token: 'variable',          foreground: 'e8ede8' },
+    { token: 'macro',             foreground: 'b0e8b0' },
+  ],
+  colors: {
+    'editor.background':                '#080404',
+    'editor.foreground':                '#E9EBF0',
+    'editor.lineHighlightBackground':   '#00979d0a',
+    'editorLineNumber.foreground':      '#4a4050',
+    'editorLineNumber.activeForeground':'#9aa0b2',
+    'editor.selectionBackground':       '#00979d30',
+    'editorCursor.foreground':          '#00979d',
+    'editorIndentGuide.background1':    '#ffffff0c',
+    'editorBracketMatch.background':    '#00979d20',
+    'editorBracketMatch.border':        '#00979d60',
+    'editorSuggestWidget.background':   '#0d110d',
+    'editorSuggestWidget.border':       '#00979d30',
+    'editorSuggestWidget.selectedBackground': '#00979d20',
+  }
+};
+
+function initEditor() {
+  if (typeof require !== 'undefined' && require.config) {
+    _asLoadMonacoMain();
+    return;
+  }
+  const s = document.createElement('script');
+  s.src = `${_MONACO_VS}/loader.js`;
+  s.onload = _asLoadMonacoMain;
+  s.onerror = _asFallbackEditor;
+  document.head.appendChild(s);
+}
+
+function _asLoadMonacoMain() {
+  require.config({ paths: { vs: _MONACO_VS } });
+  window.MonacoEnvironment = {
+    getWorkerUrl: () => `data:text/javascript;charset=utf-8,${encodeURIComponent(
+      `self.MonacoEnvironment={baseUrl:'${_MONACO_VS}/../'};` +
+      `importScripts('${_MONACO_VS}/base/worker/workerMain.js');`
+    )}`
+  };
+  require(['vs/editor/editor.main'], function () {
+    monaco.editor.defineTheme('arduino-dark', window.AS_MONACO_THEME);
+
+    // Arduino / C++ completions
+    monaco.languages.registerCompletionItemProvider('cpp', {
+      provideCompletionItems(model, position) {
+        const word  = model.getWordUntilPosition(position);
+        const range = {
+          startLineNumber: position.lineNumber, endLineNumber: position.lineNumber,
+          startColumn: word.startColumn, endColumn: word.endColumn,
+        };
+        const K = monaco.languages.CompletionItemKind;
+        const R = monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet;
+        const fn = (label, insert, detail) =>
+          ({ label, kind: K.Function,  insertText: insert, detail, range, insertTextRules: R });
+        const va = (label, detail) =>
+          ({ label, kind: K.Constant,  insertText: label,  detail, range });
+        const sn = (label, insert, detail) =>
+          ({ label, kind: K.Snippet,   insertText: insert, detail, range, insertTextRules: R });
+        return { suggestions: [
+          fn('pinMode',            'pinMode(${1:pin}, ${2:OUTPUT})',                          'void pinMode(uint8_t, uint8_t)'),
+          fn('digitalWrite',       'digitalWrite(${1:pin}, ${2:HIGH})',                       'void digitalWrite(uint8_t, uint8_t)'),
+          fn('digitalRead',        'digitalRead(${1:pin})',                                   'int digitalRead(uint8_t)'),
+          fn('analogWrite',        'analogWrite(${1:pin}, ${2:value})',                       'void analogWrite(uint8_t, int)'),
+          fn('analogRead',         'analogRead(${1:A0})',                                     'int analogRead(uint8_t)'),
+          fn('delay',              'delay(${1:1000})',                                        'void delay(unsigned long ms)'),
+          fn('delayMicroseconds',  'delayMicroseconds(${1:100})',                             'void delayMicroseconds(unsigned int)'),
+          fn('millis',             'millis()',                                                 'unsigned long millis()'),
+          fn('micros',             'micros()',                                                 'unsigned long micros()'),
+          fn('map',                'map(${1:value}, ${2:inLow}, ${3:inHigh}, ${4:outLow}, ${5:outHigh})', 'long map(...)'),
+          fn('constrain',          'constrain(${1:value}, ${2:min}, ${3:max})',               'long constrain(...)'),
+          fn('abs',                'abs(${1:x})',                                             'int abs(int)'),
+          fn('random',             'random(${1:min}, ${2:max})',                              'long random(...)'),
+          fn('Serial.begin',       'Serial.begin(${1:9600})',                                 'void Serial.begin(long)'),
+          fn('Serial.print',       'Serial.print(${1:value})',                                'void Serial.print(...)'),
+          fn('Serial.println',     'Serial.println(${1:value})',                              'void Serial.println(...)'),
+          fn('Serial.available',   'Serial.available()',                                      'int Serial.available()'),
+          fn('Serial.read',        'Serial.read()',                                           'int Serial.read()'),
+          va('HIGH',          'Digital HIGH (1)'),
+          va('LOW',           'Digital LOW (0)'),
+          va('INPUT',         'Pin mode: input'),
+          va('OUTPUT',        'Pin mode: output'),
+          va('INPUT_PULLUP',  'Pin mode: input with internal pull-up'),
+          va('LED_BUILTIN',   'Built-in LED (pin 13 on Uno)'),
+          va('A0','Analog 0'), va('A1','Analog 1'), va('A2','Analog 2'),
+          va('A3','Analog 3'), va('A4','Analog 4'), va('A5','Analog 5'),
+          va('true','boolean true'), va('false','boolean false'),
+          sn('setup',  'void setup() {\n\t$0\n}',                             'setup() function'),
+          sn('loop',   'void loop() {\n\t$0\n}',                              'loop() function'),
+          sn('#define','#define ${1:NAME} ${2:value}',                         'Preprocessor define'),
+          sn('for',    'for (int ${1:i} = 0; ${1:i} < ${2:10}; ${1:i}++) {\n\t$0\n}', 'for loop'),
+          sn('if',     'if (${1:condition}) {\n\t$0\n}',                       'if statement'),
+          sn('while',  'while (${1:condition}) {\n\t$0\n}',                    'while loop'),
+          sn('ifelse', 'if (${1:condition}) {\n\t$2\n} else {\n\t$3\n}',       'if/else'),
+        ]};
+      }
+    });
+
+    editorView = monaco.editor.create(document.getElementById('as-editor-mount'), {
+      value: DEFAULT_SKETCH,
+      language: 'cpp',
+      theme: 'arduino-dark',
+      fontSize: 13,
+      fontFamily: '"IBM Plex Mono", monospace',
+      lineHeight: 20,
+      minimap: { enabled: false },
+      scrollBeyondLastLine: false,
+      renderLineHighlight: 'line',
+      roundedSelection: true,
+      cursorBlinking: 'smooth',
+      cursorSmoothCaretAnimation: 'on',
+      tabSize: 2,
+      insertSpaces: true,
+      wordWrap: 'off',
+      automaticLayout: true,
+      quickSuggestions: true,
+      suggestOnTriggerCharacters: true,
+      bracketPairColorization: { enabled: false },
+      padding: { top: 8, bottom: 8 },
+    });
+  });
+}
+
+function _asFallbackEditor() {
+  const mount = document.getElementById('as-editor-mount');
+  mount.style.display = 'flex';
+  const ta = document.createElement('textarea');
+  ta.value = DEFAULT_SKETCH;
+  ta.style.cssText = 'flex:1;background:#0d110d;color:#e8ede8;font-family:"IBM Plex Mono",monospace;font-size:13px;border:none;padding:12px;resize:none;outline:none;tab-size:2;';
+  ta.spellcheck = false;
+  mount.appendChild(ta);
+  editorView = { getValue: () => ta.value, dispose: () => {} };
+}
+
+initEditor();
+
+// ─────────────────────────────────────────────
+//  SVG canvas + pan/zoom
+// ─────────────────────────────────────────────
+const svg = document.getElementById('as-svg');
+const wiresLayer = document.getElementById('as-wires-layer');
+const compsLayer = document.getElementById('as-comps-layer');
+const wirePreviewLayer = document.getElementById('as-wire-preview');
+
+let viewBox = { x: 0, y: 0, w: 800, h: 500 };
+let isPanning = false;
+let panStart = { x: 0, y: 0 };
+let panOrigin = { x: 0, y: 0 };
+
+function applyViewBox() {
+  svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+}
+applyViewBox();
+
+function svgPoint(clientX, clientY) {
+  const rect = svg.getBoundingClientRect();
+  const scaleX = viewBox.w / rect.width;
+  const scaleY = viewBox.h / rect.height;
+  return {
+    x: viewBox.x + (clientX - rect.left) * scaleX,
+    y: viewBox.y + (clientY - rect.top)  * scaleY,
+  };
+}
+
+svg.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const pt = svgPoint(e.clientX, e.clientY);
+  const factor = e.deltaY > 0 ? 1.1 : 0.9;
+  const newW = Math.max(200, Math.min(2400, viewBox.w * factor));
+  const newH = Math.max(125, Math.min(1500, viewBox.h * factor));
+  viewBox.x = pt.x - (pt.x - viewBox.x) * (newW / viewBox.w);
+  viewBox.y = pt.y - (pt.y - viewBox.y) * (newH / viewBox.h);
+  viewBox.w = newW;
+  viewBox.h = newH;
+  applyViewBox();
+}, { passive: false });
+
+svg.addEventListener('mousedown', (e) => {
+  if (appMode === 'running') return;
+  if (e.target.closest('[data-pin]') || e.target.closest('[data-comp]')) return;
+  // Clicking background while wiring cancels the wire
+  if (pendingWire) { cancelPendingWire(); return; }
+  isPanning = true;
+  panStart = { x: e.clientX, y: e.clientY };
+  panOrigin = { x: viewBox.x, y: viewBox.y };
+  svg.style.cursor = 'grabbing';
+  e.preventDefault();
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!isPanning) return;
+  const rect = svg.getBoundingClientRect();
+  const scaleX = viewBox.w / rect.width;
+  const scaleY = viewBox.h / rect.height;
+  viewBox.x = panOrigin.x - (e.clientX - panStart.x) * scaleX;
+  viewBox.y = panOrigin.y - (e.clientY - panStart.y) * scaleY;
+  applyViewBox();
+});
+
+// mouseup merged into drag handler above
+
+// ─────────────────────────────────────────────
+//  Pin state
+// ─────────────────────────────────────────────
+const pinState = new Array(20).fill(0); // 0-13 digital, 14-19 A0-A5
+const pinModes = new Array(20).fill('INPUT'); // OUTPUT / INPUT / INPUT_PULLUP
+
+// ─────────────────────────────────────────────
+//  Arduino Uno component (fixed)
+// ─────────────────────────────────────────────
+const UNO_ORIG = { x: 200, y: 130 };
+const UNO_W = 240, UNO_H = 155;
+
+// Pin definitions: [id, label, relX, relY]
+const UNO_PINS = [
+  // Top edge (D pins), y=0
+  { id: 'd13', label: 'D13', rx: 226, ry: -8 },
+  { id: 'd12', label: 'D12', rx: 210, ry: -8 },
+  { id: 'd11', label: 'D11', rx: 194, ry: -8 },
+  { id: 'd10', label: 'D10', rx: 178, ry: -8 },
+  { id: 'd9',  label: 'D9',  rx: 162, ry: -8 },
+  { id: 'd8',  label: 'D8',  rx: 146, ry: -8 },
+  { id: 'd7',  label: 'D7',  rx: 130, ry: -8 },
+  { id: 'd6',  label: 'D6',  rx: 114, ry: -8 },
+  { id: 'd5',  label: 'D5',  rx:  98, ry: -8 },
+  { id: 'd4',  label: 'D4',  rx:  82, ry: -8 },
+  { id: 'd3',  label: 'D3',  rx:  66, ry: -8 },
+  { id: 'd2',  label: 'D2',  rx:  50, ry: -8 },
+  // Bottom edge
+  { id: 'gnd1', label: 'GND', rx:  50, ry: 163 },
+  { id: 'gnd2', label: 'GND', rx:  66, ry: 163 },
+  { id: '5v',   label: '5V',  rx:  82, ry: 163 },
+  { id: '3v3',  label: '3V3', rx:  98, ry: 163 },
+  { id: 'a0',   label: 'A0',  rx: 130, ry: 163 },
+  { id: 'a1',   label: 'A1',  rx: 146, ry: 163 },
+  { id: 'a2',   label: 'A2',  rx: 162, ry: 163 },
+  { id: 'a3',   label: 'A3',  rx: 178, ry: 163 },
+  { id: 'a4',   label: 'A4',  rx: 194, ry: 163 },
+  { id: 'a5',   label: 'A5',  rx: 210, ry: 163 },
+];
+
+function pinDigitalIndex(pinId) {
+  const map = { d2:2,d3:3,d4:4,d5:5,d6:6,d7:7,d8:8,d9:9,d10:10,d11:11,d12:12,d13:13,
+                a0:14,a1:15,a2:16,a3:17,a4:18,a5:19 };
+  return map[pinId] ?? -1;
+}
+
+function pinVoltage(pinId) {
+  if (pinId === '5v') return 5;
+  if (pinId === '3v3') return 3.3;
+  if (pinId === 'gnd1' || pinId === 'gnd2') return 0;
+  const idx = pinDigitalIndex(pinId);
+  if (idx < 0) return 0;
+  if (pinModes[idx] === 'OUTPUT') return pinState[idx] > 0 ? 5 : 0;
+  if (pinModes[idx] === 'INPUT_PULLUP') return 5; // internal pull-up holds pin HIGH
+  return 0;
+}
+
+function renderUno() {
+  const ox = UNO_ORIG.x, oy = UNO_ORIG.y;
+  let html = `<g id="as-uno">`;
+
+  // PCB board
+  html += `<rect x="${ox}" y="${oy}" width="${UNO_W}" height="${UNO_H}" rx="8"
+    fill="#1a5c38" stroke="#2a7a48" stroke-width="1.5"/>`;
+
+  // USB port (left edge)
+  html += `<rect x="${ox - 18}" y="${oy + 50}" width="22" height="30" rx="3"
+    fill="#888" stroke="#666" stroke-width="1"/>`;
+  html += `<rect x="${ox - 14}" y="${oy + 54}" width="14" height="22" rx="2"
+    fill="#444"/>`;
+
+  // Reset button
+  html += `<circle cx="${ox + 20}" cy="${oy + 120}" r="6"
+    fill="#cc0000" stroke="#990000" stroke-width="1" cursor="pointer" id="as-uno-reset" title="Reset"/>`;
+  html += `<text x="${ox + 20}" y="${oy + 112}" text-anchor="middle"
+    font-family="IBM Plex Sans,sans-serif" font-size="7" fill="rgba(255,255,255,0.5)">RST</text>`;
+
+  // Built-in LED (pin 13)
+  const ledOn = pinState[13] > 0;
+  html += `<circle cx="${ox + 226}" cy="${oy + 16}" r="5"
+    fill="${ledOn ? '#ffee44' : '#555'}"
+    stroke="${ledOn ? '#ffcc00' : '#333'}" stroke-width="1"
+    id="as-builtin-led"
+    ${ledOn ? 'filter="url(#as-led-glow-y)"' : ''}/>`;
+  html += `<text x="${ox + 226}" y="${oy + 28}" text-anchor="middle"
+    font-family="IBM Plex Mono,monospace" font-size="6" fill="rgba(255,255,255,0.4)">L</text>`;
+
+  // "Arduino" label
+  html += `<text x="${ox + 120}" y="${oy + 88}" text-anchor="middle"
+    font-family="IBM Plex Sans,sans-serif" font-size="14" font-weight="600"
+    fill="rgba(255,255,255,0.15)" letter-spacing="2">Arduino</text>`;
+  html += `<text x="${ox + 120}" y="${oy + 102}" text-anchor="middle"
+    font-family="IBM Plex Sans,sans-serif" font-size="9"
+    fill="rgba(255,255,255,0.1)">Uno</text>`;
+
+  // IC chip
+  html += `<rect x="${ox + 110}" y="${oy + 40}" width="50" height="30" rx="3"
+    fill="#111" stroke="#333" stroke-width="1"/>`;
+
+  html += `</g>`;
+
+  // Pins group
+  html += `<g id="as-uno-pins">`;
+  for (const p of UNO_PINS) {
+    const cx = ox + p.rx, cy = oy + p.ry;
+    const onTop = p.ry < 0;
+    html += `
+      <circle cx="${cx}" cy="${cy}" r="10" fill="transparent" pointer-events="all"
+        data-pin="${p.id}" data-comp="uno"/>
+      <circle class="as-pin-circle" cx="${cx}" cy="${cy}" r="7" pointer-events="none"/>
+      <text x="${cx}" y="${cy + (onTop ? -12 : 18)}" text-anchor="middle"
+        font-family="IBM Plex Mono,monospace" font-size="7"
+        fill="rgba(255,255,255,0.45)" pointer-events="none">${p.label}</text>`;
+  }
+  html += `</g>`;
+
+  // Place into comps layer at position 0 (before other comps)
+  const unoGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  unoGroup.id = 'as-uno-group';
+  unoGroup.innerHTML = html;
+  compsLayer.insertBefore(unoGroup, compsLayer.firstChild);
+}
+
+function updateBuiltinLed() {
+  const circle = document.getElementById('as-builtin-led');
+  if (!circle) return;
+  const on = pinState[13] > 0;
+  circle.setAttribute('fill', on ? '#ffee44' : '#555');
+  circle.setAttribute('stroke', on ? '#ffcc00' : '#333');
+  if (on) circle.setAttribute('filter', 'url(#as-led-glow-y)');
+  else circle.removeAttribute('filter');
+}
+
+// ─────────────────────────────────────────────
+//  Draggable components
+// ─────────────────────────────────────────────
+let compIdCounter = 0;
+const components = []; // { id, type, x, y, state, svgEl }
+
+function addComponent(type, x, y) {
+  const id = 'comp_' + (++compIdCounter);
+  const comp = { id, type, x, y, state: {}, svgEl: null };
+  if (type === 'led') { comp.state = { on: false, color: '#e35f5f' }; }
+  if (type === 'button') { comp.state = { pressed: false }; }
+  if (type === 'resistor') { comp.state = { ohms: 220 }; }
+  components.push(comp);
+  renderComponent(comp);
+  setupCompDrag(comp);
+  return comp;
+}
+
+function getPinAbsPos(comp, pinName) {
+  const pins = getCompPins(comp);
+  const p = pins.find(p => p.name === pinName);
+  if (!p) return { x: comp.x, y: comp.y };
+  return { x: comp.x + p.rx, y: comp.y + p.ry };
+}
+
+function getCompPins(comp) {
+  if (comp.type === 'led')      return [{ name: 'A', rx: 22, ry: 70 }, { name: 'K', rx: 22, ry: 0 }];
+  if (comp.type === 'button')   return [{ name: 'P1', rx: 0, ry: 25 }, { name: 'P2', rx: 60, ry: 25 }];
+  if (comp.type === 'resistor') return [{ name: 'P1', rx: 0, ry: 15 }, { name: 'P2', rx: 70, ry: 15 }];
+  return [];
+}
+
+function renderComponent(comp) {
+  if (comp.svgEl) comp.svgEl.remove();
+  const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  g.setAttribute('data-comp', comp.id);
+  g.setAttribute('transform', `translate(${comp.x},${comp.y})`);
+  g.classList.add('as-comp-body');
+
+  let inner = '';
+
+  if (comp.type === 'led') {
+    const on = comp.state.on;
+    const col = comp.state.color || '#e35f5f';
+    const offCol = col + '88';
+    // Transparent bounding-box catch-all (prevents wires underneath from stealing clicks)
+    inner += `<rect x="5" y="-10" width="40" height="92" fill="transparent" pointer-events="all"/>`;
+    inner += `<line x1="22" y1="0" x2="22" y2="18" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>`;
+    inner += `<polygon points="10,18 34,18 22,38"
+      fill="${on ? col : offCol}" stroke="${col}" stroke-width="1.2"
+      ${on ? `filter="url(#as-led-glow-r)"` : ''}/>`;
+    inner += `<line x1="10" y1="38" x2="34" y2="38" stroke="${col}" stroke-width="2"/>`;
+    inner += `<line x1="22" y1="38" x2="22" y2="70" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>`;
+    inner += `<text x="36" y="26" font-family="IBM Plex Mono,monospace" font-size="8" fill="rgba(255,255,255,0.4)">+</text>`;
+    inner += `<text x="36" y="42" font-family="IBM Plex Mono,monospace" font-size="8" fill="rgba(255,255,255,0.4)">-</text>`;
+    inner += `<text x="22" y="84" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" fill="rgba(255,255,255,0.35)">LED</text>`;
+    // Pin hit area (large transparent) + visual circle
+    inner += `<circle cx="22" cy="70" r="10" fill="transparent" pointer-events="all" data-pin="A" data-comp="${comp.id}"/>`;
+    inner += `<circle class="as-pin-circle" cx="22" cy="70" r="7" pointer-events="none"/>`;
+    inner += `<circle cx="22" cy="0"  r="10" fill="transparent" pointer-events="all" data-pin="K" data-comp="${comp.id}"/>`;
+    inner += `<circle class="as-pin-circle" cx="22" cy="0"  r="7" pointer-events="none"/>`;
+  }
+
+  if (comp.type === 'button') {
+    const pr = comp.state.pressed;
+    // Transparent bounding-box catch-all
+    inner += `<rect x="-10" y="5" width="80" height="50" fill="transparent" pointer-events="all"/>`;
+    inner += `<line x1="0" y1="25" x2="18" y2="25" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>`;
+    inner += `<line x1="42" y1="25" x2="60" y2="25" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>`;
+    inner += `<rect x="14" y="8" width="32" height="34" rx="4"
+      fill="${pr ? 'rgba(0,151,157,0.3)' : 'rgba(255,255,255,0.06)'}"
+      stroke="${pr ? '#00979d' : 'rgba(255,255,255,0.2)'}" stroke-width="1.2"
+      class="as-btn-body" data-btn-body="${comp.id}"/>`;
+    inner += `<circle cx="30" cy="25" r="4"
+      fill="${pr ? '#2ab8be' : 'rgba(255,255,255,0.2)'}"/>`;
+    inner += `<text x="30" y="56" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" fill="rgba(255,255,255,0.35)">BTN</text>`;
+    inner += `<circle cx="0"  cy="25" r="10" fill="transparent" pointer-events="all" data-pin="P1" data-comp="${comp.id}"/>`;
+    inner += `<circle class="as-pin-circle" cx="0"  cy="25" r="7" pointer-events="none"/>`;
+    inner += `<circle cx="60" cy="25" r="10" fill="transparent" pointer-events="all" data-pin="P2" data-comp="${comp.id}"/>`;
+    inner += `<circle class="as-pin-circle" cx="60" cy="25" r="7" pointer-events="none"/>`;
+  }
+
+  if (comp.type === 'resistor') {
+    // Transparent bounding-box catch-all
+    inner += `<rect x="-10" y="-5" width="90" height="40" fill="transparent" pointer-events="all"/>`;
+    inner += `<line x1="0" y1="15" x2="14" y2="15" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>`;
+    inner += `<line x1="56" y1="15" x2="70" y2="15" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>`;
+    const zx = [14,18,22,26,30,34,38,42,46,50,54,56];
+    const zy = [ 15, 5,25, 5,25, 5,25, 5,25, 5,15,15];
+    let pts = zx.map((x,i) => `${x},${zy[i]}`).join(' ');
+    inner += `<polyline points="${pts}" fill="none" stroke="rgba(200,160,60,0.9)" stroke-width="2"/>`;
+    inner += `<text x="35" y="34" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="rgba(255,255,255,0.4)">${comp.state.ohms}Ω</text>`;
+    inner += `<circle cx="0"  cy="15" r="10" fill="transparent" pointer-events="all" data-pin="P1" data-comp="${comp.id}"/>`;
+    inner += `<circle class="as-pin-circle" cx="0"  cy="15" r="7" pointer-events="none"/>`;
+    inner += `<circle cx="70" cy="15" r="10" fill="transparent" pointer-events="all" data-pin="P2" data-comp="${comp.id}"/>`;
+    inner += `<circle class="as-pin-circle" cx="70" cy="15" r="7" pointer-events="none"/>`;
+  }
+
+  g.innerHTML = inner;
+  compsLayer.appendChild(g);
+  comp.svgEl = g;
+
+  // Button press is handled by the SVG-level drag/click system
+}
+
+// Re-apply pin listeners after re-render
+function rewireAfterRender(comp) {
+  if (!comp.svgEl) return;
+  comp.svgEl.querySelectorAll('[data-pin]').forEach(el => {
+    setupPinInteraction(el);
+  });
+}
+
+// setupCompDrag is a no-op — dragging is handled via SVG-level delegation below
+function setupCompDrag(comp) {}
+
+// ─────────────────────────────────────────────
+//  Wires
+// ─────────────────────────────────────────────
+let wireIdCounter = 0;
+const wires = []; // { id, from:{comp,pin}, to:{comp,pin}, pathEl, hitEl }
+
+let pendingWire = null; // { comp, pin, cx, cy }
+
+function getAbsPinPos(compId, pinId) {
+  if (compId === 'uno') {
+    const pin = UNO_PINS.find(p => p.id === pinId);
+    if (!pin) return { x: 0, y: 0 };
+    return { x: UNO_ORIG.x + pin.rx, y: UNO_ORIG.y + pin.ry };
+  }
+  const comp = components.find(c => c.id === compId);
+  if (!comp) return { x: 0, y: 0 };
+  return getPinAbsPos(comp, pinId);
+}
+
+// ── Obstacle-aware orthogonal wire router ────────────────────────
+const ROUTE_M = 22; // clearance around obstacles
+
+function getObstacleBBoxes() {
+  const boxes = [];
+  // Uno board body (including USB port overhang on the left)
+  boxes.push({
+    x1: UNO_ORIG.x - 22, y1: UNO_ORIG.y,
+    x2: UNO_ORIG.x + UNO_W, y2: UNO_ORIG.y + UNO_H,
+  });
+  // Uno pin circles — each pin is a small box so wires can't thread through them
+  const PR = 13; // obstacle radius (slightly larger than visual r=7, hit r=10)
+  for (const p of UNO_PINS) {
+    const cx = UNO_ORIG.x + p.rx, cy = UNO_ORIG.y + p.ry;
+    boxes.push({ x1: cx - PR, y1: cy - PR, x2: cx + PR, y2: cy + PR });
+  }
+  for (const comp of components) {
+    let b;
+    if      (comp.type === 'led')      b = { x1: comp.x,     y1: comp.y - 12, x2: comp.x + 46, y2: comp.y + 87 };
+    else if (comp.type === 'button')   b = { x1: comp.x - 14, y1: comp.y + 3, x2: comp.x + 74, y2: comp.y + 55 };
+    else if (comp.type === 'resistor') b = { x1: comp.x - 14, y1: comp.y - 8, x2: comp.x + 84, y2: comp.y + 40 };
+    if (b) boxes.push(b);
+  }
+  return boxes;
+}
+
+// Strict interior: segment is clear if it doesn't pass through any box interior
+function hClear(y, xa, xb, boxes) {
+  const a = Math.min(xa, xb), b = Math.max(xa, xb);
+  return !boxes.some(bx => y > bx.y1 && y < bx.y2 && a < bx.x2 && b > bx.x1);
+}
+function vClear(x, ya, yb, boxes) {
+  const a = Math.min(ya, yb), b = Math.max(ya, yb);
+  return !boxes.some(bx => x > bx.x1 && x < bx.x2 && a < bx.y2 && b > bx.y1);
+}
+
+// Parse all existing wire paths into H/V segments for overlap detection.
+// Each segment carries wireId so callers can exclude a specific wire's own segments.
+function getWireSegments() {
+  const segs = [];
+  for (const w of wires) {
+    const d = w.pathEl.getAttribute('d');
+    const tok = d.trim().split(/[\s,]+/);
+    let cx = 0, cy = 0, i = 0;
+    while (i < tok.length) {
+      const cmd = tok[i++];
+      if (cmd === 'M') { cx = +tok[i++]; cy = +tok[i++]; }
+      else if (cmd === 'H') { const nx = +tok[i++]; segs.push({ type:'H', y:cy, xa:Math.min(cx,nx), xb:Math.max(cx,nx), wireId:w.id }); cx = nx; }
+      else if (cmd === 'V') { const ny = +tok[i++]; segs.push({ type:'V', x:cx, ya:Math.min(cy,ny), yb:Math.max(cy,ny), wireId:w.id }); cy = ny; }
+    }
+  }
+  return segs;
+}
+
+const WIRE_SEP = 5; // min px between parallel wire segments on the same axis
+
+// Returns true if a proposed H segment would overlap an existing parallel H segment
+function hOverlaps(y, xa, xb, wireSegs) {
+  const a = Math.min(xa,xb), b = Math.max(xa,xb);
+  return wireSegs.some(s => s.type==='H' && Math.abs(s.y - y) < WIRE_SEP && s.xa < b-1 && s.xb > a+1);
+}
+// Returns true if a proposed V segment would overlap an existing parallel V segment
+function vOverlaps(x, ya, yb, wireSegs) {
+  const a = Math.min(ya,yb), b = Math.max(ya,yb);
+  return wireSegs.some(s => s.type==='V' && Math.abs(s.x - x) < WIRE_SEP && s.ya < b-1 && s.yb > a+1);
+}
+
+// wireSegs: optional pre-computed segments (pass to avoid reading live DOM mid-loop)
+function wirePath(x1, y1, x2, y2, wireSegs) {
+  const M = ROUTE_M;
+  const OFF = 7; // lateral offset used when a wire lane is occupied
+  const allBoxes = getObstacleBBoxes();
+  // Exclude boxes whose interior contains the start or end pin
+  const boxes = allBoxes.filter(bx =>
+    !(x1 > bx.x1 && x1 < bx.x2 && y1 > bx.y1 && y1 < bx.y2) &&
+    !(x2 > bx.x1 && x2 < bx.x2 && y2 > bx.y1 && y2 < bx.y2)
+  );
+
+  if (!wireSegs) wireSegs = getWireSegments();
+
+  // Candidate X values for the vertical jog (H-V-H routing)
+  // Include offsets around occupied V-segment lanes so the router naturally finds a free lane
+  const xC = [
+    (x1+x2)/2, x1, x2,
+    ...allBoxes.flatMap(b => [b.x1-M, b.x2+M]),
+    ...wireSegs.filter(s => s.type==='V').flatMap(s => [s.x-OFF, s.x+OFF]),
+  ];
+  // Candidate Y values for the horizontal jog (V-H-V routing)
+  const yC = [
+    (y1+y2)/2, y1, y2,
+    ...allBoxes.flatMap(b => [b.y1-M, b.y2+M]),
+    ...wireSegs.filter(s => s.type==='H').flatMap(s => [s.y-OFF, s.y+OFF]),
+  ];
+
+  const mx0 = (x1+x2)/2, my0 = (y1+y2)/2;
+  xC.sort((a,b) => Math.abs(a-mx0) - Math.abs(b-mx0));
+  yC.sort((a,b) => Math.abs(a-my0) - Math.abs(b-my0));
+
+  // Combined check: hard obstacle free AND no same-axis wire overlap
+  const hOk = (y, xa, xb) => hClear(y,xa,xb,boxes) && !hOverlaps(y,xa,xb,wireSegs);
+  const vOk = (x, ya, yb) => vClear(x,ya,yb,boxes) && !vOverlaps(x,ya,yb,wireSegs);
+
+  // 0. Try direct 2-segment routes (H-V or V-H) — shortest possible path
+  if (hOk(y1,x1,x2) && vOk(x2,y1,y2)) return `M ${x1} ${y1} H ${x2} V ${y2}`;
+  if (vOk(x1,y1,y2) && hOk(y2,x1,x2)) return `M ${x1} ${y1} V ${y2} H ${x2}`;
+
+  // 1. Try H-V-H
+  for (const mx of xC) {
+    if (hOk(y1,x1,mx) && vOk(mx,y1,y2) && hOk(y2,mx,x2))
+      return `M ${x1} ${y1} H ${mx} V ${y2} H ${x2}`;
+  }
+
+  // 2. Try V-H-V
+  for (const my of yC) {
+    if (vOk(x1,y1,my) && hOk(my,x1,x2) && vOk(x2,my,y2))
+      return `M ${x1} ${y1} V ${my} H ${x2} V ${y2}`;
+  }
+
+  // 3. Try 4-segment routes
+  for (const mx of xC) {
+    for (const my of yC) {
+      if (hOk(y1,x1,mx) && vOk(mx,y1,my) && hOk(my,mx,x2) && vOk(x2,my,y2))
+        return `M ${x1} ${y1} H ${mx} V ${my} H ${x2} V ${y2}`;
+      if (vOk(x1,y1,my) && hOk(my,x1,mx) && vOk(mx,my,y2) && hOk(y2,mx,x2))
+        return `M ${x1} ${y1} V ${my} H ${mx} V ${y2} H ${x2}`;
+    }
+  }
+
+  // 4. Fallback: relax wire-overlap constraint, try 2-seg then 3-seg obstacle-only
+  if (hClear(y1,x1,x2,boxes) && vClear(x2,y1,y2,boxes)) return `M ${x1} ${y1} H ${x2} V ${y2}`;
+  if (vClear(x1,y1,y2,boxes) && hClear(y2,x1,x2,boxes)) return `M ${x1} ${y1} V ${y2} H ${x2}`;
+  for (const mx of xC) {
+    if (hClear(y1,x1,mx,boxes) && vClear(mx,y1,y2,boxes) && hClear(y2,mx,x2,boxes))
+      return `M ${x1} ${y1} H ${mx} V ${y2} H ${x2}`;
+  }
+  return `M ${x1} ${y1} H ${mx0} V ${y2} H ${x2}`;
+}
+
+function createWire(fromComp, fromPin, toComp, toPin) {
+  const id = 'wire_' + (++wireIdCounter);
+  const p1 = getAbsPinPos(fromComp, fromPin);
+  const p2 = getAbsPinPos(toComp, toPin);
+  const d = wirePath(p1.x, p1.y, p2.x, p2.y);
+
+  const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  pathEl.setAttribute('d', d);
+  pathEl.setAttribute('class', 'as-wire');
+  pathEl.setAttribute('data-wire', id);
+
+  const hitEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  hitEl.setAttribute('d', d);
+  hitEl.setAttribute('class', 'as-wire-hit');
+  hitEl.setAttribute('data-wire', id);
+
+  wiresLayer.appendChild(pathEl);
+  wiresLayer.appendChild(hitEl);
+
+  const wire = { id, from: { comp: fromComp, pin: fromPin }, to: { comp: toComp, pin: toPin }, pathEl, hitEl };
+  wires.push(wire);
+
+  hitEl.addEventListener('click', () => {
+    if (appMode === 'wire') return;
+    selectedWire = id;
+    selectedComp = null;
+    updateSelectionVisual();
+  });
+
+  updatePinConnectedState();
+  updateComponentsFromPins();
+  return wire;
+}
+
+function updateWirePositions() {
+  // Re-route each wire against hard obstacles only (no wire-wire overlap avoidance).
+  // Overlap avoidance is only applied when a new wire is first created; applying
+  // it here too causes wires to push each other to extreme positions on every
+  // re-route call, producing the "huge detour" glitch.
+  for (const w of wires) {
+    const p1 = getAbsPinPos(w.from.comp, w.from.pin);
+    const p2 = getAbsPinPos(w.to.comp, w.to.pin);
+    const d = wirePath(p1.x, p1.y, p2.x, p2.y, [] /* no wire segs */);
+    w.pathEl.setAttribute('d', d);
+    w.hitEl.setAttribute('d', d);
+  }
+}
+
+function deleteWire(id) {
+  const idx = wires.findIndex(w => w.id === id);
+  if (idx < 0) return;
+  wires[idx].pathEl.remove();
+  wires[idx].hitEl.remove();
+  wires.splice(idx, 1);
+  updatePinConnectedState();
+  updateComponentsFromPins();
+}
+
+function updatePinConnectedState() {
+  // Reset all hit circles (CSS propagates to adjacent visual circles)
+  document.querySelectorAll('[data-pin]').forEach(el => el.classList.remove('connected'));
+  for (const w of wires) {
+    const fromEl = document.querySelector(`[data-comp="${w.from.comp}"][data-pin="${w.from.pin}"]`);
+    const toEl   = document.querySelector(`[data-comp="${w.to.comp}"][data-pin="${w.to.pin}"]`);
+    if (fromEl) fromEl.classList.add('connected');
+    if (toEl)   toEl.classList.add('connected');
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Selection
+// ─────────────────────────────────────────────
+let selectedWire = null;
+let selectedComp = null;
+
+function updateSelectionVisual() {
+  // Wires
+  document.querySelectorAll('.as-wire').forEach(el => {
+    el.classList.toggle('selected', el.dataset.wire === selectedWire);
+  });
+  // Components
+  document.querySelectorAll('.as-comp-body').forEach(el => {
+    el.classList.toggle('selected-comp', el.dataset.comp === selectedComp);
+  });
+}
+
+// ─────────────────────────────────────────────
+//  Mode: select | wire
+// ─────────────────────────────────────────────
+let appMode = 'idle'; // 'idle' | 'running'
+
+function setMode(mode) {
+  appMode = mode;
+  if (mode !== 'running') cancelPendingWire();
+  updateBadge();
+}
+
+function updateBadge() {
+  const badge = document.getElementById('asModeBadge');
+  const wrap  = document.getElementById('asCanvasWrap');
+  if (appMode === 'running') {
+    badge.textContent = 'RUNNING';
+    badge.className   = 'as-mode-badge running';
+  } else if (pendingWire) {
+    badge.textContent = 'WIRING';
+    badge.className   = 'as-mode-badge wire';
+    wrap.classList.add('wire-mode');
+    return;
+  } else {
+    badge.textContent = 'IDLE';
+    badge.className   = 'as-mode-badge';
+  }
+  wrap.classList.remove('wire-mode');
+}
+
+function cancelPendingWire() {
+  pendingWire = null;
+  wirePreviewLayer.innerHTML = '';
+  document.querySelectorAll('[data-pin].pending').forEach(el => el.classList.remove('pending'));
+  updateBadge();
+}
+
+// ─────────────────────────────────────────────
+//  SVG-level component drag (single handler, no stacking)
+// ─────────────────────────────────────────────
+let dragComp      = null;
+let dragMoved     = false;
+let dragLastClient = { x: 0, y: 0 };
+
+svg.addEventListener('mousedown', (e) => {
+  if (e.target.closest('[data-pin]')) return;
+  const compEl = e.target.closest('[data-comp]');
+
+  if (appMode === 'running') {
+    // While running, only allow button component press
+    if (!compEl || compEl.dataset.comp === 'uno') return;
+    const comp = components.find(c => c.id === compEl.dataset.comp);
+    if (!comp || comp.type !== 'button') return;
+    dragComp = comp; dragMoved = false;
+    dragLastClient = { x: e.clientX, y: e.clientY };
+    e.stopPropagation(); e.preventDefault();
+    return;
+  }
+
+  if (pendingWire) { cancelPendingWire(); return; }
+  if (!compEl) return;
+  const compId = compEl.dataset.comp;
+  if (compId === 'uno') return;
+  const comp = components.find(c => c.id === compId);
+  if (!comp) return;
+
+  dragComp       = comp;
+  dragMoved      = false;
+  dragLastClient = { x: e.clientX, y: e.clientY };
+  selectedComp   = compId;
+  selectedWire   = null;
+  updateSelectionVisual();
+  e.stopPropagation();
+  e.preventDefault();
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!dragComp) return;
+  // Incremental delta in client space → convert to SVG units
+  const rect   = svg.getBoundingClientRect();
+  const scaleX = viewBox.w / rect.width;
+  const scaleY = viewBox.h / rect.height;
+  const dx = (e.clientX - dragLastClient.x) * scaleX;
+  const dy = (e.clientY - dragLastClient.y) * scaleY;
+  dragLastClient = { x: e.clientX, y: e.clientY };
+  if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) dragMoved = true;
+  dragComp.x += dx;
+  dragComp.y += dy;
+  dragComp.svgEl.setAttribute('transform', `translate(${dragComp.x},${dragComp.y})`);
+  updateWirePositions();
+});
+
+window.addEventListener('mouseup', () => {
+  // Button click (no drag movement) → toggle pressed state
+  if (dragComp && !dragMoved && dragComp.type === 'button') {
+    dragComp.state.pressed = !dragComp.state.pressed;
+    renderComponent(dragComp);
+    updateComponentsFromPins();
+    updateWirePositions();
+    updatePinConnectedState();
+  }
+  dragComp  = null;
+  dragMoved = false;
+  if (isPanning) { isPanning = false; svg.style.cursor = ''; }
+});
+
+// ─────────────────────────────────────────────
+//  Pin interaction
+// ─────────────────────────────────────────────
+function setupPinInteraction(el) {
+  el.addEventListener('mouseenter', () => el.classList.add('hovered'));
+  el.addEventListener('mouseleave', () => el.classList.remove('hovered'));
+  el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (appMode !== 'wire') return;
+    const compId = el.dataset.comp;
+    const pinId  = el.dataset.pin;
+    const pos    = getAbsPinPos(compId, pinId);
+
+    if (!pendingWire) {
+      // Start wire
+      pendingWire = { comp: compId, pin: pinId, cx: pos.x, cy: pos.y };
+      el.classList.add('pending');
+    } else {
+      // Avoid self-connect on same pin
+      if (pendingWire.comp === compId && pendingWire.pin === pinId) {
+        cancelPendingWire();
+        return;
+      }
+      createWire(pendingWire.comp, pendingWire.pin, compId, pinId);
+      cancelPendingWire();
+    }
+  });
+}
+
+// Setup pin interaction for all pins on the Uno after render
+function setupUnoPinInteractions() {
+  document.querySelectorAll('#as-uno-pins [data-pin]').forEach(el => {
+    setupPinInteraction(el);
+  });
+}
+
+// Wire preview follows mouse
+svg.addEventListener('mousemove', (e) => {
+  if (!pendingWire) return;
+  const pt = svgPoint(e.clientX, e.clientY);
+  const d = wirePath(pendingWire.cx, pendingWire.cy, pt.x, pt.y);
+  wirePreviewLayer.innerHTML = `<path d="${d}" stroke="rgba(0,151,157,0.5)" stroke-width="2" fill="none" stroke-dasharray="6 3" pointer-events="none"/>`;
+});
+
+svg.addEventListener('click', (e) => {
+  if (e.target === svg || e.target.closest('#as-uno:not([data-pin])')) {
+    selectedWire = null;
+    selectedComp = null;
+    updateSelectionVisual();
+  }
+});
+
+// ─────────────────────────────────────────────
+//  Keyboard shortcuts
+// ─────────────────────────────────────────────
+window.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'Escape' || e.key === '1') { cancelPendingWire(); }
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    if (selectedWire) { deleteWire(selectedWire); selectedWire = null; }
+    if (selectedComp) {
+      const idx = components.findIndex(c => c.id === selectedComp);
+      if (idx >= 0) {
+        components[idx].svgEl?.remove();
+        // Remove attached wires
+        const toRemove = wires.filter(w => w.from.comp === selectedComp || w.to.comp === selectedComp).map(w => w.id);
+        toRemove.forEach(id => deleteWire(id));
+        components.splice(idx, 1);
+        selectedComp = null;
+        updateSelectionVisual();
+        updateComponentsFromPins();
+      }
+    }
+  }
+});
+
+// ─────────────────────────────────────────────
+//  Component update from pin simulation
+// ─────────────────────────────────────────────
+function updateComponentsFromPins() {
+  // Build a voltage map for all wire-connected nodes
+  const nodeVoltage = new Map(); // key: "compId:pinId" → voltage
+
+  function nodeKey(comp, pin) { return `${comp}:${pin}`; }
+
+  // Seed known voltages
+  for (const p of UNO_PINS) {
+    nodeVoltage.set(nodeKey('uno', p.id), pinVoltage(p.id));
+  }
+  // Propagate through wires (simple flood-fill, a few iterations)
+  for (let iter = 0; iter < 5; iter++) {
+    for (const w of wires) {
+      const kf = nodeKey(w.from.comp, w.from.pin);
+      const kt = nodeKey(w.to.comp, w.to.pin);
+      const vf = nodeVoltage.get(kf);
+      const vt = nodeVoltage.get(kt);
+
+      // Button short-circuit
+      const fromComp = components.find(c => c.id === w.from.comp);
+      const toComp   = components.find(c => c.id === w.to.comp);
+
+      if (vf !== undefined && vt === undefined) nodeVoltage.set(kt, vf);
+      if (vt !== undefined && vf === undefined) nodeVoltage.set(kf, vt);
+
+      // Button pressed: short P1 and P2 — lower voltage wins (GND overrides pull-up)
+      for (const comp of components) {
+        if (comp.type === 'button' && comp.state.pressed) {
+          const k1 = nodeKey(comp.id, 'P1');
+          const k2 = nodeKey(comp.id, 'P2');
+          const v1 = nodeVoltage.get(k1);
+          const v2 = nodeVoltage.get(k2);
+          if (v1 !== undefined && v2 === undefined) nodeVoltage.set(k2, v1);
+          else if (v2 !== undefined && v1 === undefined) nodeVoltage.set(k1, v2);
+          else if (v1 !== undefined && v2 !== undefined) {
+            const v = Math.min(v1, v2); // GND (0V) wins over pull-up (5V)
+            nodeVoltage.set(k1, v);
+            nodeVoltage.set(k2, v);
+          }
+        }
+      }
+    }
+  }
+
+  // Update INPUT_PULLUP pins that receive button signal
+  for (const w of wires) {
+    const tryUpdate = (comp, pin, otherComp, otherPin) => {
+      const idx = pinDigitalIndex(pin);
+      if (idx < 0) return;
+      if (pinModes[idx] !== 'INPUT_PULLUP' && pinModes[idx] !== 'INPUT') return;
+      const v = nodeVoltage.get(nodeKey(otherComp, otherPin));
+      if (v !== undefined) pinState[idx] = v > 2 ? 1 : 0;
+    };
+    tryUpdate(w.from.comp, w.from.pin, w.to.comp, w.to.pin);
+    tryUpdate(w.to.comp, w.to.pin, w.from.comp, w.from.pin);
+  }
+
+  // Update LED components
+  for (const comp of components) {
+    if (comp.type !== 'led') continue;
+    const va = nodeVoltage.get(nodeKey(comp.id, 'A')) ?? 0;
+    const vk = nodeVoltage.get(nodeKey(comp.id, 'K')) ?? 0;
+    const wasOn = comp.state.on;
+    comp.state.on = (va - vk) > 1.5;
+    if (comp.state.on !== wasOn) {
+      renderComponent(comp);
+      setupCompDrag(comp);
+      rewireAfterRender(comp);
+      // Pin positions don't change when LED state changes, so no re-routing needed.
+      updatePinConnectedState();
+    }
+  }
+
+  updateBuiltinLed();
+}
+
+// ─────────────────────────────────────────────
+//  Serial monitor
+// ─────────────────────────────────────────────
+let simStartTime = 0;
+
+function serialPrint(msg) {
+  const out = document.getElementById('asSerialOutput');
+  const elapsed = simStartTime ? ((Date.now() - simStartTime) / 1000).toFixed(2) : '0.00';
+  const line = document.createElement('span');
+  line.className = 'as-serial-line';
+  line.innerHTML = `<span class="as-serial-ts">[${elapsed}s]</span>${escapeHtml(String(msg))}`;
+  out.appendChild(line);
+  out.scrollTop = out.scrollHeight;
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+document.getElementById('asSerialClear').addEventListener('click', () => {
+  document.getElementById('asSerialOutput').innerHTML = '';
+});
+
+// ─────────────────────────────────────────────
+//  Arduino transpiler
+// ─────────────────────────────────────────────
+function transpile(src) {
+  return src
+    .replace(/#include[^\n]*/g, '')
+    .replace(/#define\s+(\w+)\s+([^\n]+)/g, 'const $1 = $2;')
+    .replace(/#[^\n]*/g, '')
+    .replace(/\b(void|int|float|double|bool|char|long|byte|unsigned\s+int|String|uint8_t|uint16_t|int8_t|int16_t)\s+(\w+)\s*\(([^)]*)\)/g, (m, type, name, params) => {
+      const cleanParams = params.replace(/\b(int|float|double|bool|char|long|byte|unsigned\s+int|String|uint8_t|uint16_t)\s+/g, '');
+      return `async function ${name}(${cleanParams})`;
+    })
+    .replace(/\b(int|float|double|bool|char|long|byte|unsigned\s+int|String|uint8_t|uint16_t|int8_t|int16_t)\s+(\w+)/g, 'let $2')
+    .replace(/\bdelay\s*\(/g, 'await $__delay(')
+    .replace(/\bdelayMicroseconds\s*\(/g, 'await $__delayUs(');
+}
+
+// ─────────────────────────────────────────────
+//  Runner
+// ─────────────────────────────────────────────
+let stopSketch = null;
+let simSpeed = 1.0;
+
+function getSketchCode() {
+  if (editorView && typeof editorView.getValue === 'function') return editorView.getValue();
+  const ta = document.querySelector('#as-editor-mount textarea');
+  return ta ? ta.value : DEFAULT_SKETCH;
+}
+
+async function runSketch() {
+  if (stopSketch) { stopSketch(); stopSketch = null; }
+
+  const code = getSketchCode();
+  let transpiled;
+  try {
+    transpiled = transpile(code);
+  } catch (e) {
+    serialPrint('[transpile error] ' + e.message);
+    return;
+  }
+
+  simStartTime = Date.now();
+  let stopped = false;
+
+  const api = {
+    pinMode: (pin, mode) => {
+      pin = Number(pin);
+      if (pin >= 0 && pin < 20) pinModes[pin] = mode;
+    },
+    digitalWrite: (pin, val) => {
+      pin = Number(pin);
+      if (pin >= 0 && pin < 20) {
+        pinState[pin] = val === 1 || val === true ? 1 : 0;
+        updateComponentsFromPins();
+      }
+    },
+    digitalRead: (pin) => {
+      pin = Number(pin);
+      if (pin < 0 || pin >= 20) return 0;
+      if (pinModes[pin] === 'INPUT_PULLUP') return pinState[pin]; // 1=HIGH (pull-up), 0=LOW (driven by GND)
+      return pinState[pin];
+    },
+    analogWrite: (pin, val) => {
+      pin = Number(pin);
+      if (pin >= 0 && pin < 20) {
+        pinState[pin] = Math.max(0, Math.min(255, Number(val)));
+        updateComponentsFromPins();
+      }
+    },
+    analogRead: (pin) => {
+      const idx = pin + 14;
+      return pinState[idx] ? Math.round(pinState[idx] * 204) : 0;
+    },
+    millis: () => Date.now() - simStartTime,
+    micros: () => (Date.now() - simStartTime) * 1000,
+    HIGH: 1, LOW: 0,
+    INPUT: 'INPUT', OUTPUT: 'OUTPUT', INPUT_PULLUP: 'INPUT_PULLUP', INPUT_PULLDOWN: 'INPUT_PULLDOWN',
+    Serial: {
+      begin: () => {},
+      println: (v) => serialPrint(v ?? ''),
+      print:   (v) => serialPrint(v ?? ''),
+      write:   (v) => serialPrint(v ?? ''),
+    },
+    $__delay: (ms) => new Promise((res) => {
+      if (stopped) return res();
+      const adjusted = Math.max(0, Number(ms) / simSpeed);
+      setTimeout(res, adjusted);
+    }),
+    $__delayUs: (us) => new Promise((res) => {
+      if (stopped) return res();
+      setTimeout(res, Math.max(0, Number(us) / 1000 / simSpeed));
+    }),
+    $__stopped: () => stopped,
+  };
+
+  const args = [
+    'pinMode','digitalWrite','digitalRead','analogWrite','analogRead',
+    'millis','micros','HIGH','LOW','INPUT','OUTPUT','INPUT_PULLUP','INPUT_PULLDOWN',
+    'Serial','$__delay','$__delayUs','$__stopped',
+  ];
+  const argVals = args.map(k => api[k]);
+
+  const body = `${transpiled}
+  if(typeof setup==='function') await setup();
+  while(!$__stopped()){ if(typeof loop==='function') await loop(); await $__delay(0); }`;
+
+  let fn;
+  try {
+    const AsyncFn = Object.getPrototypeOf(async function(){}).constructor;
+    fn = new AsyncFn(...args, body);
+  } catch (e) {
+    serialPrint('[compile error] ' + e.message);
+    return;
+  }
+
+  fn(...argVals).catch(e => {
+    if (!stopped) serialPrint('[runtime error] ' + e.message);
+  });
+
+  stopSketch = () => { stopped = true; };
+}
+
+// ─────────────────────────────────────────────
+//  Toolbar controls
+// ─────────────────────────────────────────────
+const btnRun  = document.getElementById('asBtnRun');
+const btnStop = document.getElementById('asBtnStop');
+const speedEl = document.getElementById('asSpeed');
+const speedValEl = document.getElementById('asSpeedVal');
+
+btnRun.addEventListener('click', () => {
+  runSketch();
+  btnRun.disabled  = true;
+  btnStop.disabled = false;
+  setMode('running');
+});
+
+btnStop.addEventListener('click', () => {
+  if (stopSketch) { stopSketch(); stopSketch = null; }
+  btnRun.disabled  = false;
+  btnStop.disabled = true;
+  // Reset pin states
+  pinState.fill(0);
+  updateComponentsFromPins();
+  setMode('idle');
+  serialPrint('[stopped]');
+});
+
+speedEl.addEventListener('input', () => {
+  simSpeed = parseFloat(speedEl.value);
+  speedValEl.textContent = simSpeed.toFixed(1) + 'x';
+});
+
+// Palette: click a component card to add it near the centre of the visible canvas
+document.getElementById('asPalette').addEventListener('click', (e) => {
+  const item = e.target.closest('[data-add]');
+  if (!item) return;
+  const type = item.dataset.add;
+  // Place near canvas centre in SVG coords
+  const cx = viewBox.x + viewBox.w * 0.62 + (Math.random() * 40 - 20);
+  const cy = viewBox.y + viewBox.h * 0.45 + (Math.random() * 40 - 20);
+  const comp = addComponent(type, cx, cy);
+  rewireAfterRender(comp);
+  selectedComp = comp.id;
+  selectedWire = null;
+  updateSelectionVisual();
+});
+
+// ─────────────────────────────────────────────
+//  Initial render
+// ─────────────────────────────────────────────
+renderUno();
+setupUnoPinInteractions();
+
+// Canvas starts blank — add components from the palette on the right
+
+// ─────────────────────────────────────────────
+//  Delegate SVG pin events (for dynamically added pins)
+// ─────────────────────────────────────────────
+svg.addEventListener('click', (e) => {
+  const pinEl = e.target.closest('[data-pin]');
+  if (!pinEl) return;
+  if (appMode === 'running') return;
+  e.stopPropagation();
+  const compId = pinEl.dataset.comp;
+  const pinId  = pinEl.dataset.pin;
+  const pos    = getAbsPinPos(compId, pinId);
+
+  if (!pendingWire) {
+    pendingWire = { comp: compId, pin: pinId, cx: pos.x, cy: pos.y };
+    pinEl.classList.add('pending');
+    updateBadge();
+  } else {
+    if (pendingWire.comp === compId && pendingWire.pin === pinId) {
+      cancelPendingWire();
+      return;
+    }
+    createWire(pendingWire.comp, pendingWire.pin, compId, pinId);
+    cancelPendingWire();
+  }
+}, true);
+
+// ─────────────────────────────────────────────
+//  Example sketches
+// ─────────────────────────────────────────────
+const EXAMPLES = {
+  'blink': {
+    code: `void setup() {
+  pinMode(13, OUTPUT);
+  Serial.begin(9600);
+  Serial.println("Blink ready");
+}
+
+void loop() {
+  digitalWrite(13, HIGH);
+  Serial.println("LED ON");
+  delay(1000);
+  digitalWrite(13, LOW);
+  Serial.println("LED OFF");
+  delay(1000);
+}`,
+    circuit: null, // uses built-in LED only
+  },
+
+  'button-led': {
+    code: `#define LED_PIN 13
+#define BTN_PIN 2
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(BTN_PIN, INPUT_PULLUP);
+  Serial.begin(9600);
+  Serial.println("Ready — press the button");
+}
+
+void loop() {
+  if (digitalRead(BTN_PIN) == LOW) {
+    digitalWrite(LED_PIN, HIGH);
+    Serial.println("Button pressed — LED ON");
+    delay(200);
+  } else {
+    digitalWrite(LED_PIN, LOW);
+    delay(50);
+  }
+}`,
+    circuit(addC, wire) {
+      // Button: P2 → D2, P1 → GND (INPUT_PULLUP — button pulls D2 LOW when pressed)
+      const btn = addC('button', 50, 165);
+      wire(btn.id, 'P2', 'uno', 'd2');
+      wire(btn.id, 'P1', 'uno', 'gnd2');
+      // LED: A → D13 (signal), K → GND
+      const led = addC('led', 490, 30);
+      wire(led.id, 'A', 'uno', 'd13');
+      wire(led.id, 'K', 'uno', 'gnd1');
+    },
+  },
+
+  'fade': {
+    code: `int brightness = 0;
+int fadeStep = 5;
+
+void setup() {
+  pinMode(9, OUTPUT);
+  Serial.begin(9600);
+  Serial.println("Fading...");
+}
+
+void loop() {
+  analogWrite(9, brightness);
+  Serial.println(brightness);
+  brightness += fadeStep;
+  if (brightness >= 255 || brightness <= 0) {
+    fadeStep = -fadeStep;
+  }
+  delay(30);
+}`,
+    circuit(addC, wire) {
+      // LED on PWM pin 9: A → D9, K → GND
+      const led = addC('led', 390, 30);
+      wire(led.id, 'A', 'uno', 'd9');
+      wire(led.id, 'K', 'uno', 'gnd1');
+    },
+  },
+
+  'serial-echo': {
+    code: `int counter = 0;
+
+void setup() {
+  Serial.begin(9600);
+  Serial.println("Counter started");
+}
+
+void loop() {
+  Serial.print("Count: ");
+  Serial.println(counter);
+  counter++;
+  delay(500);
+}`,
+    circuit: null,
+  },
+
+  'traffic': {
+    code: `#define RED_PIN    11
+#define YELLOW_PIN 12
+#define GREEN_PIN  13
+
+void setup() {
+  pinMode(RED_PIN,    OUTPUT);
+  pinMode(YELLOW_PIN, OUTPUT);
+  pinMode(GREEN_PIN,  OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  digitalWrite(RED_PIN, HIGH);
+  Serial.println("RED");
+  delay(3000);
+
+  digitalWrite(RED_PIN, LOW);
+  digitalWrite(YELLOW_PIN, HIGH);
+  Serial.println("YELLOW");
+  delay(1000);
+
+  digitalWrite(YELLOW_PIN, LOW);
+  digitalWrite(GREEN_PIN, HIGH);
+  Serial.println("GREEN");
+  delay(3000);
+
+  digitalWrite(GREEN_PIN, LOW);
+}`,
+    circuit(addC, wire) {
+      // Three LEDs above the board, A→signal pin, K→GND
+      const r = addC('led', 360, 20);
+      wire(r.id, 'A', 'uno', 'd11');
+      wire(r.id, 'K', 'uno', 'gnd1');
+      r.state.color = '#e35f5f';
+
+      const y = addC('led', 420, 20);
+      wire(y.id, 'A', 'uno', 'd12');
+      wire(y.id, 'K', 'uno', 'gnd2');
+      y.state.color = '#f0a030';
+
+      const g = addC('led', 480, 20);
+      wire(g.id, 'A', 'uno', 'd13');
+      wire(g.id, 'K', 'uno', 'gnd1');
+      g.state.color = '#50c878';
+    },
+  },
+};
+
+function clearCanvas() {
+  if (stopSketch) { stopSketch(); stopSketch = null; }
+  [...wires].forEach(w => deleteWire(w.id));
+  [...components].forEach(c => c.svgEl?.remove());
+  components.length = 0;
+  selectedComp = null; selectedWire = null;
+  pinState.fill(0);
+  pinModes.fill('INPUT');
+  updateBuiltinLed();
+  updateSelectionVisual();
+  document.getElementById('asBtnRun').disabled = false;
+  document.getElementById('asBtnStop').disabled = true;
+  setMode('idle');
+}
+
+function loadExample(name) {
+  const ex = EXAMPLES[name];
+  if (!ex) return;
+
+  // Load code
+  if (editorView && typeof editorView.setValue === 'function') {
+    editorView.setValue(ex.code);
+  } else {
+    const ta = document.querySelector('#as-editor-mount textarea');
+    if (ta) ta.value = ex.code;
+  }
+
+  // Set up circuit
+  clearCanvas();
+  if (typeof ex.circuit === 'function') {
+    ex.circuit(
+      (type, x, y) => {
+        const c = addComponent(type, x, y);
+        rewireAfterRender(c);
+        return c;
+      },
+      (fromComp, fromPin, toComp, toPin) => createWire(fromComp, fromPin, toComp, toPin)
+    );
+  }
+}
+
+(function () {
+  const btn  = document.getElementById('asExamplesBtn');
+  const drop = document.getElementById('asExamplesDrop');
+
+  // Position dropdown below button using fixed coords
+  function openDrop() {
+    const r = btn.getBoundingClientRect();
+    drop.style.top  = (r.bottom + 6) + 'px';
+    drop.style.left = r.left + 'px';
+    drop.classList.add('open');
+  }
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    drop.classList.contains('open') ? drop.classList.remove('open') : openDrop();
+  });
+
+  drop.addEventListener('click', (e) => {
+    const item = e.target.closest('[data-example]');
+    if (!item) return;
+    loadExample(item.dataset.example);
+    drop.classList.remove('open');
+  });
+
+  document.addEventListener('click', () => drop.classList.remove('open'));
+})();
+
+// ─────────────────────────────────────────────
+//  Sidebar resize
+// ─────────────────────────────────────────────
+(function () {
+  const handle   = document.getElementById('asResizeHandle');
+  const sidebar  = document.querySelector('.as-sidebar');
+  const MIN_W = 160, MAX_W = 640;
+  let resizing = false, startX = 0, startW = 0;
+
+  handle.addEventListener('mousedown', (e) => {
+    resizing = true;
+    startX   = e.clientX;
+    startW   = sidebar.getBoundingClientRect().width;
+    handle.classList.add('dragging');
+    document.body.style.cursor    = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!resizing) return;
+    const w = Math.min(MAX_W, Math.max(MIN_W, startW + (e.clientX - startX)));
+    sidebar.style.width = w + 'px';
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!resizing) return;
+    resizing = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor    = '';
+    document.body.style.userSelect = '';
+    // Monaco needs to know the container resized
+    if (editorView && typeof editorView.layout === 'function') editorView.layout();
+  });
+})();
+
+// ─────────────────────────────────────────────
+//  Cleanup
+// ─────────────────────────────────────────────
+window.__asCleanup = () => {
+  document.body.classList.remove('as-page');
+  if (stopSketch) { stopSketch(); stopSketch = null; }
+  if (editorView && typeof editorView.dispose === 'function') editorView.dispose();
+  window.__asCleanup = null;
+};
+</script>

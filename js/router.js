@@ -13,9 +13,10 @@ const ROUTES = {
   '/':          '/pages/home.html',
   '/projects':  '/pages/projects.html',
   '/project':   '/pages/project.html',
-  '/iyai':      '/pages/iyai.html',
-  '/designer':  '/pages/designer.html',
-  '/model-map': '/pages/model-map.html',
+  '/iyai':         '/pages/iyai.html',
+  '/designer':     '/pages/designer.html',
+  '/model-map':    '/pages/model-map.html',
+  '/arduino-sim':  '/pages/arduino-sim.html',
 };
 
 // Cache fetched fragments so we don't re-fetch on back/forward
@@ -68,18 +69,42 @@ function initPage() {
 
   if (typeof startShowcaseAnimations === 'function') startShowcaseAnimations();
 
+  // Scroll-triggered entrance animations + Motion progress bar
+  if (typeof window.initScrollAnimations === 'function') window.initScrollAnimations();
+
+  // Move focus to main content for screen readers after page swap
+  const mainEl = document.getElementById('app');
+  if (mainEl) {
+    mainEl.setAttribute('tabindex', '-1');
+    mainEl.focus({ preventScroll: true });
+  }
+
   // Scroll to top on page swap
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// Map routes to the body class they need (for footer hiding etc.)
+const ROUTE_BODY_CLASS = {
+  '/designer':    'ib-page',
+  '/model-map':   'mm-page',
+  '/arduino-sim': 'as-page',
+};
+
 // Transition: fade out → swap → fade in
-async function swapContent(html) {
+async function swapContent(html, pathname) {
   if (typeof stopShowcaseAnimations === 'function') stopShowcaseAnimations();
   if (typeof window.__ibCleanup === 'function') window.__ibCleanup();
   if (typeof window.__bmCleanup === 'function') window.__bmCleanup();
   if (typeof window.__mmCleanup === 'function') window.__mmCleanup();
+  if (typeof window.__asCleanup === 'function') window.__asCleanup();
+  // Apply the incoming page's body class BEFORE removing old ones so the footer
+  // never flashes during the transition gap.
+  const nextClass = ROUTE_BODY_CLASS[pathname] || null;
+  if (nextClass) document.body.classList.add(nextClass);
   document.body.classList.remove('ib-page');
   document.body.classList.remove('mm-page');
+  document.body.classList.remove('as-page');
+  if (nextClass) document.body.classList.add(nextClass);
   app.classList.add('page-exit');
   await new Promise(r => setTimeout(r, 180));
   app.innerHTML = html;
@@ -208,7 +233,7 @@ async function navigate(pathname, pushState = true) {
     html = `<section class="page-hero"><div class="container"><p style="color:var(--foreground-muted)">Page not found.</p></div></section>`;
   }
 
-  await swapContent(html);
+  await swapContent(html, pathname);
 
   if (pushState) {
     history.pushState({ pathname }, '', pathname);
@@ -220,7 +245,8 @@ async function navigate(pathname, pushState = true) {
     '/projects':  'Projects | imluri',
     '/iyai':      'IYAI Bridge | imluri',
     '/designer':  'Designer | imluri',
-    '/model-map': '3D Model Mapper | imluri',
+    '/model-map':    '3D Model Mapper | imluri',
+    '/arduino-sim':  'Arduino Sim | imluri',
   };
   if (pathname.startsWith('/project/')) {
     const slug = pathname.replace('/project/', '');
