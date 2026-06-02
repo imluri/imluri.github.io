@@ -382,15 +382,15 @@ nav {
      cubic-bezier(0.65, 0, 0.35, 1) is the "expo out" curve — barely
      moves for the first ~120ms, then glides into place. */
   transition:
-    max-width 850ms cubic-bezier(0.65, 0, 0.35, 1),
-    background-color 850ms cubic-bezier(0.65, 0, 0.35, 1),
-    border-color 850ms cubic-bezier(0.65, 0, 0.35, 1),
-    border-radius 850ms cubic-bezier(0.65, 0, 0.35, 1),
-    backdrop-filter 850ms cubic-bezier(0.65, 0, 0.35, 1),
-    -webkit-backdrop-filter 850ms cubic-bezier(0.65, 0, 0.35, 1),
-    box-shadow 850ms cubic-bezier(0.65, 0, 0.35, 1),
-    top 850ms cubic-bezier(0.65, 0, 0.35, 1),
-    padding 850ms cubic-bezier(0.65, 0, 0.35, 1) !important;
+    max-width 680ms cubic-bezier(0.65, 0, 0.35, 1),
+    background-color 680ms cubic-bezier(0.65, 0, 0.35, 1),
+    border-color 680ms cubic-bezier(0.65, 0, 0.35, 1),
+    border-radius 680ms cubic-bezier(0.65, 0, 0.35, 1),
+    backdrop-filter 680ms cubic-bezier(0.65, 0, 0.35, 1),
+    -webkit-backdrop-filter 680ms cubic-bezier(0.65, 0, 0.35, 1),
+    box-shadow 680ms cubic-bezier(0.65, 0, 0.35, 1),
+    top 680ms cubic-bezier(0.65, 0, 0.35, 1),
+    padding 680ms cubic-bezier(0.65, 0, 0.35, 1) !important;
 }
 
 /* Docked = floating pill, clearly detached from the viewport edge */
@@ -416,7 +416,7 @@ nav.is-docked .nav-inner {
   height: 52px !important;
 }
 nav .nav-inner {
-  transition: height 850ms cubic-bezier(0.65, 0, 0.35, 1), padding 850ms cubic-bezier(0.65, 0, 0.35, 1) !important;
+  transition: height 680ms cubic-bezier(0.65, 0, 0.35, 1), padding 680ms cubic-bezier(0.65, 0, 0.35, 1) !important;
 }
 
 /* Push the page content down so the docked pill doesn't overlap content */

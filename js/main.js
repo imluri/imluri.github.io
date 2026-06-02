@@ -620,6 +620,10 @@ function startShowcaseAnimations() {
   function snapTo(y) {
     cancelSmooth();
     locked = true;
+    // Pre-fire the nav dock/undock now, in lockstep with the scroll. Because
+    // we already know the destination, the nav animates over the same 680ms
+    // instead of waiting for scrollY to cross its threshold mid-glide.
+    document.dispatchEvent(new CustomEvent('navsnap', { detail: { y } }));
     const from     = window.scrollY;
     const distance = y - from;
     const duration = 680;
@@ -636,6 +640,7 @@ function startShowcaseAnimations() {
         window.scrollTo(0, y);
         syncSmooth();
         locked = false;
+        document.dispatchEvent(new CustomEvent('navsnapend', { detail: { y } }));
       }
     }
     requestAnimationFrame(step);
