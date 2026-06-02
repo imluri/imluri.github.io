@@ -360,27 +360,37 @@ nav {
   left: 0 !important;
   right: 0 !important;
   z-index: 100 !important;
-  background: transparent !important;
-  background-color: transparent !important;
-  border: 0 !important;
-  border-bottom: 0 !important;
+  /* Border-width is always 1px so the docked transition only swaps the
+     colour from transparent → cream — no width snap, no white edge */
+  border: 1px solid transparent !important;
+  border-bottom: 1px solid transparent !important;
+  background-color: rgba(4, 6, 8, 0) !important;
   border-radius: 0 !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: none !important;
+  backdrop-filter: blur(0px) saturate(100%) !important;
+  -webkit-backdrop-filter: blur(0px) saturate(100%) !important;
+  /* Shadow stack is always present, but invisible at top (0 alpha) so
+     the transition crossfades smoothly instead of popping in */
+  box-shadow:
+    0 1px 0 rgba(236, 235, 231, 0) inset,
+    0 24px 60px -28px rgba(0, 0, 0, 0),
+    0 8px 24px -12px rgba(0, 0, 0, 0) !important;
   margin: 0 auto !important;
-  max-width: none !important;
+  max-width: 100% !important;
   padding: 8px 0 !important;
+  will-change: max-width, top, background-color, border-radius, backdrop-filter, box-shadow !important;
+  /* Single duration + easing so every property lands at the same beat.
+     cubic-bezier(0.65, 0, 0.35, 1) is the "expo out" curve — barely
+     moves for the first ~120ms, then glides into place. */
   transition:
-    max-width 720ms cubic-bezier(0.32, 0.72, 0, 1),
-    background-color 520ms cubic-bezier(0.32, 0.72, 0, 1),
-    border-color 520ms cubic-bezier(0.32, 0.72, 0, 1),
-    border-radius 720ms cubic-bezier(0.32, 0.72, 0, 1),
-    backdrop-filter 520ms ease,
-    -webkit-backdrop-filter 520ms ease,
-    box-shadow 520ms ease,
-    top 720ms cubic-bezier(0.32, 0.72, 0, 1),
-    padding 520ms cubic-bezier(0.32, 0.72, 0, 1) !important;
+    max-width 850ms cubic-bezier(0.65, 0, 0.35, 1),
+    background-color 850ms cubic-bezier(0.65, 0, 0.35, 1),
+    border-color 850ms cubic-bezier(0.65, 0, 0.35, 1),
+    border-radius 850ms cubic-bezier(0.65, 0, 0.35, 1),
+    backdrop-filter 850ms cubic-bezier(0.65, 0, 0.35, 1),
+    -webkit-backdrop-filter 850ms cubic-bezier(0.65, 0, 0.35, 1),
+    box-shadow 850ms cubic-bezier(0.65, 0, 0.35, 1),
+    top 850ms cubic-bezier(0.65, 0, 0.35, 1),
+    padding 850ms cubic-bezier(0.65, 0, 0.35, 1) !important;
 }
 
 /* Docked = floating pill, clearly detached from the viewport edge */
@@ -388,9 +398,9 @@ nav.is-docked {
   top: 14px !important;
   max-width: min(1180px, calc(100% - 32px)) !important;
   padding: 4px 0 !important;
-  background: rgba(4, 6, 8, 0.78) !important;
   background-color: rgba(4, 6, 8, 0.78) !important;
-  border: 1px solid rgba(236, 235, 231, 0.08) !important;
+  border-color: rgba(236, 235, 231, 0.08) !important;
+  border-bottom-color: rgba(236, 235, 231, 0.08) !important;
   border-radius: 9999px !important;
   backdrop-filter: blur(18px) saturate(160%) !important;
   -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
@@ -404,7 +414,9 @@ nav.is-docked .nav-inner {
   padding-left: 22px !important;
   padding-right: 14px !important;
   height: 52px !important;
-  transition: height 720ms cubic-bezier(0.32, 0.72, 0, 1), padding 520ms cubic-bezier(0.32, 0.72, 0, 1) !important;
+}
+nav .nav-inner {
+  transition: height 850ms cubic-bezier(0.65, 0, 0.35, 1), padding 850ms cubic-bezier(0.65, 0, 0.35, 1) !important;
 }
 
 /* Push the page content down so the docked pill doesn't overlap content */
