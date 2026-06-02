@@ -24,7 +24,7 @@
     .banner {
       width: 960px;
       height: 480px;
-      background: #0c0707;
+      background: #000101;
       position: relative;
       overflow: hidden;
       flex-shrink: 0;
@@ -36,9 +36,9 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse 50% 90% at 0% 55%, rgba(227,95,95,0.2) 0%, transparent 65%),
-        radial-gradient(ellipse 40% 60% at 50% 40%, rgba(227,95,95,0.06) 0%, transparent 60%),
-        radial-gradient(ellipse 30% 45% at 98% 80%, rgba(227,95,95,0.07) 0%, transparent 55%);
+        radial-gradient(ellipse 50% 90% at 0% 55%, rgba(236,168,214,0.2) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 60% at 50% 40%, rgba(236,168,214,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 45% at 98% 80%, rgba(236,168,214,0.07) 0%, transparent 55%);
       pointer-events: none;
     }
 
@@ -64,7 +64,7 @@
     .ring {
       position: absolute;
       border-radius: 50%;
-      border: 1px solid rgba(227,95,95,0.1);
+      border: 1px solid rgba(236,168,214,0.1);
       pointer-events: none;
     }
 
@@ -76,7 +76,7 @@
       transform: translateY(-50%);
       width: 2px;
       height: 140px;
-      background: linear-gradient(to bottom, transparent, #e35f5f 40%, #e35f5f 60%, transparent);
+      background: linear-gradient(to bottom, transparent, #eca8d6 40%, #eca8d6 60%, transparent);
       border-radius: 9999px;
       opacity: 0.65;
     }
@@ -94,7 +94,7 @@
       font-size: 10.5px;
       letter-spacing: 0.24em;
       text-transform: uppercase;
-      color: #e35f5f;
+      color: #eca8d6;
       margin-bottom: 14px;
       opacity: 0.75;
     }
@@ -105,16 +105,16 @@
       font-weight: 800;
       line-height: 0.88;
       letter-spacing: -0.03em;
-      color: #E9EBF0;
+      color: #ecebe7;
       margin-bottom: 24px;
     }
 
-    .name span { color: #e35f5f; }
+    .name span { color: #eca8d6; }
 
     .tagline {
       font-family: 'JetBrains Mono', monospace;
       font-size: 11.5px;
-      color: rgba(233,235,240,0.38);
+      color: rgba(236,235,231,0.38);
       letter-spacing: 0.05em;
       display: flex;
       align-items: center;
@@ -124,7 +124,7 @@
     .dot {
       width: 4px; height: 4px;
       border-radius: 50%;
-      background: #e35f5f;
+      background: #eca8d6;
       opacity: 0.5;
       flex-shrink: 0;
     }
@@ -143,8 +143,8 @@
     }
 
     .c-dim     { color: rgba(255,255,255,0.09); }
-    .c-accent  { color: rgba(227,95,95,0.38); }
-    .c-string  { color: rgba(220,175,95,0.26); }
+    .c-accent  { color: rgba(236,168,214,0.38); }
+    .c-string  { color: rgba(236,168,214,0.26); }
     .c-keyword { color: rgba(175,130,255,0.20); }
 
     /* Bottom-right url */
@@ -155,7 +155,7 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
       letter-spacing: 0.1em;
-      color: rgba(227,95,95,0.45);
+      color: rgba(236,168,214,0.45);
     }
 
     /* Avatar zone guide — DELETE before screenshotting */
@@ -178,6 +178,8 @@
       letter-spacing: 0.08em;
     }
   </style>
+  <link rel="stylesheet" href="/css/theme.css">
+  <script src="/js/dock-nav.js" defer></script>
 </head>
 <body>
   <div style="display:flex;align-items:center;gap:16px;">
@@ -185,12 +187,12 @@
     <button id="exportBtn" onclick="exportBanner()" style="
       font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.1em;
       text-transform:uppercase;padding:8px 20px;border-radius:9999px;cursor:pointer;
-      background:#e35f5f;border:none;color:#fff;transition:opacity 0.15s;
+      background:#eca8d6;border:none;color:#fff;transition:opacity 0.15s;
     " onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
       Export PNG
     </button>
     <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
-      <input type="checkbox" id="showGuide" checked onchange="document.querySelector('.avatar-guide').style.display=this.checked?'block':'none'" style="accent-color:#e35f5f;">
+      <input type="checkbox" id="showGuide" checked onchange="document.querySelector('.avatar-guide').style.display=this.checked?'block':'none'" style="accent-color:#eca8d6;">
       <span class="hint">avatar guide</span>
     </label>
   </div>
@@ -201,8 +203,8 @@
 
     <!-- Rings on left — avatar overlaps these, looks fine -->
     <div class="ring" style="width:340px;height:340px;left:-120px;top:-80px;"></div>
-    <div class="ring" style="width:200px;height:200px;left:-40px;bottom:-70px;border-color:rgba(227,95,95,0.07);"></div>
-    <div class="ring" style="width:90px;height:90px;left:110px;top:70px;border-color:rgba(227,95,95,0.08);"></div>
+    <div class="ring" style="width:200px;height:200px;left:-40px;bottom:-70px;border-color:rgba(236,168,214,0.07);"></div>
+    <div class="ring" style="width:90px;height:90px;left:110px;top:70px;border-color:rgba(236,168,214,0.08);"></div>
 
     <!-- Avatar guide (remove before screenshot) -->
     <div class="avatar-guide"></div>
@@ -252,7 +254,7 @@
           scale: 1,
           useCORS: true,
           logging: false,
-          backgroundColor: '#0c0707',
+          backgroundColor: '#000101',
         });
 
         const link = document.createElement('a');

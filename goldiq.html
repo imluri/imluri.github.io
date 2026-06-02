@@ -23,14 +23,14 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg:        #0a0700;
+  --bg:        #000101;
   --surface:   #160f00;
-  --gold:      #c9960c;
-  --gold-lt:   #f0c040;
+  --gold:      #eca8d6;
+  --gold-lt:   #eca8d6;
   --copper:    #cd7f32;
-  --white:     #fffdf0;
+  --white:     #ecebe7;
   --grey:      #9a8a60;
-  --border:    rgba(201,150,12,0.18);
+  --border:    rgba(236,168,214,0.18);
   --mono:      'IBM Plex Mono', monospace;
 }
 
@@ -81,7 +81,7 @@ body {
 .loader-bar-wrap {
   width: 200px;
   height: 2px;
-  background: rgba(201,150,12,0.15);
+  background: rgba(236,168,214,0.15);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -404,7 +404,7 @@ body {
   transition: background 0.2s, color 0.2s;
   flex-shrink: 0;
 }
-.modal-close:hover { background: rgba(201,150,12,0.12); color: var(--gold-lt); }
+.modal-close:hover { background: rgba(236,168,214,0.12); color: var(--gold-lt); }
 
 .modal-loc {
   font-family: var(--mono);
@@ -420,7 +420,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 9px 0;
-  border-bottom: 1px solid rgba(201,150,12,0.07);
+  border-bottom: 1px solid rgba(236,168,214,0.07);
   font-size: 0.85rem;
 }
 .modal-row:last-child { border-bottom: none; }
@@ -445,7 +445,7 @@ body {
 .modal-timestamp { font-family: var(--mono); font-size: 0.65rem; color: var(--grey); }
 .modal-btn {
   padding: 7px 16px;
-  background: rgba(201,150,12,0.12);
+  background: rgba(236,168,214,0.12);
   border: 1px solid var(--border);
   border-radius: 6px;
   color: var(--gold-lt);
@@ -454,7 +454,7 @@ body {
   cursor: pointer;
   transition: background 0.2s;
 }
-.modal-btn:hover { background: rgba(201,150,12,0.22); }
+.modal-btn:hover { background: rgba(236,168,214,0.22); }
 
 /* ── Scroll progress bar ───────────────────────────────────────────────── */
 #progress-bar {
@@ -508,6 +508,8 @@ body {
   .header-title   { display: none; }
 }
 </style>
+  <link rel="stylesheet" href="/css/theme.css">
+  <script src="/js/dock-nav.js" defer></script>
 </head>
 <body>
 
@@ -576,11 +578,11 @@ body {
   <div class="legend-title">Components</div>
   <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div> ESP32 Controller</div>
   <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div> pH · EC Probes</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#f0c040"></div> GPS · 4G Modules</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#eca8d6"></div> GPS · 4G Modules</div>
   <div class="legend-item"><div class="legend-dot" style="background:#60a5fa"></div> Rugged Tablet</div>
   <div class="legend-item"><div class="legend-dot" style="background:#cd7f32"></div> Soil Core Sample</div>
-  <div class="legend-item" style="margin-top:6px; border-top:1px solid rgba(201,150,12,0.15); padding-top:6px">
-    <div class="legend-dot" style="background:#f0c040; box-shadow:0 0 4px rgba(240,192,64,0.8)"></div> Data flow (gold)
+  <div class="legend-item" style="margin-top:6px; border-top:1px solid rgba(236,168,214,0.15); padding-top:6px">
+    <div class="legend-dot" style="background:#eca8d6; box-shadow:0 0 4px rgba(236,168,214,0.8)"></div> Data flow (gold)
   </div>
   <div class="legend-item">
     <div class="legend-dot" style="background:#00ccff; box-shadow:0 0 4px rgba(0,204,255,0.8)"></div> Sensor flow (cyan)
@@ -718,7 +720,7 @@ const COMPONENTS = {
   },
   gps: {
     label: 'GPS Module (u-blox NEO-M9N)',
-    roleColor: '#f0c040',
+    roleColor: '#eca8d6',
     rows: [
       ['Role',        'Location Tracking'],
       ['Accuracy',    '2 cm (RTK mode)'],
@@ -1073,7 +1075,7 @@ PLACEMENTS.forEach(({ id, build, pos, rotY }) => {
 //  FLOATING SPRITE LABELS
 //  Canvas-based sprites that always face the camera.
 // ─────────────────────────────────────────────────────────────────────────────
-function makeLabel(text, color = '#f0c040') {
+function makeLabel(text, color = '#eca8d6') {
   const c   = document.createElement('canvas');
   c.width   = 320;
   c.height  = 72;

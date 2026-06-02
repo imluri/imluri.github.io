@@ -21,13 +21,13 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg:        #080608;
+  --bg:        #000101;
   --surface:   #0f0d12;
   --surface2:  #161420;
-  --accent:    #e35f5f;
-  --accent-br: #ff7070;
-  --gold:      #f0c040;
-  --white:     #e9ebf0;
+  --accent:    #eca8d6;
+  --accent-br: #eca8d6;
+  --gold:      #eca8d6;
+  --white:     #ecebe7;
   --muted:     #9aa0b2;
   --subtle:    rgba(255,255,255,0.05);
   --border:    rgba(255,255,255,0.07);
@@ -103,8 +103,8 @@ header {
 }
 .mode-btn:hover { background: var(--subtle); color: var(--white); }
 .mode-btn.active {
-  background: rgba(227,95,95,0.14);
-  border-color: rgba(227,95,95,0.35);
+  background: rgba(236,168,214,0.14);
+  border-color: rgba(236,168,214,0.35);
   color: var(--accent-br);
 }
 .mode-btn .dot {
@@ -172,8 +172,8 @@ header {
   position: relative;
 }
 .upload-area:hover, .upload-area.drag-over {
-  border-color: rgba(227,95,95,0.4);
-  background: rgba(227,95,95,0.04);
+  border-color: rgba(236,168,214,0.4);
+  background: rgba(236,168,214,0.04);
 }
 .upload-area input[type=file] {
   position: absolute;
@@ -235,7 +235,7 @@ header {
   outline: none;
   transition: border-color 0.15s;
 }
-.form-input:focus { border-color: rgba(227,95,95,0.4); }
+.form-input:focus { border-color: rgba(236,168,214,0.4); }
 .form-input::placeholder { color: var(--muted); }
 
 .form-row { display: flex; gap: 6px; }
@@ -291,7 +291,7 @@ header {
   position: relative;
 }
 .pin-item:hover { border-color: rgba(255,255,255,0.14); }
-.pin-item.selected { border-color: rgba(227,95,95,0.4); }
+.pin-item.selected { border-color: rgba(236,168,214,0.4); }
 
 .pin-item-header {
   display: flex;
@@ -311,7 +311,7 @@ header {
   width: 8px; height: 8px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 6px rgba(227,95,95,0.6);
+  box-shadow: 0 0 6px rgba(236,168,214,0.6);
   flex-shrink: 0;
 }
 .pin-delete {
@@ -324,7 +324,7 @@ header {
   border-radius: 4px;
   transition: color 0.15s, background 0.15s;
 }
-.pin-delete:hover { color: var(--accent); background: rgba(227,95,95,0.1); }
+.pin-delete:hover { color: var(--accent); background: rgba(236,168,214,0.1); }
 
 .pin-coords {
   font-family: var(--mono);
@@ -342,8 +342,8 @@ header {
 .export-btn {
   width: 100%;
   padding: 9px;
-  background: rgba(240,192,64,0.08);
-  border: 1px solid rgba(240,192,64,0.2);
+  background: rgba(236,168,214,0.08);
+  border: 1px solid rgba(236,168,214,0.2);
   border-radius: 7px;
   color: var(--gold);
   font-family: 'IBM Plex Sans', sans-serif;
@@ -352,7 +352,7 @@ header {
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
 }
-.export-btn:hover { background: rgba(240,192,64,0.14); border-color: rgba(240,192,64,0.35); }
+.export-btn:hover { background: rgba(236,168,214,0.14); border-color: rgba(236,168,214,0.35); }
 .export-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .export-hint { font-size: 0.68rem; color: var(--muted); margin-top: 6px; line-height: 1.5; }
@@ -404,14 +404,14 @@ header {
   color: var(--muted);
 }
 #mode-badge.pin {
-  background: rgba(227,95,95,0.12);
-  border: 1px solid rgba(227,95,95,0.3);
+  background: rgba(236,168,214,0.12);
+  border: 1px solid rgba(236,168,214,0.3);
   color: var(--accent-br);
   animation: badgePulse 1.8s ease-in-out infinite;
 }
 @keyframes badgePulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(227,95,95,0.25); }
-  50%      { box-shadow: 0 0 0 5px rgba(227,95,95,0); }
+  0%,100% { box-shadow: 0 0 0 0 rgba(236,168,214,0.25); }
+  50%      { box-shadow: 0 0 0 5px rgba(236,168,214,0); }
 }
 
 /* No-model overlay */
@@ -463,10 +463,10 @@ header {
   user-select: none;
 }
 .h-node:hover { background: var(--subtle); color: var(--white); }
-.h-node.selected { background: rgba(227,95,95,0.12); color: var(--accent-br); }
+.h-node.selected { background: rgba(236,168,214,0.12); color: var(--accent-br); }
 .h-node-mesh { color: var(--white); }
 .h-node-icon { font-size: 0.6rem; flex-shrink: 0; color: var(--muted); }
-.h-node-mesh > .h-node-icon { color: #f0c040; }
+.h-node-mesh > .h-node-icon { color: #eca8d6; }
 .h-node.selected > .h-node-icon { color: var(--accent); }
 .h-node-name {
   overflow: hidden;
@@ -484,6 +484,8 @@ header {
   .canvas-wrap { height: 50vh; }
 }
 </style>
+  <link rel="stylesheet" href="/css/theme.css">
+  <script src="/js/dock-nav.js" defer></script>
 </head>
 <body>
 
@@ -946,7 +948,7 @@ function cancelPendingPin(switchToPin = true) {
 
 function confirmPin() {
   const label = pinLabelInput.value.trim();
-  if (!label) { pinLabelInput.focus(); pinLabelInput.style.borderColor = 'rgba(227,95,95,0.6)'; return; }
+  if (!label) { pinLabelInput.focus(); pinLabelInput.style.borderColor = 'rgba(236,168,214,0.6)'; return; }
   pinLabelInput.style.borderColor = '';
 
   const desc  = pinDescInput.value.trim();
@@ -1019,12 +1021,12 @@ function makeLabelSprite(text) {
   ctx.beginPath();
   ctx.roundRect(4, 4, 312, 72, 10);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(227,95,95,0.5)';
+  ctx.strokeStyle = 'rgba(236,168,214,0.5)';
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
   // Label text
-  ctx.fillStyle = '#e9ebf0';
+  ctx.fillStyle = '#ecebe7';
   ctx.font = '600 28px "IBM Plex Sans"';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';

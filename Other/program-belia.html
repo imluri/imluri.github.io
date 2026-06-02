@@ -13,18 +13,18 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --navy:     #0d1b3e;
+  --navy:     #000101;
   --navy-lt:  #162048;
   --navy-mid: #1e2d5a;
-  --gold:     #c9960c;
-  --gold-lt:  #f0c040;
-  --gold-dim: rgba(201,150,12,0.15);
-  --gold-br:  rgba(240,192,64,0.9);
-  --white:    #fffdf0;
+  --gold:     #eca8d6;
+  --gold-lt:  #eca8d6;
+  --gold-dim: rgba(236,168,214,0.15);
+  --gold-br:  rgba(236,168,214,0.9);
+  --white:    #ecebe7;
   --grey:     #9a8a60;
-  --muted:    rgba(255,253,240,0.6);
-  --border:   rgba(201,150,12,0.18);
-  --border-lt:rgba(201,150,12,0.08);
+  --muted:    rgba(236,235,231,0.6);
+  --border:   rgba(236,168,214,0.18);
+  --border-lt:rgba(236,168,214,0.08);
   --mono:     'IBM Plex Mono', monospace;
   --r:        16px;
 }
@@ -75,16 +75,16 @@ body {
 }
 
 .card {
-  background: rgba(255,253,240,0.04);
+  background: rgba(236,235,231,0.04);
   border: 1px solid var(--border);
   border-radius: var(--r);
   padding: 24px;
   transition: background 0.2s, border-color 0.2s;
 }
-.card:hover { background: rgba(201,150,12,0.05); border-color: rgba(201,150,12,0.3); }
+.card:hover { background: rgba(236,168,214,0.05); border-color: rgba(236,168,214,0.3); }
 
 .quote-banner {
-  background: rgba(201,150,12,0.07);
+  background: rgba(236,168,214,0.07);
   border: 1px solid var(--border);
   border-radius: 100px;
   padding: 14px 28px;
@@ -137,7 +137,7 @@ nav {
   position: absolute;
   width: 600px; height: 600px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(201,150,12,0.18) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(236,168,214,0.18) 0%, transparent 70%);
   top: 50%; right: -100px; transform: translateY(-50%);
   pointer-events: none;
 }
@@ -145,7 +145,7 @@ nav {
   position: absolute;
   width: 300px; height: 300px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(201,150,12,0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(236,168,214,0.08) 0%, transparent 70%);
   bottom: 10%; left: -60px;
   pointer-events: none;
 }
@@ -180,7 +180,7 @@ nav {
 .hero-pill {
   display: flex; align-items: center; gap: 8px;
   padding: 8px 16px;
-  background: rgba(201,150,12,0.08); border: 1px solid var(--border);
+  background: rgba(236,168,214,0.08); border: 1px solid var(--border);
   border-radius: 8px; font-size: 0.82rem; color: var(--gold-lt);
 }
 .hero-pill .dot {
@@ -193,7 +193,7 @@ nav {
   max-width: 560px;
 }
 .pillar-chip {
-  background: rgba(255,253,240,0.04); border: 1px solid var(--border-lt);
+  background: rgba(236,235,231,0.04); border: 1px solid var(--border-lt);
   border-radius: 10px; padding: 14px 12px; text-align: center;
   font-size: 0.75rem; color: var(--muted); line-height: 1.4;
 }
@@ -213,7 +213,7 @@ nav {
   background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
 }
 .compare-new {
-  background: rgba(201,150,12,0.07); border: 1px solid var(--border);
+  background: rgba(236,168,214,0.07); border: 1px solid var(--border);
 }
 .compare-label {
   font-family: var(--mono); font-size: 0.65rem; letter-spacing: 2px;
@@ -243,25 +243,25 @@ nav {
 }
 .orbital-ring {
   position: absolute; inset: 0;
-  border: 1px solid rgba(201,150,12,0.2);
+  border: 1px solid rgba(236,168,214,0.2);
   border-radius: 50%;
   animation: orbitalPulse 4s ease-in-out infinite;
 }
 .orbital-ring-2 {
   position: absolute; inset: 60px;
-  border: 1px solid rgba(201,150,12,0.1);
+  border: 1px solid rgba(236,168,214,0.1);
   border-radius: 50%;
 }
 @keyframes orbitalPulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(201,150,12,0); }
-  50%      { box-shadow: 0 0 30px 0 rgba(201,150,12,0.1); }
+  0%,100% { box-shadow: 0 0 0 0 rgba(236,168,214,0); }
+  50%      { box-shadow: 0 0 30px 0 rgba(236,168,214,0.1); }
 }
 @media (prefers-reduced-motion: reduce) { .orbital-ring { animation: none; } }
 
 .orbital-center {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
   width: 110px; height: 110px;
-  background: radial-gradient(circle, rgba(201,150,12,0.25) 0%, rgba(201,150,12,0.05) 100%);
+  background: radial-gradient(circle, rgba(236,168,214,0.25) 0%, rgba(236,168,214,0.05) 100%);
   border: 1.5px solid var(--gold);
   border-radius: 50%;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -281,7 +281,7 @@ nav {
 }
 .orbital-node-dot {
   width: 44px; height: 44px; border-radius: 50%;
-  background: rgba(201,150,12,0.12); border: 1px solid var(--border);
+  background: rgba(236,168,214,0.12); border: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center;
   font-size: 1.1rem;
 }
@@ -298,11 +298,11 @@ nav {
 }
 .stake-card {
   border-radius: var(--r); padding: 28px 24px;
-  background: rgba(255,253,240,0.03); border: 1px solid var(--border-lt);
+  background: rgba(236,235,231,0.03); border: 1px solid var(--border-lt);
   display: flex; flex-direction: column; gap: 12px;
 }
 .stake-card.center-card {
-  background: rgba(201,150,12,0.08); border-color: var(--border);
+  background: rgba(236,168,214,0.08); border-color: var(--border);
   grid-column: 2;
 }
 .stake-icon {
@@ -326,11 +326,11 @@ nav {
 }
 .module-card {
   border-radius: var(--r); padding: 32px;
-  background: rgba(255,253,240,0.03); border: 1px solid var(--border-lt);
+  background: rgba(236,235,231,0.03); border: 1px solid var(--border-lt);
   display: flex; flex-direction: column; gap: 14px;
   transition: background 0.2s, border-color 0.2s;
 }
-.module-card:hover { background: rgba(201,150,12,0.05); border-color: var(--border); }
+.module-card:hover { background: rgba(236,168,214,0.05); border-color: var(--border); }
 .module-num {
   font-family: var(--mono); font-size: 0.65rem; color: var(--gold);
   letter-spacing: 2px; text-transform: uppercase;
@@ -356,7 +356,7 @@ nav {
 .timeline-item { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .timeline-dot {
   width: 44px; height: 44px; border-radius: 50%;
-  background: rgba(201,150,12,0.12); border: 1.5px solid var(--gold);
+  background: rgba(236,168,214,0.12); border: 1.5px solid var(--gold);
   display: flex; align-items: center; justify-content: center;
   font-family: var(--mono); font-size: 0.58rem; font-weight: 600;
   color: var(--gold-lt); text-align: center; line-height: 1.2; padding: 2px;
@@ -377,7 +377,7 @@ nav {
 }
 .kpi-card {
   border-radius: var(--r); padding: 28px 24px; text-align: center;
-  background: rgba(201,150,12,0.05); border: 1px solid var(--border);
+  background: rgba(236,168,214,0.05); border: 1px solid var(--border);
 }
 .kpi-number {
   font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800;
@@ -395,7 +395,7 @@ nav {
   flex-wrap: wrap; gap: 24px; margin-bottom: 40px;
 }
 .finance-total {
-  background: linear-gradient(135deg, rgba(201,150,12,0.2), rgba(201,150,12,0.05));
+  background: linear-gradient(135deg, rgba(236,168,214,0.2), rgba(236,168,214,0.05));
   border: 1.5px solid var(--gold); border-radius: var(--r);
   padding: 20px 32px; text-align: center;
 }
@@ -407,7 +407,7 @@ nav {
 }
 .finance-item {
   border-radius: 10px; padding: 18px 16px;
-  background: rgba(255,253,240,0.03); border: 1px solid var(--border-lt);
+  background: rgba(236,235,231,0.03); border: 1px solid var(--border-lt);
 }
 .finance-amount {
   font-size: 1rem; font-weight: 700; color: var(--gold-lt); margin-bottom: 4px;
@@ -447,7 +447,7 @@ nav {
 }
 .step-card {
   border-radius: var(--r); padding: 32px 24px;
-  background: rgba(255,253,240,0.03); border: 1px solid var(--border-lt);
+  background: rgba(236,235,231,0.03); border: 1px solid var(--border-lt);
   text-align: center;
 }
 .step-num {
@@ -490,14 +490,14 @@ nav {
   color: var(--muted); text-decoration: none; font-size: 0.85rem;
   transition: color 0.2s, border-color 0.2s;
 }
-.back-btn:hover { color: var(--white); border-color: rgba(201,150,12,0.4); }
+.back-btn:hover { color: var(--white); border-color: rgba(236,168,214,0.4); }
 
 /* ── PDRM Modules ── */
 .pdrm-section { padding: 100px 0; }
 .pdrm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 40px; }
 .pdrm-card {
   border-radius: var(--r); padding: 24px;
-  background: rgba(255,253,240,0.03); border: 1px solid var(--border-lt);
+  background: rgba(236,235,231,0.03); border: 1px solid var(--border-lt);
 }
 .pdrm-title { font-size: 0.9rem; font-weight: 700; color: var(--white); margin-bottom: 6px; }
 .pdrm-focus { font-size: 0.78rem; color: var(--muted); }
@@ -529,6 +529,8 @@ nav {
   .hero-pillars { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
+  <link rel="stylesheet" href="/css/theme.css">
+  <script src="/js/dock-nav.js" defer></script>
 </head>
 <body>
 

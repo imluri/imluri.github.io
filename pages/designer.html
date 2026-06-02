@@ -1,3 +1,5 @@
+<script src="/js/dock-nav.js" defer></script>
+<link rel="stylesheet" href="/css/theme.css">
 <!-- Designer — full-screen editor -->
 <div class="bm-editor">
 
@@ -110,7 +112,7 @@
         <input type="file" id="bmJsonFileInput" accept=".json" style="display:none">
       </div>
       <div class="bm-btn-row" style="margin-top:4px;">
-        <button class="bm-btn bm-btn-secondary" id="bmClearBtn" style="flex:1;color:rgba(227,95,95,0.8);">
+        <button class="bm-btn bm-btn-secondary" id="bmClearBtn" style="flex:1;">
           <iconify-icon icon="mdi:trash-can-outline" width="14" height="14"></iconify-icon>
           Clear
         </button>
@@ -465,7 +467,7 @@
   cursor: pointer; transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 .bm-lib-view-btn:hover { background: rgba(255,255,255,0.06); color: var(--foreground); }
-.bm-lib-view-btn.bm-lib-view-active { border-color: var(--accent); color: var(--accent); background: rgba(227,95,95,0.08); }
+.bm-lib-view-btn.bm-lib-view-active { border-color: rgba(236,235,231,0.35); color: var(--foreground); background: rgba(236,235,231,0.08); }
 
 /* Syntax highlighting */
 .hl-pre { font-family:'JetBrains Mono',monospace; white-space:pre; margin:0; color:rgba(255,255,255,0.45); }
@@ -512,8 +514,8 @@
   flex-shrink: 0; transition: background 0.15s, color 0.15s;
 }
 .bm-icon-btn:hover { background: rgba(255,255,255,0.07); color: var(--foreground); }
-.bm-icon-btn-danger { color: #e35f5f; }
-.bm-icon-btn-danger:hover { background: rgba(227,95,95,0.12); color: #ff7070; }
+.bm-icon-btn-danger { color: var(--foreground-muted); }
+.bm-icon-btn-danger:hover { background: rgba(236,235,231,0.12); color: var(--foreground); }
 
 /* Form controls */
 .bm-group {
@@ -572,7 +574,7 @@
 .bm-btn:hover { opacity: 0.82; }
 .bm-btn:active { transform: scale(0.97); }
 .bm-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-.bm-btn-primary { background: var(--accent); color: #fff; width: 100%; }
+.bm-btn-primary { background: var(--accent); color: var(--bg-deep); width: 100%; }
 .bm-btn-secondary {
   background: rgba(255,255,255,0.05);
   border: 1px solid var(--border-default);
@@ -616,7 +618,7 @@
   white-space: nowrap; cursor: default;
 }
 .bm-save-status.bm-save-flash { color: #6fcf97; }
-.bm-save-status.bm-save-error { color: #e35f5f; }
+.bm-save-status.bm-save-error { color: var(--foreground); }
 .bm-tool-hint {
   font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;
   color: rgba(255,255,255,0.2); letter-spacing: 0.04em;
@@ -649,7 +651,7 @@
   text-align: left;
 }
 .bm-size-preset-btn:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.15); }
-.bm-size-preset-btn.bm-size-active { border-color: var(--accent); background: rgba(227,95,95,0.08); }
+.bm-size-preset-btn.bm-size-active { border-color: rgba(236,235,231,0.35); background: rgba(236,235,231,0.08); }
 .bm-size-preset-name { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--foreground); }
 .bm-size-preset-dim  { font-family: 'JetBrains Mono', monospace; font-size: 0.52rem; color: var(--foreground-muted); margin-top: 1px; }
 
@@ -851,8 +853,8 @@
 .bm-ctx-item:hover { background: rgba(255,255,255,0.06); }
 .bm-ctx-item span { font-size: 0.62rem; color: rgba(255,255,255,0.28); white-space: nowrap; }
 .bm-ctx-disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
-.bm-ctx-danger { color: #e35f5f; }
-.bm-ctx-danger:hover { background: rgba(227,95,95,0.1); }
+.bm-ctx-danger { color: var(--foreground-muted); }
+.bm-ctx-danger:hover { background: rgba(236,235,231,0.1); color: var(--foreground); }
 
 /* ── Templates ── */
 .bm-tpl-grid {
@@ -927,7 +929,7 @@
 .bm-snap-input::-webkit-outer-spin-button,
 .bm-snap-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .bm-snap-input:focus { border-color: var(--accent); }
-.bm-tool-btn.bm-snap-active { color: var(--accent); border-color: var(--accent); background: rgba(227,95,95,0.08); }
+.bm-tool-btn.bm-snap-active { color: var(--foreground); border-color: rgba(236,235,231,0.35); background: rgba(236,235,231,0.08); }
 
 /* ── Popup solid background (overrides semi-transparent --bg-elevated) ── */
 .bm-toolbar-drop,
@@ -971,7 +973,7 @@
   transition: background 0.12s, color 0.12s;
 }
 .bm-grad-dir:hover { background: rgba(255,255,255,0.08); color: var(--foreground); }
-.bm-grad-dir.bm-grad-dir-active { background: rgba(227,95,95,0.12); color: var(--accent); border-color: var(--accent); }
+.bm-grad-dir.bm-grad-dir-active { background: rgba(236,235,231,0.12); color: var(--foreground); border-color: rgba(236,235,231,0.35); }
 .bm-grad-stops-list {
   display: flex; flex-direction: column; gap: 5px;
   margin-top: 10px;
@@ -1081,7 +1083,7 @@
   position: relative;
 }
 .bm-layer-row:hover { background: rgba(255,255,255,0.05); color: var(--foreground); }
-.bm-layer-row.bm-layer-selected { background: rgba(227,95,95,0.12); color: var(--foreground); }
+.bm-layer-row.bm-layer-selected { background: rgba(236,235,231,0.12); color: var(--foreground); }
 .bm-layer-row.bm-layer-selected .bm-layer-icon { color: var(--accent); }
 .bm-layer-row.bm-layer-dragging { opacity: 0.35; }
 .bm-layer-row.bm-layer-drop-above::before {

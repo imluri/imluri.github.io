@@ -74,7 +74,11 @@
   window.initScrollAnimations = function () {
     applyStagger();
     observeSectionEnter();
-    initScrollProgress();
+    // Scroll progress bar removed — keep cleanup so any stale bar from
+    // a previous route is also taken down.
+    if (_progressCleanup) { _progressCleanup(); _progressCleanup = null; }
+    const stale = document.getElementById('scroll-progress');
+    if (stale) stale.remove();
   };
 
   document.addEventListener('DOMContentLoaded', window.initScrollAnimations);

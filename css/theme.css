@@ -1,0 +1,545 @@
+/* Bluesminds-inspired theme overrides
+   Source palette and typography adapted from bluesminds.com */
+
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/assets/fonts/Instrument%20Sans%20Regular.woff2") format("woff2");
+}
+
+:root {
+  /* Bluesminds palette */
+  --bm-background: #000101;
+  --bm-foreground: #ecebe7;
+  --bm-card: #020204;
+  --bm-secondary: #040608;
+  --bm-muted: #040608;
+  --bm-muted-foreground: #757168;
+  --bm-accent-surface: #07090d;
+  --bm-border: #101215;
+  --bm-input: #07090c;
+  --bm-ring: #ecebe7;
+  --bm-primary: #ecebe7;
+  --bm-primary-foreground: #000101;
+  --bm-destructive: #e40014;
+  --bm-pink: #eca8d6;
+  --bm-chart-2: #a7a49e;
+  --bm-chart-3: #6c695f;
+  --bm-chart-4: #3c3a35;
+  --bm-chart-5: #171612;
+  --bm-radius: 0.25rem;
+
+  /* Fonts */
+  --font-instrument: "Instrument Sans", system-ui, sans-serif;
+  --font-instrument-serif: "Instrument Sans", system-ui, sans-serif;
+  --font-jetbrains: "Instrument Sans", ui-monospace, "Cascadia Mono", Menlo, monospace;
+
+  /* Override existing tokens so the existing stylesheet inherits the new look */
+  --bg-deep: var(--bm-background);
+  --bg-base: var(--bm-background);
+  --bg-elevated: var(--bm-card);
+  --surface: var(--bm-secondary);
+  --surface-hover: var(--bm-accent-surface);
+  --foreground: var(--bm-foreground);
+  --foreground-muted: var(--bm-muted-foreground);
+  --foreground-subtle: rgba(236, 235, 231, 0.55);
+  /* Chrome accent → monochrome cream. Glow tokens stay pink so the
+     blob/atmosphere effects are unaffected (they explicitly read these). */
+  --accent: var(--bm-foreground);
+  --accent-bright: #ffffff;
+  --accent-glow: rgba(236, 168, 214, 0.14);
+  --bm-glow: var(--bm-pink);
+  --border-default: var(--bm-border);
+  --border-hover: rgba(236, 235, 231, 0.12);
+  --border-accent: rgba(236, 235, 231, 0.18);
+  --ink: 0, 1, 1;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html, body, button, input, textarea, select, optgroup, h1, h2, h3, h4, h5, h6, p, li, a, span, div, code, kbd, pre, samp, small, label, th, td {
+  font-family: "Instrument Sans", system-ui, sans-serif !important;
+}
+
+body {
+  font-family: var(--font-instrument);
+  background-color: var(--bm-background);
+  color: var(--bm-foreground);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.005em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-instrument-serif);
+  font-weight: 400;
+  color: var(--bm-foreground);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+h1 { font-size: clamp(2.75rem, 6vw, 5.5rem); }
+h2 { font-size: clamp(2rem, 4.5vw, 3.75rem); }
+h3 { font-size: clamp(1.5rem, 3vw, 2.25rem); }
+h4 { font-size: 1.5rem; }
+
+p, li {
+  font-family: var(--font-instrument);
+  color: var(--bm-foreground);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+small, .eyebrow, .label, .mono, code, kbd, pre, samp {
+  font-family: var(--font-jetbrains);
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.eyebrow, .label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--bm-muted-foreground);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 160ms ease, opacity 160ms ease;
+}
+
+a:hover {
+  color: var(--bm-foreground);
+  opacity: 0.78;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--bm-border);
+}
+
+/* Buttons */
+button,
+.btn,
+.button,
+input[type="submit"],
+input[type="button"] {
+  font-family: var(--font-instrument);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  padding: 0.625rem 1.125rem;
+  border-radius: var(--bm-radius);
+  border: 1px solid var(--bm-border);
+  background: var(--bm-primary);
+  color: var(--bm-primary-foreground);
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+button:hover,
+.btn:hover,
+.button:hover {
+  background: var(--bm-foreground);
+  color: var(--bm-primary-foreground);
+  border-color: rgba(236, 235, 231, 0.4);
+  opacity: 0.92;
+}
+
+.btn-ghost,
+.button.ghost {
+  background: transparent;
+  color: var(--bm-foreground);
+  border-color: var(--bm-border);
+}
+
+.btn-ghost:hover {
+  background: var(--bm-accent-surface);
+  border-color: rgba(236, 235, 231, 0.2);
+  color: var(--bm-foreground);
+}
+
+/* Cards / surfaces */
+.card,
+.surface {
+  background: var(--bm-card);
+  border: 1px solid var(--bm-border);
+  border-radius: var(--bm-radius);
+}
+
+/* Inputs */
+input, textarea, select {
+  font-family: var(--font-instrument);
+  background: var(--bm-input);
+  color: var(--bm-foreground);
+  border: 1px solid var(--bm-border);
+  border-radius: var(--bm-radius);
+  padding: 0.5rem 0.75rem;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--bm-ring);
+  box-shadow: 0 0 0 3px rgba(236, 235, 231, 0.1);
+}
+
+/* Selection */
+::selection {
+  background: rgba(236, 235, 231, 0.25);
+  color: var(--bm-foreground);
+}
+
+/* Scrollbar tuned to new palette */
+::-webkit-scrollbar-thumb {
+  background: rgba(236, 235, 231, 0.12);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(236, 235, 231, 0.22);
+}
+* {
+  scrollbar-color: rgba(236, 235, 231, 0.12) transparent;
+}
+
+/* ------------------------------------------------------------------ */
+/*  FORCE-UNIFY LAYER                                                  */
+/*  Loaded last → wins against per-page inline styles and Tailwind     */
+/*  utilities so every page reads as the same dark, cream-on-near-     */
+/*  black product with pink accents.                                   */
+/* ------------------------------------------------------------------ */
+
+/* Force the base canvas everywhere */
+html, body {
+  background-color: var(--bm-background) !important;
+  color: var(--bm-foreground) !important;
+}
+
+/* Neutralize Tailwind light-theme utilities (used by /designs pages) */
+body.bg-white,
+body.bg-gray-50,
+body.bg-gray-100,
+body.bg-stone-50,
+body.bg-stone-100,
+body.bg-neutral-50,
+body.bg-neutral-100,
+.bg-white,
+.bg-gray-50,
+.bg-gray-100,
+.bg-stone-50,
+.bg-stone-100 {
+  background-color: var(--bm-card) !important;
+  color: var(--bm-foreground) !important;
+}
+
+/* Common light-text Tailwind utilities → cream */
+.text-gray-800,
+.text-gray-700,
+.text-gray-600,
+.text-gray-900,
+.text-black,
+.text-stone-800,
+.text-stone-900,
+.text-neutral-800,
+.text-neutral-900 {
+  color: var(--bm-foreground) !important;
+}
+
+.text-gray-500,
+.text-gray-400,
+.text-stone-500,
+.text-neutral-500 {
+  color: var(--bm-muted-foreground) !important;
+}
+
+/* Strip generic shadows on cards over dark bg — they read as smudges */
+.shadow, .shadow-md, .shadow-lg, .shadow-xl {
+  box-shadow: 0 1px 0 var(--bm-border) !important;
+}
+
+/* Common card containers across pages */
+nav,
+header,
+footer,
+section,
+aside,
+article {
+  background-color: transparent;
+}
+
+/* Hero/banner gradients that paint white → swap to near-black with a pink wash */
+.hero-gradient {
+  background:
+    radial-gradient(ellipse 60% 80% at 20% 30%, rgba(236, 168, 214, 0.12), transparent 60%),
+    var(--bm-background) !important;
+}
+
+/* Accent-flavored utility overrides → monochrome cream */
+.text-orange-500, .text-orange-600, .text-orange-700,
+.text-amber-500, .text-amber-600, .text-amber-700,
+.text-yellow-500, .text-yellow-600,
+.text-red-500, .text-red-600,
+.text-cyan-400, .text-cyan-500,
+.text-sky-400, .text-sky-500 {
+  color: var(--bm-foreground) !important;
+}
+
+.bg-orange-500, .bg-orange-600,
+.bg-amber-500, .bg-amber-600,
+.bg-yellow-500,
+.bg-red-500, .bg-red-600,
+.bg-cyan-500, .bg-sky-500 {
+  background-color: var(--bm-foreground) !important;
+  color: var(--bm-primary-foreground) !important;
+}
+
+.border-orange-500, .border-amber-500, .border-red-500, .border-cyan-500 {
+  border-color: rgba(236, 235, 231, 0.25) !important;
+}
+
+/* Tailwind blues/indigos/purples → monochrome cream */
+.text-blue-300, .text-blue-400, .text-blue-500, .text-blue-600,
+.text-indigo-400, .text-indigo-500,
+.text-purple-400, .text-purple-500 {
+  color: var(--bm-foreground) !important;
+}
+.bg-blue-500, .bg-blue-600, .bg-blue-700,
+.bg-indigo-500, .bg-indigo-600,
+.bg-purple-500, .bg-purple-600 {
+  background-color: var(--bm-foreground) !important;
+  color: var(--bm-primary-foreground) !important;
+}
+.border-blue-400, .border-blue-500, .border-indigo-500, .border-purple-500 {
+  border-color: rgba(236, 235, 231, 0.25) !important;
+}
+
+/* Dark grays Tailwind uses for surfaces → unify to card/bg */
+.bg-gray-900, .bg-gray-800, .bg-slate-900, .bg-slate-800, .bg-zinc-900, .bg-zinc-800, .bg-neutral-900, .bg-neutral-800 {
+  background-color: var(--bm-card) !important;
+}
+
+/* Light foregrounds Tailwind throws around */
+.text-white {
+  color: var(--bm-foreground) !important;
+}
+
+/* Gradient utilities — flatten via-*/to-* color stops that come out blue/orange */
+[class*="from-blue-"], [class*="via-blue-"], [class*="to-blue-"],
+[class*="from-orange-"], [class*="via-orange-"], [class*="to-orange-"],
+[class*="from-amber-"], [class*="via-amber-"], [class*="to-amber-"] {
+  --tw-gradient-from: rgba(236, 168, 214, 0.15) !important;
+  --tw-gradient-via: rgba(236, 168, 214, 0.08) !important;
+  --tw-gradient-to: rgba(0, 1, 1, 0) !important;
+}
+
+/* Page-local font overrides — any element that names a non-Instrument
+   font is force-rebound to Instrument Sans by the rule earlier in this
+   file. The variables below catch projects that hold the font in a
+   custom property. */
+:root {
+  --font-syne: "Instrument Sans", system-ui, sans-serif;
+  --font-poppins: "Instrument Sans", system-ui, sans-serif;
+  --font-ibm-plex: "Instrument Sans", system-ui, sans-serif;
+  --font-plus-jakarta: "Instrument Sans", system-ui, sans-serif;
+}
+
+/* ------------------------------------------------------------------ */
+/*  SCROLL-DOCKED NAV                                                  */
+/*  Top of page → fully transparent, full-bleed, blends into bg.       */
+/*  Scrolled (`.is-docked` on <nav>) → centered floating pill with     */
+/*  blur, border, shadow. Mirrors bluesminds.com navbar behaviour.     */
+/* ------------------------------------------------------------------ */
+
+nav {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 100 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-bottom: 0 !important;
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  margin: 0 auto !important;
+  max-width: none !important;
+  padding: 8px 0 !important;
+  transition:
+    max-width 720ms cubic-bezier(0.32, 0.72, 0, 1),
+    background-color 520ms cubic-bezier(0.32, 0.72, 0, 1),
+    border-color 520ms cubic-bezier(0.32, 0.72, 0, 1),
+    border-radius 720ms cubic-bezier(0.32, 0.72, 0, 1),
+    backdrop-filter 520ms ease,
+    -webkit-backdrop-filter 520ms ease,
+    box-shadow 520ms ease,
+    top 720ms cubic-bezier(0.32, 0.72, 0, 1),
+    padding 520ms cubic-bezier(0.32, 0.72, 0, 1) !important;
+}
+
+/* Docked = floating pill, clearly detached from the viewport edge */
+nav.is-docked {
+  top: 14px !important;
+  max-width: min(1180px, calc(100% - 32px)) !important;
+  padding: 4px 0 !important;
+  background: rgba(4, 6, 8, 0.78) !important;
+  background-color: rgba(4, 6, 8, 0.78) !important;
+  border: 1px solid rgba(236, 235, 231, 0.08) !important;
+  border-radius: 9999px !important;
+  backdrop-filter: blur(18px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
+  box-shadow:
+    0 1px 0 rgba(236, 235, 231, 0.06) inset,
+    0 24px 60px -28px rgba(0, 0, 0, 0.7),
+    0 8px 24px -12px rgba(0, 0, 0, 0.4) !important;
+}
+
+nav.is-docked .nav-inner {
+  padding-left: 22px !important;
+  padding-right: 14px !important;
+  height: 52px !important;
+  transition: height 720ms cubic-bezier(0.32, 0.72, 0, 1), padding 520ms cubic-bezier(0.32, 0.72, 0, 1) !important;
+}
+
+/* Push the page content down so the docked pill doesn't overlap content */
+body { padding-top: 0; }
+
+/* Kill top-nav hover highlights — links and dropdown triggers stay
+   their resting colour on hover. Active route still highlights. */
+nav .nav-links a:hover,
+nav .nav-dropdown-trigger:hover {
+  color: inherit !important;
+  opacity: 1 !important;
+  background: transparent !important;
+}
+nav .nav-links a,
+nav .nav-dropdown-trigger {
+  transition: none !important;
+}
+
+/* CTA on docked state — paint it as the pill-within-pill primary */
+nav .nav-cta,
+nav .nav-end .nav-cta {
+  transition: background 200ms ease, color 200ms ease, transform 200ms ease;
+}
+nav.is-docked .nav-cta {
+  background: var(--bm-foreground) !important;
+  color: var(--bm-background) !important;
+  border-radius: 9999px !important;
+  padding: 0.5rem 1rem !important;
+}
+
+/* A subtle global page atmosphere so disparate pages share air */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(236, 168, 214, 0.05), transparent 60%),
+    radial-gradient(ellipse 60% 60% at 100% 100%, rgba(236, 168, 214, 0.04), transparent 70%);
+}
+body > * { position: relative; z-index: 1; }
+
+/* ------------------------------------------------------------------ */
+/*  MONOCHROME LOCK                                                    */
+/*  Strips remaining pink/red brand tint from buttons, borders, focus  */
+/*  rings, links, and chrome — while leaving the hero shimmer          */
+/*  (.accent-text / .gradient-text) and the atmospheric glows          */
+/*  (body::before, .blob-*, .hero-gradient, *-glow) untouched.         */
+/* ------------------------------------------------------------------ */
+
+/* Primary CTAs from style.css */
+.btn-primary {
+  background: var(--bm-foreground) !important;
+  color: var(--bm-background) !important;
+  box-shadow:
+    0 0 0 1px rgba(236, 235, 231, 0.18),
+    0 4px 12px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.18) !important;
+}
+.btn-primary:hover {
+  background: #ffffff !important;
+  color: var(--bm-background) !important;
+}
+.btn-secondary {
+  background: transparent !important;
+  color: var(--bm-foreground) !important;
+  border: 1px solid rgba(236, 235, 231, 0.18) !important;
+}
+.btn-secondary:hover {
+  background: rgba(236, 235, 231, 0.06) !important;
+  border-color: rgba(236, 235, 231, 0.32) !important;
+}
+
+/* Inline pink/red-pink colored text (qsm-h, ck, ib-port-input focus, etc.) */
+.qsm-h {
+  background: rgba(236, 235, 231, 0.08) !important;
+  border-color: rgba(236, 235, 231, 0.25) !important;
+  color: var(--bm-foreground) !important;
+}
+.ck { color: var(--bm-foreground) !important; }
+
+/* Focus rings & input borders that pull in --accent */
+input:focus, textarea:focus, select:focus,
+.ib-port-input:focus, .ib-msg-input:focus {
+  border-color: rgba(236, 235, 231, 0.45) !important;
+  box-shadow: 0 0 0 3px rgba(236, 235, 231, 0.1) !important;
+}
+
+/* Accent-colored dividers and small dots → muted cream */
+.tag::before {
+  background: rgba(236, 235, 231, 0.55) !important;
+}
+
+/* Hairline accent borders (sections, cards) → monochrome */
+[class]:not(.hero-gradient):not(.blob-1):not(.blob-2):not(.blob-3):not(.blob-4) {
+  /* no-op; needed only to anchor the rule below to high enough specificity */
+}
+
+/* Hero shimmer — explicitly KEEP its pink gradient, isolated from the
+   monochrome --accent override above (the var() still resolves to pink
+   because we left --accent / --accent-bright alone). Just re-state for
+   clarity / future-proofing. */
+.accent-text {
+  background: linear-gradient(to right, var(--bm-pink), #ff9ed1, var(--bm-pink)) !important;
+  background-size: 200% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+}
+
+/* ------------------------------------------------------------------ */
+/*  GLOW RESTORATION                                                   */
+/*  Bulk monochrome sweep above neutralized all bare red rgba values   */
+/*  in style.css. Re-paint the actual glow effects back to pink.       */
+/* ------------------------------------------------------------------ */
+
+/* Body radial atmosphere */
+.bg-radial {
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 60%, rgba(236, 168, 214, 0.07) 0%, transparent 70%),
+    var(--bg-base) !important;
+}
+
+/* Floating blurred blobs — keep them pink so the hero still glows */
+.blob-1, .blob-4 {
+  background: var(--bm-pink) !important;
+}
+.blob-2 {
+  background: linear-gradient(135deg, #b8568e, var(--bm-pink)) !important;
+}
+.blob-3 {
+  background: linear-gradient(135deg, #a04379, var(--bm-pink)) !important;
+}
+
+/* Mouse-follow / hover glow circles still read --accent-glow which we
+   left at pink at the top of this file — nothing else to do. */

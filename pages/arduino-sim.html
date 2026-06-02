@@ -1,12 +1,14 @@
+<script src="/js/dock-nav.js" defer></script>
+<link rel="stylesheet" href="/css/theme.css">
 <!-- Arduino Simulator -->
 <style>
   body.as-page footer { display: none; }
 
   /* Local accent tokens — rest inherits from global site vars */
   .as-wrap {
-    --as-accent:    #00979d;
-    --as-accent-br: #2ab8be;
-    --as-red:       #e35f5f;
+    --as-accent:    #eca8d6;
+    --as-accent-br: #eca8d6;
+    --as-red:       #eca8d6;
 
     position: fixed;
     top: 58px; left: 0; right: 0; bottom: 0;
@@ -131,17 +133,17 @@
   .as-tool-btn:hover:not(:disabled) { background: rgba(255,255,255,0.07); color: var(--foreground); }
   .as-tool-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .as-tool-btn.as-btn-run {
-    background: rgba(0,151,157,0.08);
-    border-color: rgba(0,151,157,0.25);
+    background: rgba(236,168,214,0.08);
+    border-color: rgba(236,168,214,0.25);
     color: var(--as-accent-br);
   }
-  .as-tool-btn.as-btn-run:hover:not(:disabled) { background: rgba(0,151,157,0.18); border-color: var(--as-accent); }
+  .as-tool-btn.as-btn-run:hover:not(:disabled) { background: rgba(236,168,214,0.18); border-color: var(--as-accent); }
   .as-tool-btn.as-btn-stop {
-    background: rgba(227,95,95,0.07);
-    border-color: rgba(227,95,95,0.22);
+    background: rgba(236,168,214,0.07);
+    border-color: rgba(236,168,214,0.22);
     color: var(--as-red);
   }
-  .as-tool-btn.as-btn-stop:hover:not(:disabled) { background: rgba(227,95,95,0.16); border-color: var(--as-red); }
+  .as-tool-btn.as-btn-stop:hover:not(:disabled) { background: rgba(236,168,214,0.16); border-color: var(--as-red); }
   .as-speed-label {
     font-size: 0.6rem;
     color: var(--foreground-muted);
@@ -208,19 +210,19 @@
     transition: background 0.2s, color 0.2s, border-color 0.2s;
   }
   .as-mode-badge.wire {
-    background: rgba(0,151,157,0.1);
-    border-color: rgba(0,151,157,0.35);
+    background: rgba(236,168,214,0.1);
+    border-color: rgba(236,168,214,0.35);
     color: var(--as-accent-br);
   }
   .as-mode-badge.running {
-    background: rgba(0,151,157,0.14);
+    background: rgba(236,168,214,0.14);
     border-color: var(--as-accent);
     color: var(--as-accent-br);
     animation: asBadgePulse 1.5s ease-in-out infinite;
   }
   @keyframes asBadgePulse {
-    0%,100% { box-shadow: 0 0 0 0 rgba(0,151,157,0.3); }
-    50%      { box-shadow: 0 0 0 5px rgba(0,151,157,0); }
+    0%,100% { box-shadow: 0 0 0 0 rgba(236,168,214,0.3); }
+    50%      { box-shadow: 0 0 0 5px rgba(236,168,214,0); }
   }
 
   /* ── Component palette (right strip) ── */
@@ -256,8 +258,8 @@
     transition: background 0.15s;
     user-select: none;
   }
-  .as-palette-item:hover { background: rgba(0,151,157,0.06); }
-  .as-palette-item:active { background: rgba(0,151,157,0.12); }
+  .as-palette-item:hover { background: rgba(236,168,214,0.06); }
+  .as-palette-item:active { background: rgba(236,168,214,0.12); }
   .as-palette-item svg { display: block; overflow: visible; }
   .as-palette-label {
     font-size: 0.58rem;
@@ -312,7 +314,7 @@
   }
   .as-serial-output::-webkit-scrollbar { width: 3px; }
   .as-serial-output::-webkit-scrollbar-track { background: transparent; }
-  .as-serial-output::-webkit-scrollbar-thumb { background: rgba(0,151,157,0.2); border-radius: 4px; }
+  .as-serial-output::-webkit-scrollbar-thumb { background: rgba(236,168,214,0.2); border-radius: 4px; }
   .as-serial-line { display: block; }
   .as-serial-ts { color: var(--foreground-muted); margin-right: 6px; }
 
@@ -325,16 +327,16 @@
   }
   /* Hit circle hover → adjacent visual circle */
   [data-pin]:hover + .as-pin-circle {
-    fill: rgba(0,151,157,0.28);
+    fill: rgba(236,168,214,0.28);
     stroke: var(--as-accent);
   }
   [data-pin].pending + .as-pin-circle {
-    fill: rgba(0,151,157,0.4);
+    fill: rgba(236,168,214,0.4);
     stroke: var(--as-accent-br);
     stroke-width: 2;
   }
   [data-pin].connected + .as-pin-circle {
-    fill: rgba(0,151,157,0.12);
+    fill: rgba(236,168,214,0.12);
     stroke: var(--as-accent);
   }
 
@@ -342,13 +344,13 @@
   .as-wire.selected {
     stroke: var(--as-accent-br);
     stroke-width: 2.5;
-    filter: drop-shadow(0 0 4px rgba(0,151,157,0.6));
+    filter: drop-shadow(0 0 4px rgba(236,168,214,0.6));
   }
   .as-wire-hit { stroke: transparent; stroke-width: 14; fill: none; cursor: pointer; }
 
   .as-comp-body { cursor: move; }
-  .as-comp-body.selected-comp > * { filter: drop-shadow(0 0 6px rgba(0,151,157,0.5)); }
-  .as-led-on { filter: drop-shadow(0 0 6px var(--led-color, #e35f5f)); }
+  .as-comp-body.selected-comp > * { filter: drop-shadow(0 0 6px rgba(236,168,214,0.5)); }
+  .as-led-on { filter: drop-shadow(0 0 6px var(--led-color, #eca8d6)); }
 
   @keyframes asLedGlow {
     0%,100% { opacity: 1; }
@@ -378,7 +380,7 @@
     transition: background 0.12s;
   }
   .as-examples-item:last-child { border-bottom: none; }
-  .as-examples-item:hover { background: rgba(0,151,157,0.07); }
+  .as-examples-item:hover { background: rgba(236,168,214,0.07); }
   .as-examples-name {
     font-size: 0.68rem;
     color: var(--foreground);
@@ -461,8 +463,8 @@
         <div class="as-palette-item" data-add="led">
           <svg width="40" height="68" viewBox="0 0 44 80">
             <line x1="22" y1="0" x2="22" y2="18" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
-            <polygon points="10,18 34,18 22,38" fill="rgba(227,95,95,0.45)" stroke="#e35f5f" stroke-width="1.2"/>
-            <line x1="10" y1="38" x2="34" y2="38" stroke="#e35f5f" stroke-width="2"/>
+            <polygon points="10,18 34,18 22,38" fill="rgba(236,168,214,0.45)" stroke="#eca8d6" stroke-width="1.2"/>
+            <line x1="10" y1="38" x2="34" y2="38" stroke="#eca8d6" stroke-width="2"/>
             <line x1="22" y1="38" x2="22" y2="70" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
             <circle cx="22" cy="0"  r="4" fill="#333" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
             <circle cx="22" cy="70" r="4" fill="#333" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
@@ -581,19 +583,19 @@ window.AS_MONACO_THEME = {
     { token: 'macro',             foreground: 'b0e8b0' },
   ],
   colors: {
-    'editor.background':                '#080404',
-    'editor.foreground':                '#E9EBF0',
-    'editor.lineHighlightBackground':   '#00979d0a',
+    'editor.background':                '#000101',
+    'editor.foreground':                '#ecebe7',
+    'editor.lineHighlightBackground':   '#eca8d60a',
     'editorLineNumber.foreground':      '#4a4050',
     'editorLineNumber.activeForeground':'#9aa0b2',
-    'editor.selectionBackground':       '#00979d30',
-    'editorCursor.foreground':          '#00979d',
+    'editor.selectionBackground':       '#eca8d630',
+    'editorCursor.foreground':          '#eca8d6',
     'editorIndentGuide.background1':    '#ffffff0c',
-    'editorBracketMatch.background':    '#00979d20',
-    'editorBracketMatch.border':        '#00979d60',
+    'editorBracketMatch.background':    '#eca8d620',
+    'editorBracketMatch.border':        '#eca8d660',
     'editorSuggestWidget.background':   '#0d110d',
-    'editorSuggestWidget.border':       '#00979d30',
-    'editorSuggestWidget.selectedBackground': '#00979d20',
+    'editorSuggestWidget.border':       '#eca8d630',
+    'editorSuggestWidget.selectedBackground': '#eca8d620',
   }
 };
 
@@ -920,7 +922,7 @@ const components = []; // { id, type, x, y, state, svgEl }
 function addComponent(type, x, y) {
   const id = 'comp_' + (++compIdCounter);
   const comp = { id, type, x, y, state: {}, svgEl: null };
-  if (type === 'led') { comp.state = { on: false, color: '#e35f5f' }; }
+  if (type === 'led') { comp.state = { on: false, color: '#eca8d6' }; }
   if (type === 'button') { comp.state = { pressed: false }; }
   if (type === 'resistor') { comp.state = { ohms: 220 }; }
   components.push(comp);
@@ -954,7 +956,7 @@ function renderComponent(comp) {
 
   if (comp.type === 'led') {
     const on = comp.state.on;
-    const col = comp.state.color || '#e35f5f';
+    const col = comp.state.color || '#eca8d6';
     const offCol = col + '88';
     // Transparent bounding-box catch-all (prevents wires underneath from stealing clicks)
     inner += `<rect x="5" y="-10" width="40" height="92" fill="transparent" pointer-events="all"/>`;
@@ -981,11 +983,11 @@ function renderComponent(comp) {
     inner += `<line x1="0" y1="25" x2="18" y2="25" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>`;
     inner += `<line x1="42" y1="25" x2="60" y2="25" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>`;
     inner += `<rect x="14" y="8" width="32" height="34" rx="4"
-      fill="${pr ? 'rgba(0,151,157,0.3)' : 'rgba(255,255,255,0.06)'}"
-      stroke="${pr ? '#00979d' : 'rgba(255,255,255,0.2)'}" stroke-width="1.2"
+      fill="${pr ? 'rgba(236,168,214,0.3)' : 'rgba(255,255,255,0.06)'}"
+      stroke="${pr ? '#eca8d6' : 'rgba(255,255,255,0.2)'}" stroke-width="1.2"
       class="as-btn-body" data-btn-body="${comp.id}"/>`;
     inner += `<circle cx="30" cy="25" r="4"
-      fill="${pr ? '#2ab8be' : 'rgba(255,255,255,0.2)'}"/>`;
+      fill="${pr ? '#eca8d6' : 'rgba(255,255,255,0.2)'}"/>`;
     inner += `<text x="30" y="56" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="8" fill="rgba(255,255,255,0.35)">BTN</text>`;
     inner += `<circle cx="0"  cy="25" r="10" fill="transparent" pointer-events="all" data-pin="P1" data-comp="${comp.id}"/>`;
     inner += `<circle class="as-pin-circle" cx="0"  cy="25" r="7" pointer-events="none"/>`;
@@ -1416,7 +1418,7 @@ svg.addEventListener('mousemove', (e) => {
   if (!pendingWire) return;
   const pt = svgPoint(e.clientX, e.clientY);
   const d = wirePath(pendingWire.cx, pendingWire.cy, pt.x, pt.y);
-  wirePreviewLayer.innerHTML = `<path d="${d}" stroke="rgba(0,151,157,0.5)" stroke-width="2" fill="none" stroke-dasharray="6 3" pointer-events="none"/>`;
+  wirePreviewLayer.innerHTML = `<path d="${d}" stroke="rgba(236,168,214,0.5)" stroke-width="2" fill="none" stroke-dasharray="6 3" pointer-events="none"/>`;
 });
 
 svg.addEventListener('click', (e) => {
@@ -1888,7 +1890,7 @@ void loop() {
       const r = addC('led', 360, 20);
       wire(r.id, 'A', 'uno', 'd11');
       wire(r.id, 'K', 'uno', 'gnd1');
-      r.state.color = '#e35f5f';
+      r.state.color = '#eca8d6';
 
       const y = addC('led', 420, 20);
       wire(y.id, 'A', 'uno', 'd12');
