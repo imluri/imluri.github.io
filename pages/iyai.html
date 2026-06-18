@@ -299,6 +299,10 @@
     </button>
   </div>
   <div class="ib-modal-body">
+    <div class="ib-help-note" id="ibHttpsWarn" style="display:none;margin-bottom:14px;">
+      <iconify-icon icon="mdi:alert-outline" width="13" height="13"></iconify-icon>
+      <span>You're viewing this page over <strong>HTTPS</strong>. Browsers block an HTTPS page from reaching a local <code>http://localhost</code> bridge, so connecting here won't work. Run the UI from a local <code>http://</code> origin instead: download the <a href="https://github.com/imluri/imluri.github.io" target="_blank" rel="noopener">site repo</a>, run <code>python serve.py</code>, and open <code>http://localhost:5500/iyai</code>. Then follow the steps below.</span>
+    </div>
     <ol class="ib-help-steps">
       <li>
         <span class="ib-help-step-num">1</span>
@@ -394,7 +398,9 @@ let ibEventSource = null;
 let ibBaseUrl     = 'http://localhost:7402';
 let ibCurrentHistory = [];
 let ibSettings = { host: 'OpenRouter', model: '', apiKey: '' };
-const IB_HOSTS = ['OpenRouter', 'Groq', 'Mistral', 'Pollinations', 'HuggingFace', 'Google AI Studio', 'Ollama', '9router', 'OpenCode'];
+// Provider names must match the plugin's providers.json exactly (the chosen
+// host string is sent back to the plugin via settings_update).
+const IB_HOSTS = ['OpenRouter', 'Ollama', 'Ollama ☁️', 'Mistral', 'Groq', 'Pollinations', 'HuggingFace', 'Google AI Studio', '9router', 'OpenCode', 'Bluesminds'];
 
 // Per-window position/visibility state
 const ibWinState = new Map([
@@ -429,11 +435,31 @@ function ibLogClear() {
 }
 
 // ── Connection ────────────────────────────────────────────────
+// Browsers block a page served over HTTPS from reaching a plain-HTTP
+// localhost server (the request is upgraded to https:// or refused). This
+// page on https://imluri.github.io therefore CANNOT talk to the local
+// bridge. Detect that up front and tell the user how to actually run it.
+function ibHttpsBlocked(targetUrl) {
+  if (location.protocol !== 'https:') return false;        // local http page → fine
+  return /^http:\/\//i.test(targetUrl);                    // https page → http target = blocked
+}
+
 async function ibConnect() {
   if (ibConnected) { ibDisconnect(); return; }
   if (ibConnecting) return;
   ibConnecting = true;
   ibBaseUrl = (document.getElementById('ibPortInput').value || 'http://localhost:7402').trim();
+
+  if (ibHttpsBlocked(ibBaseUrl)) {
+    ibConnecting = false;
+    ibSetStatus('disconnected');
+    ibAddMsg('system', "This page is loaded over HTTPS, so your browser blocks it from reaching the local bridge (http://localhost). Run the UI from a local http:// origin instead — see “How to Connect”.");
+    ibLog('Blocked: an HTTPS page cannot reach an http://localhost bridge (mixed-content / auto-upgrade).', 'err');
+    ibLog('Fix: download the repo and run serve.py, then open http://localhost:5500/iyai — or open the bridge URL directly.', 'err');
+    ibToggleHelp();
+    return;
+  }
+
   ibSetStatus('connecting');
   ibLog(`Connecting to ${ibBaseUrl}…`);
   try {
@@ -2186,6 +2212,14 @@ async function ibDecompileCopy() {
 
 requestAnimationFrame(() => requestAnimationFrame(ibInitWindows));
 ibInitMonaco();
+
+// Surface the HTTPS limitation up front: if this page is served over HTTPS it
+// cannot reach the local http bridge, so flag it in the header and help modal.
+if (location.protocol === 'https:') {
+  const warn = document.getElementById('ibHttpsWarn');
+  if (warn) warn.style.display = '';
+  ibLog('Heads up: served over HTTPS — open via a local http:// origin to reach the bridge. Click the (?) for how.', 'err');
+}
 
 // Expose functions called from inline onclick attributes
 window.ibConnect         = ibConnect;

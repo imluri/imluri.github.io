@@ -303,14 +303,19 @@ function renderProjectCard(project) {
       </div>
     `;
   } else {
-    extraClass = '';
+    // Icon-only projects use the same cover layout as image cards, with the
+    // icon centered in the background — matches Chessist's image-fallback look
+    // so the grid stays visually consistent.
+    extraClass = 'project-card--cover project-card--contain';
     inner = `
-      <div class="project-image">
+      <div class="project-card-bg">
         <iconify-icon icon="${fallbackIcon}" width="48" height="48" style="color:var(--accent)"></iconify-icon>
       </div>
-      <h3 class="project-title">${project.title}</h3>
-      <p class="project-description">${project.description}</p>
-      <div class="project-tags">${tags}</div>
+      <div class="project-card-overlay">
+        <h3 class="project-title">${project.title}</h3>
+        <p class="project-description">${project.description}</p>
+        <div class="project-tags">${tags}</div>
+      </div>
     `;
   }
 
