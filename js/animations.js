@@ -3,8 +3,21 @@
   const io = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
-      entry.target.classList.add('is-visible');
-      io.unobserve(entry.target);
+      const el = entry.target;
+      el.classList.add('is-visible');
+      io.unobserve(el);
+      // Once the entrance animation finishes, drop the entrance classes so the
+      // forwards-fill animation stops pinning `transform`. Left in place it
+      // silently overrides any `:hover { transform }` (e.g. the glass-card
+      // lift), so cards on .section-enter wouldn't lift on hover. Removing the
+      // class settles the element to its natural position — same visual, but
+      // hover transforms work again.
+      el.addEventListener('animationend', function settle(e) {
+        if (e.animationName !== 'sectionEnter') return;
+        el.removeEventListener('animationend', settle);
+        el.classList.remove('section-enter', 'is-visible');
+        el.style.animationDelay = '';
+      });
     });
   }, { threshold: 0.08, rootMargin: '0px 0px -32px 0px' });
 

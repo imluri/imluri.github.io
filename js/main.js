@@ -55,11 +55,15 @@ function renderProjectCard(project) {
 
 function renderToolCard(tool) {
   const tags = tool.tags.map(t => `<span class="tag-badge">${t}</span>`).join('');
-  const iconHTML = `<iconify-icon icon="${tool.icon}" width="36" height="36" style="color: white;"></iconify-icon>`;
+  // Compact glyph card: the icon is a small glowing accent tile beside the
+  // title — no empty 16:9 image box, since these category cards have no image.
+  const iconHTML = `<iconify-icon icon="${tool.icon}" width="26" height="26"></iconify-icon>`;
 
   const inner = `
-    <div class="project-image">${iconHTML}</div>
-    <h3 class="project-title">${tool.title}</h3>
+    <div class="tool-card-head">
+      <span class="glyph-tile">${iconHTML}</span>
+      <h3 class="project-title">${tool.title}</h3>
+    </div>
     <p class="project-description">${tool.description}</p>
     <div class="project-tags">${tags}</div>
   `;
@@ -69,13 +73,13 @@ function renderToolCard(tool) {
     card.href = tool.link;
     card.target = '_blank';
     card.rel = 'noopener noreferrer';
-    card.className = 'bento-card project-card';
+    card.className = 'bento-card project-card tool-card spotlight';
     card.innerHTML = inner;
     return card;
   }
 
   const card = document.createElement('div');
-  card.className = 'bento-card project-card';
+  card.className = 'bento-card project-card tool-card spotlight';
   card.innerHTML = inner;
   return card;
 }
@@ -598,120 +602,16 @@ function startShowcaseAnimations() {
   _runChessist();
 }
 
-// ── Snap + smooth scroll ──────────────────────────────────────
-
-(function () {
-  let locked = false;
-  let smoothTarget  = window.scrollY;
-  let smoothCurrent = window.scrollY;
-  let smoothRaf     = null;
-  let smoothLastT   = null;
-
-  function cancelSmooth() {
-    if (smoothRaf) { cancelAnimationFrame(smoothRaf); smoothRaf = null; }
-    smoothLastT = null;
-  }
-
-  function syncSmooth() {
-    smoothTarget = smoothCurrent = window.scrollY;
-  }
-
-  // Snap: ease-in-out cubic, cancels smooth first
-  function snapTo(y) {
-    cancelSmooth();
-    locked = true;
-    // Pre-fire the nav dock/undock now, in lockstep with the scroll. Because
-    // we already know the destination, the nav animates over the same 680ms
-    // instead of waiting for scrollY to cross its threshold mid-glide.
-    document.dispatchEvent(new CustomEvent('navsnap', { detail: { y } }));
-    const from     = window.scrollY;
-    const distance = y - from;
-    const duration = 680;
-    const t0       = performance.now();
-    function easeInOut(t) {
-      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    }
-    function step(now) {
-      const p = Math.min((now - t0) / duration, 1);
-      window.scrollTo(0, from + distance * easeInOut(p));
-      if (p < 1) {
-        requestAnimationFrame(step);
-      } else {
-        window.scrollTo(0, y);
-        syncSmooth();
-        locked = false;
-        document.dispatchEvent(new CustomEvent('navsnapend', { detail: { y } }));
-      }
-    }
-    requestAnimationFrame(step);
-  }
-
-  // Smooth: exponential decay lerp — frame-rate independent (k≈8 ≈ 0.12 factor at 60fps)
-  function smoothStep(now) {
-    const dt = smoothLastT ? Math.min((now - smoothLastT) / 1000, 0.1) : 1 / 60;
-    smoothLastT = now;
-    const factor = 1 - Math.exp(-8 * dt);
-    smoothCurrent += (smoothTarget - smoothCurrent) * factor;
-    window.scrollTo(0, smoothCurrent);
-    if (Math.abs(smoothTarget - smoothCurrent) > 0.5) {
-      smoothRaf = requestAnimationFrame(smoothStep);
-    } else {
-      window.scrollTo(0, smoothTarget);
-      smoothCurrent = smoothTarget;
-      smoothRaf = null;
-      smoothLastT = null;
-    }
-  }
-
-  // Normalize wheel delta to pixels regardless of deltaMode
-  function normalizeDelta(e) {
-    if (e.deltaMode === 1) return e.deltaY * 24;   // line mode (~24px/line)
-    if (e.deltaMode === 2) return e.deltaY * window.innerHeight; // page mode
-    return e.deltaY;                                // pixel mode (default)
-  }
-
-  window.addEventListener('wheel', (e) => {
-    if (window.innerWidth <= 768) return;
-    // Let native scroll handle wheel events inside scrollable sub-panels
-    if (e.target.closest('.ib-win-body, .ib-explorer, .ib-props, .ib-log-entries, .ib-history-list, .ib-tools-list, .bm-sidebar, .bm-shortcuts-grid, .bm-ctx-menu, .bm-toolbar-drop, .bm-layers-list, #pin-list, #hierarchy-tree')) return;
-    e.preventDefault();
-
-    if (locked) return;
-
-    const showcase = document.getElementById('showcase');
-    const about    = document.getElementById('about');
-    const SNAP_1_OFFSET = -50;
-    const SNAP_2_OFFSET = 0;
-    const sy = window.scrollY;
-    const s1 = showcase ? showcase.offsetTop + SNAP_1_OFFSET : null;
-    const s2 = about    ? about.offsetTop    + SNAP_2_OFFSET : null;
-    const vh = window.innerHeight;
-
-    // Snap zones (home page only)
-    if (showcase) {
-      if      (e.deltaY > 0 && sy < s1)                               { snapTo(s1); return; }
-      else if (e.deltaY > 0 && s2 && sy >= s1 && sy < s2)            { snapTo(s2); return; }
-      else if (e.deltaY < 0 && s2 && sy > s2 - vh * 0.2 && sy <= s2) { snapTo(s1); return; }
-      else if (e.deltaY < 0 && sy > 0 && sy < s1 + vh * 0.2)         { snapTo(0);  return; }
-    }
-
-    // Smooth scroll — sync both targets from real position if RAF was idle
-    if (!smoothRaf) syncSmooth();
-    const delta = normalizeDelta(e);
-    const maxY = document.documentElement.scrollHeight - window.innerHeight;
-    smoothTarget = Math.max(0, Math.min(maxY, smoothTarget + delta));
-    if (!smoothRaf) smoothRaf = requestAnimationFrame(smoothStep);
-  }, { passive: false });
-
-  // Keep state in sync when scrollbar drag or page navigation moves scrollY
-  // outside of our wheel handler (e.g. scrollbar, router scrollTo, touch)
-  window.addEventListener('scroll', () => {
-    if (!smoothRaf && !locked) syncSmooth();
-  }, { passive: true });
-
-  // Cancel + sync on back/forward navigation
-  window.addEventListener('popstate', () => { cancelSmooth(); syncSmooth(); });
-}());
+// ── Scrolling ─────────────────────────────────────────────────
+// Native scrolling only. A previous custom wheel engine (whole-page
+// smooth-lerp + snap-to-section) assumed every section fit within one
+// viewport — roughly true near 1080p, but on shorter/taller screens it
+// force-snapped past content that didn't fit and fought trackpad/high-
+// refresh input. Removed in favour of native scroll, which is correct at
+// every resolution and input device. Nav docking (dock-nav.js via
+// IntersectionObserver) and the 3D scroll-fade (scene3d.js via
+// window.scrollY) work independently and are unaffected. CSS
+// `scroll-behavior: smooth` still gives smooth anchor / router scrolling.
 
 // ── Init ──────────────────────────────────────────────────────
 

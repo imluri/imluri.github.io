@@ -72,6 +72,9 @@ function initPage() {
   // Scroll-triggered entrance animations + Motion progress bar
   if (typeof window.initScrollAnimations === 'function') window.initScrollAnimations();
 
+  // Decrypt-scramble headline effect
+  if (typeof window.initDecryptText === 'function') window.initDecryptText();
+
   // Move focus to main content for screen readers after page swap
   const mainEl = document.getElementById('app');
   if (mainEl) {
@@ -171,8 +174,8 @@ function renderProjectDetail(slug) {
             ${project.link ? `
             <div class="btn-group" style="margin-top:24px;">
               <a href="${project.link}" target="_blank" rel="noopener" class="btn btn-primary">
-                ${project.link.includes('github.com') ? 'View on GitHub' : 'View Project'}
-                <iconify-icon icon="${project.link.includes('github.com') ? 'mdi:github' : 'mdi:open-in-new'}" width="16" height="16"></iconify-icon>
+                ${project.link.includes('github.com') ? 'View on GitHub' : project.link.includes('discord.com') ? 'Add to Discord' : 'View Project'}
+                <iconify-icon icon="${project.link.includes('github.com') ? 'mdi:github' : project.link.includes('discord.com') ? 'mdi:discord' : 'mdi:open-in-new'}" width="16" height="16"></iconify-icon>
               </a>
               ${project.webLink ? `
               <a href="${project.webLink}" data-route class="btn btn-secondary">

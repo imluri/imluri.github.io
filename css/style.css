@@ -31,21 +31,64 @@
 }
 
 :root {
-  --bg-deep: #080404;
-  --bg-base: #0c0707;
-  --bg-elevated: #0000003d;
-  --surface: rgba(255,255,255,0.04);
-  --surface-hover: rgba(255,255,255,0.06);
-  --foreground: #E9EBF0;
-  --foreground-muted: #9aa0b2;
-  --foreground-subtle: rgba(255,255,255,0.55);
-  --accent: #ecebe7;
-  --accent-bright: #ecebe7;
-  --accent-glow: rgba(236,235,231,0.14);
-  --border-default: rgba(255,255,255,0.04);
-  --border-hover: rgba(255,255,255,0.08);
-  --border-accent: rgba(236,235,231,0.20);
-  --ink: 18, 10, 10; /* accent hue, sat=0, very dark */
+  /* ============================================================== */
+  /*  SINGLE SOURCE OF TRUTH — design tokens                        */
+  /*  Palette + typography adapted from bluesminds.com. Previously  */
+  /*  these were re-declared (and !important-overridden) in         */
+  /*  theme.css; consolidated here so there is exactly one place    */
+  /*  to change a colour. theme.css now only layers behaviour       */
+  /*  (docked nav) and tames third-party Tailwind on /designs.      */
+  /* ============================================================== */
+
+  /* Raw palette */
+  --bm-background: #000101;
+  --bm-foreground: #ecebe7;
+  --bm-card: #020204;
+  --bm-secondary: #040608;
+  --bm-muted: #040608;
+  --bm-muted-foreground: #807b71; /* lifted from #757168 to clear WCAG AA 4.5:1 on near-black */
+  --bm-accent-surface: #07090d;
+  --bm-border: #101215;
+  --bm-input: #07090c;
+  --bm-ring: #ecebe7;
+  --bm-primary: #ecebe7;
+  --bm-primary-foreground: #000101;
+  --bm-destructive: #e40014;
+  --bm-pink: #eca8d6;
+  --bm-glow: var(--bm-pink);
+  --bm-chart-2: #a7a49e;
+  --bm-chart-3: #6c695f;
+  --bm-chart-4: #3c3a35;
+  --bm-chart-5: #171612;
+  --bm-radius: 0.25rem;
+
+  /* Fonts */
+  --font-instrument: "Instrument Sans", system-ui, sans-serif;
+  --font-instrument-serif: "Instrument Sans", system-ui, sans-serif;
+  --font-jetbrains: "Instrument Sans", ui-monospace, "Cascadia Mono", Menlo, monospace;
+  /* Pages that hold a font in a custom property inherit Instrument too */
+  --font-syne: "Instrument Sans", system-ui, sans-serif;
+  --font-poppins: "Instrument Sans", system-ui, sans-serif;
+  --font-ibm-plex: "Instrument Sans", system-ui, sans-serif;
+  --font-plus-jakarta: "Instrument Sans", system-ui, sans-serif;
+
+  /* Semantic tokens consumed throughout style.css */
+  --bg-deep: var(--bm-background);
+  --bg-base: var(--bm-background);
+  --bg-elevated: var(--bm-card);
+  --surface: var(--bm-secondary);
+  --surface-hover: var(--bm-accent-surface);
+  --foreground: var(--bm-foreground);
+  --foreground-muted: var(--bm-muted-foreground);
+  --foreground-subtle: rgba(236, 235, 231, 0.55);
+  /* Chrome accent → monochrome cream; glow stays pink for the atmosphere */
+  --accent: var(--bm-foreground);
+  --accent-bright: #ffffff;
+  --accent-glow: rgba(236, 168, 214, 0.14);
+  --border-default: var(--bm-border);
+  --border-hover: rgba(236, 235, 231, 0.12);
+  --border-accent: rgba(236, 235, 231, 0.18);
+  --ink: 0, 1, 1;
 }
 
 html {
@@ -70,7 +113,7 @@ body {
 }
 
 .bg-radial {
-  background: radial-gradient(ellipse 60% 40% at 50% 60%, rgba(236,235,231,0.06) 0%, transparent 70%), var(--bg-base);
+  background: radial-gradient(ellipse 60% 40% at 50% 60%, rgba(236,168,214,0.07) 0%, transparent 70%), var(--bg-base);
 }
 
 .bg-noise {
@@ -98,7 +141,7 @@ body {
   transform: translateX(-50%);
   width: 520px;
   height: 520px;
-  background: var(--accent);
+  background: var(--bm-pink);
   opacity: 0.07;
   animation-delay: 0s;
 }
@@ -108,7 +151,7 @@ body {
   left: 5%;
   width: 320px;
   height: 320px;
-  background: linear-gradient(135deg, #c43a3a, #ecebe7);
+  background: linear-gradient(135deg, #b8568e, var(--bm-pink));
   opacity: 0.05;
   animation-delay: -3s;
 }
@@ -118,7 +161,7 @@ body {
   right: 5%;
   width: 280px;
   height: 280px;
-  background: linear-gradient(135deg, #b52525, #ecebe7);
+  background: linear-gradient(135deg, #a04379, var(--bm-pink));
   opacity: 0.04;
   animation-delay: -5s;
 }
@@ -128,7 +171,7 @@ body {
   left: 35%;
   width: 240px;
   height: 240px;
-  background: var(--accent);
+  background: var(--bm-pink);
   opacity: 0.04;
   animation: pulse 4s ease-in-out infinite;
   animation-delay: -2s;
@@ -492,7 +535,7 @@ nav {
   content: '';
   width: 6px;
   height: 6px;
-  background: var(--accent);
+  background: rgba(236,235,231,0.55);
   border-radius: 50%;
   animation: blink 2s ease-in-out infinite;
 }
@@ -518,7 +561,7 @@ h1 {
 }
 
 .accent-text {
-  background: linear-gradient(to right, var(--accent), #ecebe7, var(--accent));
+  background: linear-gradient(to right, var(--bm-pink), #ff9ed1, var(--bm-pink));
   background-size: 200% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -555,11 +598,11 @@ h1 {
 
 .btn-primary {
   background: var(--accent);
-  color: #fff;
-  box-shadow: 
-    0 0 0 1px rgba(236,235,231,0.5),
-    0 4px 12px rgba(236,235,231,0.3),
-    inset 0 1px 0 0 rgba(255,255,255,0.2);
+  color: var(--bm-background);
+  box-shadow:
+    0 0 0 1px rgba(236,235,231,0.18),
+    0 4px 12px rgba(0,0,0,0.35),
+    inset 0 1px 0 0 rgba(255,255,255,0.18);
 }
 
 .btn-primary:hover {
@@ -576,14 +619,14 @@ h1 {
 }
 
 .btn-secondary {
-  background: var(--surface);
+  background: transparent;
   color: var(--foreground);
-  border: 1px solid var(--border-default);
+  border: 1px solid rgba(236,235,231,0.18);
 }
 
 .btn-secondary:hover {
-  background: var(--surface-hover);
-  border-color: var(--border-hover);
+  background: rgba(236,235,231,0.06);
+  border-color: rgba(236,235,231,0.32);
 }
 
 .btn-ghost {
@@ -726,9 +769,17 @@ h2 {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), var(--accent-glow) 0%, transparent 50%);
+  /* ReactBits SpotlightCard-style: a soft cream core catching the light,
+     fading through the pink brand glow to transparent. Fixed-radius circle
+     reads as a real spotlight rather than scaling with the card. */
+  background: radial-gradient(
+    260px circle at var(--x, 50%) var(--y, 50%),
+    rgba(236, 235, 231, 0.10) 0%,
+    var(--accent-glow) 38%,
+    transparent 72%
+  );
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.35s ease;
   pointer-events: none;
   border-radius: inherit;
 }
@@ -1029,6 +1080,58 @@ h2 {
   border-color: rgba(236,235,231,0.25);
 }
 
+/* ── Compact glyph cards (Games & Mods, Tools & Experiments) ───── */
+/* Icon-only category cards with no screenshot. Instead of a big empty
+   16:9 box, the icon sits in a small glowing accent tile beside the
+   title, so the card reads dense and intentional. */
+.tool-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.tool-card-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.tool-card .project-title {
+  margin-bottom: 0;
+}
+
+.tool-card .project-description {
+  flex: 1 1 auto; /* keep tag rows aligned across cards of unequal text */
+}
+
+.glyph-tile {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  color: var(--bm-foreground);
+  background:
+    radial-gradient(120% 120% at 30% 20%, rgba(236,235,231,0.12), rgba(236,235,231,0.02) 60%),
+    var(--bm-card);
+  border: 1px solid var(--border-accent);
+  box-shadow:
+    0 6px 16px -8px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+.tool-card:hover .glyph-tile {
+  border-color: rgba(236,168,214,0.45);
+  box-shadow:
+    0 0 0 1px rgba(236,168,214,0.18),
+    0 0 22px -4px rgba(236,168,214,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+  transform: translateY(-1px);
+}
+
 /* Floating tech icons — hero bento card */
 .floating-icons {
   position: absolute;
@@ -1144,7 +1247,7 @@ h2 {
 /* Syntax colours */
 .ct { color: #4b5563; }               /* comment */
 .ca { color: var(--foreground-muted); } /* attribute wrapper */
-.ck { color: var(--accent-bright); }   /* keyword */
+.ck { color: var(--bm-foreground); }   /* keyword */
 .ctype { color: #7dd3fc; }             /* type */
 .cs { color: #86efac; }               /* string */
 .cf { color: #fde68a; }               /* function name */
@@ -1518,7 +1621,7 @@ h2 {
   border: 1px solid;
 }
 
-.qsm-h  { background: rgba(236,235,231,0.15); border-color: var(--accent-bright); color: var(--accent-bright); }
+.qsm-h  { background: rgba(236,235,231,0.08); border-color: rgba(236,235,231,0.25); color: var(--bm-foreground); }
 .qsm-x  { background: rgba(134,239,172,0.12); border-color: #86efac; color: #86efac; }
 .qsm-z  { background: rgba(125,211,252,0.12); border-color: #7dd3fc; color: #7dd3fc; }
 .qsm-t  { background: rgba(253,230,138,0.12); border-color: #fde68a; color: #fde68a; }

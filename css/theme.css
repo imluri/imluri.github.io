@@ -9,53 +9,9 @@
   src: url("/assets/fonts/Instrument%20Sans%20Regular.woff2") format("woff2");
 }
 
-:root {
-  /* Bluesminds palette */
-  --bm-background: #000101;
-  --bm-foreground: #ecebe7;
-  --bm-card: #020204;
-  --bm-secondary: #040608;
-  --bm-muted: #040608;
-  --bm-muted-foreground: #757168;
-  --bm-accent-surface: #07090d;
-  --bm-border: #101215;
-  --bm-input: #07090c;
-  --bm-ring: #ecebe7;
-  --bm-primary: #ecebe7;
-  --bm-primary-foreground: #000101;
-  --bm-destructive: #e40014;
-  --bm-pink: #eca8d6;
-  --bm-chart-2: #a7a49e;
-  --bm-chart-3: #6c695f;
-  --bm-chart-4: #3c3a35;
-  --bm-chart-5: #171612;
-  --bm-radius: 0.25rem;
-
-  /* Fonts */
-  --font-instrument: "Instrument Sans", system-ui, sans-serif;
-  --font-instrument-serif: "Instrument Sans", system-ui, sans-serif;
-  --font-jetbrains: "Instrument Sans", ui-monospace, "Cascadia Mono", Menlo, monospace;
-
-  /* Override existing tokens so the existing stylesheet inherits the new look */
-  --bg-deep: var(--bm-background);
-  --bg-base: var(--bm-background);
-  --bg-elevated: var(--bm-card);
-  --surface: var(--bm-secondary);
-  --surface-hover: var(--bm-accent-surface);
-  --foreground: var(--bm-foreground);
-  --foreground-muted: var(--bm-muted-foreground);
-  --foreground-subtle: rgba(236, 235, 231, 0.55);
-  /* Chrome accent → monochrome cream. Glow tokens stay pink so the
-     blob/atmosphere effects are unaffected (they explicitly read these). */
-  --accent: var(--bm-foreground);
-  --accent-bright: #ffffff;
-  --accent-glow: rgba(236, 168, 214, 0.14);
-  --bm-glow: var(--bm-pink);
-  --border-default: var(--bm-border);
-  --border-hover: rgba(236, 235, 231, 0.12);
-  --border-accent: rgba(236, 235, 231, 0.18);
-  --ink: 0, 1, 1;
-}
+/* Design tokens (palette, fonts, semantic tokens) now live in style.css
+   :root as the single source of truth. This file only layers behaviour
+   and third-party taming on top. */
 
 html {
   scroll-behavior: smooth;
@@ -336,16 +292,10 @@ article {
   --tw-gradient-to: rgba(0, 1, 1, 0) !important;
 }
 
-/* Page-local font overrides — any element that names a non-Instrument
-   font is force-rebound to Instrument Sans by the rule earlier in this
-   file. The variables below catch projects that hold the font in a
-   custom property. */
-:root {
-  --font-syne: "Instrument Sans", system-ui, sans-serif;
-  --font-poppins: "Instrument Sans", system-ui, sans-serif;
-  --font-ibm-plex: "Instrument Sans", system-ui, sans-serif;
-  --font-plus-jakarta: "Instrument Sans", system-ui, sans-serif;
-}
+/* Page-local font custom properties (--font-syne, --font-poppins, etc.)
+   are defined in style.css :root so any page holding a font in a custom
+   property inherits Instrument Sans. The global font-family !important
+   rule earlier in this file rebinds elements that name a font directly. */
 
 /* ------------------------------------------------------------------ */
 /*  SCROLL-DOCKED NAV                                                  */
@@ -461,97 +411,16 @@ body::before {
 body > * { position: relative; z-index: 1; }
 
 /* ------------------------------------------------------------------ */
-/*  MONOCHROME LOCK                                                    */
-/*  Strips remaining pink/red brand tint from buttons, borders, focus  */
-/*  rings, links, and chrome — while leaving the hero shimmer          */
-/*  (.accent-text / .gradient-text) and the atmospheric glows          */
-/*  (body::before, .blob-*, .hero-gradient, *-glow) untouched.         */
+/*  INPUT FOCUS REFINEMENT                                             */
+/*  Buttons, blobs, hero shimmer, tag dots and the radial atmosphere   */
+/*  are now defined with their final values directly in style.css —    */
+/*  no override layer needed. The only thing kept here is a softer     */
+/*  focus ring for the integration-builder inputs, which style.css     */
+/*  draws with a solid --accent border; this loads later to win the    */
+/*  cascade tie without needing !important.                            */
 /* ------------------------------------------------------------------ */
-
-/* Primary CTAs from style.css */
-.btn-primary {
-  background: var(--bm-foreground) !important;
-  color: var(--bm-background) !important;
-  box-shadow:
-    0 0 0 1px rgba(236, 235, 231, 0.18),
-    0 4px 12px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.18) !important;
-}
-.btn-primary:hover {
-  background: #ffffff !important;
-  color: var(--bm-background) !important;
-}
-.btn-secondary {
-  background: transparent !important;
-  color: var(--bm-foreground) !important;
-  border: 1px solid rgba(236, 235, 231, 0.18) !important;
-}
-.btn-secondary:hover {
-  background: rgba(236, 235, 231, 0.06) !important;
-  border-color: rgba(236, 235, 231, 0.32) !important;
-}
-
-/* Inline pink/red-pink colored text (qsm-h, ck, ib-port-input focus, etc.) */
-.qsm-h {
-  background: rgba(236, 235, 231, 0.08) !important;
-  border-color: rgba(236, 235, 231, 0.25) !important;
-  color: var(--bm-foreground) !important;
-}
-.ck { color: var(--bm-foreground) !important; }
-
-/* Focus rings & input borders that pull in --accent */
 input:focus, textarea:focus, select:focus,
 .ib-port-input:focus, .ib-msg-input:focus {
-  border-color: rgba(236, 235, 231, 0.45) !important;
-  box-shadow: 0 0 0 3px rgba(236, 235, 231, 0.1) !important;
+  border-color: rgba(236, 235, 231, 0.45);
+  box-shadow: 0 0 0 3px rgba(236, 235, 231, 0.1);
 }
-
-/* Accent-colored dividers and small dots → muted cream */
-.tag::before {
-  background: rgba(236, 235, 231, 0.55) !important;
-}
-
-/* Hairline accent borders (sections, cards) → monochrome */
-[class]:not(.hero-gradient):not(.blob-1):not(.blob-2):not(.blob-3):not(.blob-4) {
-  /* no-op; needed only to anchor the rule below to high enough specificity */
-}
-
-/* Hero shimmer — explicitly KEEP its pink gradient, isolated from the
-   monochrome --accent override above (the var() still resolves to pink
-   because we left --accent / --accent-bright alone). Just re-state for
-   clarity / future-proofing. */
-.accent-text {
-  background: linear-gradient(to right, var(--bm-pink), #ff9ed1, var(--bm-pink)) !important;
-  background-size: 200% 100% !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  color: transparent !important;
-}
-
-/* ------------------------------------------------------------------ */
-/*  GLOW RESTORATION                                                   */
-/*  Bulk monochrome sweep above neutralized all bare red rgba values   */
-/*  in style.css. Re-paint the actual glow effects back to pink.       */
-/* ------------------------------------------------------------------ */
-
-/* Body radial atmosphere */
-.bg-radial {
-  background:
-    radial-gradient(ellipse 60% 40% at 50% 60%, rgba(236, 168, 214, 0.07) 0%, transparent 70%),
-    var(--bg-base) !important;
-}
-
-/* Floating blurred blobs — keep them pink so the hero still glows */
-.blob-1, .blob-4 {
-  background: var(--bm-pink) !important;
-}
-.blob-2 {
-  background: linear-gradient(135deg, #b8568e, var(--bm-pink)) !important;
-}
-.blob-3 {
-  background: linear-gradient(135deg, #a04379, var(--bm-pink)) !important;
-}
-
-/* Mouse-follow / hover glow circles still read --accent-glow which we
-   left at pink at the top of this file — nothing else to do. */
