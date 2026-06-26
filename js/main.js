@@ -85,6 +85,12 @@ function renderToolCard(tool) {
 }
 
 function renderAll() {
+  const botsGrid = document.getElementById('bots-grid');
+  if (botsGrid && typeof DISCORD_BOTS !== 'undefined') {
+    botsGrid.innerHTML = '';
+    DISCORD_BOTS.forEach(p => botsGrid.appendChild(renderProjectCard(p)));
+  }
+
   const projectsGrid = document.getElementById('projects-grid');
   if (projectsGrid && typeof PROJECTS !== 'undefined') {
     projectsGrid.innerHTML = '';

@@ -2,6 +2,53 @@
 //  Portfolio Data — edit this file to update projects/tools/designs
 // ============================================================
 
+// Discord bots — shown in their own section at the top, separate from work
+const DISCORD_BOTS = [
+  {
+    slug: "valdar",
+    title: "Valdar",
+    description: "Discord bot for Valorant. Shows your daily store, night market deals, and skins across every edition tier — right inside Discord.",
+    tags: ["Python", "Discord.py", "Valorant"],
+    link: "https://discord.com/oauth2/authorize?client_id=1512887503303217212",
+    icon: "simple-icons:valorant",
+    details: {
+      year: "2026",
+      status: "Active",
+      summary: "Valdar is a Discord bot for Valorant. It pulls your daily store and night market straight into Discord, tracks skins across edition tiers, and surfaces Valorant Points — so you can check your shop without launching the game.",
+      highlights: [
+        "Daily store and night market display in Discord",
+        "Skin tracking across edition tiers (Select, Deluxe, Premium, Exclusive, Ultra)",
+        "Valorant Points and bundle info at a glance",
+        "Built with discord.py and a cog-based command structure",
+      ],
+      tech: ["Python", "discord.py", "Valorant API"],
+    },
+  },
+  {
+    slug: "lami",
+    title: "Lami",
+    description: "AI assistant, now as a Discord bot — add it to your server and chat. Context-aware across conversations, pulls live data, and automates tasks on command.",
+    tags: ["Python", "Discord.py", "AI"],
+    link: "https://discord.com/oauth2/authorize?client_id=1412245203011633292",
+    image: "assets/lami-web.png",
+    imageAlt: "Lami",
+    fullscreen: true,
+    details: {
+      year: "2025",
+      status: "Active",
+      summary: "Lami is an AI assistant you can add to Discord as a bot. It keeps context across a conversation, pulls in live data, and automates tasks on command — right inside your server.",
+      highlights: [
+        "Runs as a Discord bot you can invite to any server",
+        "Context-aware across the whole conversation",
+        "Hooks into real-time data sources and runs analysis on the fly",
+        "Natural language task automation, just tell it what to do",
+        "Python backend with persistent session memory",
+      ],
+      tech: ["Python", "discord.py", "AI", "NLP", "Real-Time Data"],
+    },
+  },
+];
+
 const PROJECTS = [
   {
     slug: "qsm",
@@ -47,26 +94,6 @@ const PROJECTS = [
         "Available as a Chrome extension and an Electron desktop app",
       ],
       tech: ["JavaScript", "Electron", "React", "Vite", "Stockfish"],
-    },
-  },
-  {
-    slug: "valdar",
-    title: "Valdar",
-    description: "Discord bot for Valorant. Shows your daily store, night market deals, and skins across every edition tier — right inside Discord.",
-    tags: ["Python", "Discord.py", "Valorant"],
-    link: "https://discord.com/oauth2/authorize?client_id=1512887503303217212",
-    icon: "simple-icons:valorant",
-    details: {
-      year: "2026",
-      status: "Active",
-      summary: "Valdar is a Discord bot for Valorant. It pulls your daily store and night market straight into Discord, tracks skins across edition tiers, and surfaces Valorant Points — so you can check your shop without launching the game.",
-      highlights: [
-        "Daily store and night market display in Discord",
-        "Skin tracking across edition tiers (Select, Deluxe, Premium, Exclusive, Ultra)",
-        "Valorant Points and bundle info at a glance",
-        "Built with discord.py and a cog-based command structure",
-      ],
-      tech: ["Python", "discord.py", "Valorant API"],
     },
   },
   {
@@ -228,29 +255,6 @@ const PROJECTS = [
         "Auto-updates on every run by pulling the latest version from GitHub",
       ],
       tech: ["Lua", "Roblox API", "OpenRouter", "Groq", "Google AI Studio", "DuckDuckGo Search"],
-    },
-  },
-  {
-    slug: "lami",
-    title: "Lami",
-    description: "AI assistant, now as a Discord bot — add it to your server and chat. Context-aware across conversations, pulls live data, and automates tasks on command.",
-    tags: ["Python", "Discord.py", "AI"],
-    link: "https://discord.com/oauth2/authorize?client_id=1412245203011633292",
-    image: "assets/lami-web.png",
-    imageAlt: "Lami",
-    fullscreen: true,
-    details: {
-      year: "2025",
-      status: "Active",
-      summary: "Lami is an AI assistant you can add to Discord as a bot. It keeps context across a conversation, pulls in live data, and automates tasks on command — right inside your server.",
-      highlights: [
-        "Runs as a Discord bot you can invite to any server",
-        "Context-aware across the whole conversation",
-        "Hooks into real-time data sources and runs analysis on the fly",
-        "Natural language task automation, just tell it what to do",
-        "Python backend with persistent session memory",
-      ],
-      tech: ["Python", "discord.py", "AI", "NLP", "Real-Time Data"],
     },
   },
   {

@@ -123,6 +123,7 @@ async function swapContent(html, pathname) {
 // Render project detail page from PROJECTS or DESIGN_PROJECTS data
 function renderProjectDetail(slug) {
   const allProjects = [
+    ...(typeof DISCORD_BOTS !== 'undefined' ? DISCORD_BOTS : []),
     ...(typeof PROJECTS !== 'undefined' ? PROJECTS : []),
     ...(typeof DESIGN_PROJECTS !== 'undefined' ? DESIGN_PROJECTS : []),
   ];
